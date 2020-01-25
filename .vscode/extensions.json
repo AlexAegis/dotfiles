@@ -1,0 +1,14 @@
+{
+	"recommendations": [
+		"npxms.hide-gitignored",
+		"DavidAnson.vscode-markdownlint",
+		"eamodio.gitlens",
+		"EditorConfig.EditorConfig",
+		"esbenp.prettier-vscode",
+		"Gruntfuggly.todo-tree",
+		"jasonlhy.hungry-delete",
+		"mhutchie.git-graph",
+		"mads-hartmann.bash-ide-vscode",
+		"rogalmic.bash-debug"
+	]
+}
