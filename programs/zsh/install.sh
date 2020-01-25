@@ -1,2 +1,2 @@
 #!/bin/bash
-apt install zsh
+apt-get -y install zsh

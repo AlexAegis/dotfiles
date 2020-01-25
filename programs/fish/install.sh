@@ -1,2 +1,2 @@
 #!/bin/bash
-apt install fish
+apt-get -y install fish
