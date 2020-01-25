@@ -1,7 +1,9 @@
 #!/bin/bash
 
+source ./is_installed.sh
+
 # Only tries to installs if package is not present
-function try_install {
+function install {
 	if [[ $(dpkg -s $1 | grep Status ) == Status* ]] ;
 	then
 		echo "$1 is already installed"
@@ -14,5 +16,5 @@ function try_install {
 
 if [ "${BASH_SOURCE[0]}" -ef "$0" ]
 then
-    try_install $1
+    install "$@"
 fi

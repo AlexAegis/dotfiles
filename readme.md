@@ -15,3 +15,7 @@ Expectations:
 
   > try using symlinks everywhere, collect
   > the installed symlinks in an uninstall script)
+
+- Differentiate between being an owner and a guest. (Setup on remote)
+
+- Provide update script for git based packages
