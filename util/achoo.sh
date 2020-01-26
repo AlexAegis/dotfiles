@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Only tries to installs if package is not present
+# test
 function achoo {
 	echo "$@"
 }
