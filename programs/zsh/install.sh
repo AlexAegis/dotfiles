@@ -5,12 +5,13 @@ apt-get -y install zsh
 
 # Addons
 
-# Antigen
-# https://github.com/zsh-users/antigen
+# Antibody
+# https://getantibody.github.io/
 
-echo Installing Antigen
-curl -L git.io/antigen > ~/.antigen.zsh
-
+echo Installing Antibody
+mkdir ~/tools 2>&/dev/null
+mkdir ~/tools/zsh 2>&/dev/null
+curl -sfL git.io/antibody | sh -s - -b ~/tools/zsh
 
 # oh-my-zsh
 # https://ohmyz.sh/
@@ -21,4 +22,8 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 # stow rc files to home:
 
-stow -t ~ zsh-home
+stow -t ~ home-zsh
+
+# Postlink
+
+antibody bundle < ~/.zsh-plugins.antibody > ~/.zsh-plugins.antibody.sh

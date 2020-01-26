@@ -1,4 +1,5 @@
 #!/bin/bash
 
-rm ~/.antigen.zsh
-stow -D -t ~ zsh-home
+rm -rf ~/tools/zsh # remove antibody
+rm -rf ~/.oh-my-zsh # remove oh-my-zsh
+stow -D -t ~ home-zsh # unstow links

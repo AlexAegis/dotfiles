@@ -4,3 +4,4 @@ source ./scripts/try-install.sh
 
 try_install git
 try_install stow
+try_install curl

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source ./
 source ./install-required.sh
 
 # Pull and update submodules
