@@ -1,5 +1,6 @@
 {
 	"editor.formatOnSave": true,
+	"terminal.integrated.shell.linux": "zsh",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.markdownlint": true
 	}
