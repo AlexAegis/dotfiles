@@ -32,4 +32,8 @@ Expectations:
 
 - Provide update script for git based packages
 
+- Dependency resolve:
+  - check if dependency is fulfilled or not with unique script in the module
+  - if not install that,
+
 TODO Read: http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/autoconf.html#Portable-Shell
