@@ -1,0 +1,3 @@
+# sddm
+
+Display Manager
