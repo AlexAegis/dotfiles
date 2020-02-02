@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
-# Common environment
-. $HOME/.profile
+# Common environment TODO handled by .zlogin
+# . $HOME/.profile
 
 # ZSH Environment
 ZDOTDIR="~/.config/zsh"
