@@ -1,7 +1,16 @@
 #!/bin/bash
 # Every `*.env` file in the home
 set -a
-for i in $HOME/*.env $HOME/.env/*.env; do
-	. $i
+for f in $HOME/*.env;
+do
+  echo sourcing $i
+  . $f
 done
+
+for f in $HOME/.env/*.env;
+do
+  echo sourcing2 $f 
+  . $f
+done
+
 set +a

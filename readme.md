@@ -2,6 +2,15 @@
 
 My Dotfiles
 
+## Installation
+
+```bash
+git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
+. ~/.dotfiles/install.sh
+```
+
+TODO: Parameterize
+
 ## Goals
 
 Use an interactive config
@@ -36,4 +45,4 @@ Expectations:
   - check if dependency is fulfilled or not with unique script in the module
   - if not install that,
 
-TODO Read: http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/autoconf.html#Portable-Shell
+TODO Read: <http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/autoconf.html#Portable-Shell>

@@ -1,5 +1,8 @@
+#!/usr/bin/zsh
 # zsh startup file
 
-source ./.zshrc.default
-source ./.zsh-plugins.antibody.sh
-source ./.zshrc.p10k
+. ./.zshrc.default
+. ./.zsh-plugins.antibody.sh
+. ./.zshrc.p10k
+
+# TODO: history plugin https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/history.zsh

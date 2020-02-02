@@ -1,5 +1,5 @@
 #!/bin/bash
 # Aliases
 
-alias cl=clear
-alias l=ls -al
+alias cl="clear"
+alias l="ls -al"
