@@ -1,10 +1,5 @@
 #!/bin/bash
 # Dependencies: curl
-# Install package
-
-apt-get -y install zsh
-
-echo export ZDOTDIR="~/.config/zsh" > ~
 
 # Addons
 
@@ -12,17 +7,14 @@ echo export ZDOTDIR="~/.config/zsh" > ~
 # https://getantibody.github.io/
 
 echo Installing Antibody
-mkdir ~/tools 2>&/dev/null
-mkdir ~/tools/zsh 2>&/dev/null
+mkdir -p ~/./zsh
 curl -sfL git.io/antibody | sh -s - -b $ZDOTDIR/tools/zsh
-
-
 
 # oh-my-zsh
 # https://ohmyz.sh/
 
-echo Installing oh-my-zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+# echo Installing oh-my-zsh
+# sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 
 # stow rc files to home:
