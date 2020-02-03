@@ -1,0 +1,9 @@
+#!/bin/bash
+# Loads every `*.env` file in the home and in the .env folder
+set -a
+for f in $HOME/*.env $HOME/.env/*.env;
+do
+	[[ -d $dir && $(ls -A $dir) ]] || continue
+	. $f
+done
+set +a

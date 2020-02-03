@@ -2,10 +2,12 @@
 # Dependencies: curl
 
 # Presourcing the environment file for the installation
-mkdir -p $HOME/.env # Don't let stow manage shared folders
-stow -t ~ home-zsh
-. ./home-zsh/.config/zsh/.zsh.env
-cat ./home-zsh/.config/zsh/.zsh.env
+
+stow -t $HOME home-zsh
+set -a
+. ./home-zsh/.zshenv
+set +a
+
 # Addons
 
 # Antibody
@@ -27,3 +29,4 @@ curl -sfL git.io/antibody | sh -s - -b $ZDOTDIR/tools
 # Postlink
 
 antibody bundle < $ZDOTDIR/.zsh-plugins.antibody > $ZDOTDIR/.zsh-plugins.antibody.sh
+# antibody bundle < ./home-zsh/.config/zsh/.zsh-plugins.antibody > $ZDOTDIR/.zsh-plugins.antibody.sh
