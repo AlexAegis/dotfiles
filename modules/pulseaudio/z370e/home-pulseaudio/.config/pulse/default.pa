@@ -1,0 +1,10 @@
+# PulseAudio user specific config
+# For ASUS-Z370E
+
+# Load defaults
+.include /etc/pulse/default.pa
+
+# Enable Digital output
+set-card-profile alsa_card.pci-0000_00_1f.3 output:iec958-stereo+input:analog-stereo
+
+# TODO: Set defaults here

@@ -2,9 +2,21 @@
 
 My Dotfiles
 
+## Installation
+
+```bash
+git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
+. ~/.dotfiles/install.sh
+```
+
+TODO: Parameterize
+
 ## Goals
 
 Use an interactive config
+Be able to detect (by hostname) my pc (hardware based configs like audio)
+Be able to detect distro (and use the correct installers)
+And make a folder stucture to represent this
 
 1. TMUX
 2. SHELL
@@ -28,3 +40,9 @@ Expectations:
 - Differentiate between being an owner and a guest. (Setup on remote)
 
 - Provide update script for git based packages
+
+- Dependency resolve:
+  - check if dependency is fulfilled or not with unique script in the module
+  - if not install that,
+
+TODO Read: <http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/autoconf.html#Portable-Shell>
