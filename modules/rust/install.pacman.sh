@@ -1,3 +1,4 @@
 #!/bin/bash
 
-pacman -Syu rust
+pacman -Syu rustup
+rustup default stable

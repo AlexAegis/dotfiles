@@ -1,9 +1,17 @@
 #!/bin/bash
 # Loads every `*.env` file in the home and in the .env folder
+
+function source_in_folder() {
+	for f in $(find "$1" -maxdepth 1 -wholename $2);
+	do
+		echo Sourcing $f;
+		. $f
+	done
+}
+
+echo Loading Environment
+
 set -a
-for f in $HOME/*.env $HOME/.env/*.env;
-do
-	[[ -d $dir && $(ls -A $dir) ]] || continue
-	. $f
-done
+source_in_folder "$HOME/" ".env"
+source_in_folder "$HOME/.env/" "*.env"
 set +a
