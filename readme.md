@@ -27,6 +27,11 @@ And make a folder stucture to represent this
 
 Expectations:
 
+- VERSIONING
+
+By default only reinstall stuff if the version changed maybe with a .version file
+or let me use a --force that will run it anyway
+
 - Should be environment aware
 
   > Should work on different type of distros

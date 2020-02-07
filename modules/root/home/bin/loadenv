@@ -2,10 +2,14 @@
 # Loads every `*.env` file in the home and in the .env folder
 
 function source_in_folder() {
-	for f in $(find "$1" -maxdepth 1 -wholename $2);
+	local -r FOLDER="$1"
+	shift
+	for f in $(find "$FOLDER" -maxdepth 1 -wholename $1);
 	do
 		echo Sourcing $f;
+		set -a
 		. $f
+		set +a
 	done
 }
 

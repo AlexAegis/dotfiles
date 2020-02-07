@@ -19,9 +19,10 @@ echo Starting zsh
 # To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
 [[ ! -f ~/.config/zsh/.p10k.zsh ]] || source $ZDOTDIR/.p10k.zsh
 
-## Pluginconfig
+## Plugin configurations
 
 # zsh-users/zsh-autosuggestions
+# https://github.com/zsh-users/zsh-autosuggestions
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444"
 export ZSH_AUTOSUGGEST_STRATEGY=(completion history)
 export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
