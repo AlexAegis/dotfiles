@@ -13,6 +13,7 @@
 		"jasonlhy.hungry-delete",
 		"mhutchie.git-graph",
 		"mads-hartmann.bash-ide-vscode",
-		"rogalmic.bash-debug"
+		"rogalmic.bash-debug",
+		"visualstudioexptteam.vscodeintellicode"
 	]
 }
