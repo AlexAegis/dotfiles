@@ -27,3 +27,8 @@ export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444"
 export ZSH_AUTOSUGGEST_STRATEGY=(completion history)
 export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 export ZSH_AUTOSUGGEST_USE_ASYNC=1
+
+# direnv hook
+if command -v direnv > /dev/null 2>&1; then
+	eval "$(direnv hook zsh)"
+fi

@@ -1,1 +1,1 @@
-pacman -Syu cowsay
+sudo pacman -S cowsay

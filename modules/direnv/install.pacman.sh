@@ -1,0 +1,1 @@
+yes | yay -S direnv

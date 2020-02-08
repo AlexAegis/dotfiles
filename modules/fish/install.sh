@@ -1,9 +1,6 @@
-#!/bin/bash
-
-# Install Package
-apt-get -y install fish
-
+#!/bin/sh
 # Addons
+
 # oh-my-fish
 # https://github.com/oh-my-fish/oh-my-fish
 

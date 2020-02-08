@@ -1,0 +1,11 @@
+#!/bin/sh
+# source in folder
+FOLDER="$1"
+shift
+set -a
+for f in $(find "$FOLDER" -maxdepth 1 -wholename $1);
+do
+	echo Sourcing $f;
+	. $f
+done
+set +a
