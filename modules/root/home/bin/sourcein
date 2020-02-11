@@ -1,9 +1,7 @@
 #!/bin/sh
 # source in folder
-FOLDER="$1"
-shift
 set -a
-for f in $(find "$FOLDER" -maxdepth 1 -wholename $1);
+for f in $(find "$1" -maxdepth 1 -regex $2);
 do
 	echo Sourcing $f;
 	. $f

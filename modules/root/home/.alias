@@ -4,4 +4,3 @@
 alias cl="clear"
 alias l="ls -al"
 alias df="cd ~/.dotfiles"
-alias df="df && code ."

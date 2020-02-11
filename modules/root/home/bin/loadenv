@@ -1,8 +1,8 @@
 #!/bin/bash
 # Loads every `*.env` file in the home and in the .env folder
 
-echo Loading Environment
+echo Loading Environment $0 $1
 set -a
-sourcein "$HOME/" ".env"
-sourcein "$HOME/.env/" "*.env"
+. $HOME/bin/sourcein "$HOME/" ".*\.env"
+. $HOME/bin/sourcein "$HOME/.env/" ".*\.env"
 set +a

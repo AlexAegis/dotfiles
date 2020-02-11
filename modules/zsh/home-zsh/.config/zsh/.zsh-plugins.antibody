@@ -6,9 +6,17 @@ zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting
 zsh-users/zsh-history-substring-search
 robbyrussell/oh-my-zsh path:plugins/archlinux
-robbyrussell/oh-my-zsh path:plugins/vi-mode
 robbyrussell/oh-my-zsh path:plugins/bgnotify
 robbyrussell/oh-my-zsh path:plugins/cargo
 robbyrussell/oh-my-zsh path:plugins/chucknorris
+robbyrussell/oh-my-zsh path:plugins/command-not-found
+robbyrussell/oh-my-zsh path:plugins/docker
+robbyrussell/oh-my-zsh path:plugins/docker-compose
+robbyrussell/oh-my-zsh path:plugins/docker-machine
+robbyrussell/oh-my-zsh path:plugins/fzf
 robbyrussell/oh-my-zsh path:plugins/nvm
+robbyrussell/oh-my-zsh path:plugins/npx
+robbyrussell/oh-my-zsh path:plugins/npm
+robbyrussell/oh-my-zsh path:plugins/sudo
+robbyrussell/oh-my-zsh path:plugins/themes
 romkatv/powerlevel10k
