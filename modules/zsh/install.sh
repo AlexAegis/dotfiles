@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Dependencies: curl
 
 # Presourcing the environment file for the installation

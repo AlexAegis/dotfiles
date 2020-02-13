@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 function is_installed {
 	if [ -f /usr/bin/apt ]; then

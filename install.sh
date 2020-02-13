@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-source ./
-source ./install-required.sh
+. ./
+. ./install-required.sh
 
 # Pull and update submodules
 git submodule init

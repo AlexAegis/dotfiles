@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 . /usr/share/nvm/init-nvm.sh
 nvm install --lts # latest LTS
 nvm install node # latest

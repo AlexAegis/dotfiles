@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 pacman -Syu rustup
 rustup default stable

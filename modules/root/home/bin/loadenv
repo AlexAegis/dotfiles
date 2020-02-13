@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Loads every `*.env` file in the home and in the .env folder
 
 echo Loading Environment $0 $1

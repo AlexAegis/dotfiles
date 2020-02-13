@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 source ./is_installed.sh
 

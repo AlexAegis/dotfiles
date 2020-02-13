@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # VS Code (Microsoft)
 
