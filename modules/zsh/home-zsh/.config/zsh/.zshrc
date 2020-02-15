@@ -20,6 +20,10 @@ echo Starting zsh
 
 . $HOME/bin/sourcein "$HOME/.rc/" ".*.[sh|zsh]"
 
+## zsh config
+
+export KEYTIMEOUT=1 # esc has a default timeout of 0.4 sec which is annoying in vi mode
+
 # TODO: history plugin https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/history.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.

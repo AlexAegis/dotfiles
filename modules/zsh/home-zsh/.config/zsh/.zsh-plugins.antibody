@@ -18,4 +18,5 @@ robbyrussell/oh-my-zsh path:plugins/npx
 robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
 robbyrussell/oh-my-zsh path:plugins/themes
+softmoth/zsh-vim-mode
 romkatv/powerlevel10k

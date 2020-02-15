@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # NVIDIA Driver
-sudo pacman -Syu nvidia
+sudo pacman -Syu nvidia nvidia-settings

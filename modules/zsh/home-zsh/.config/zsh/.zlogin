@@ -2,4 +2,4 @@
 
 # User login to zsh
 
-emulate sh -c '. ~/.profile'
+# emulate sh -c '. ~/.profile'
