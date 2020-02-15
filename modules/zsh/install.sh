@@ -2,7 +2,8 @@
 # Dependencies: curl
 
 # Presourcing the environment file for the installation
-
+mkdir -p "$HOME/bin"
+mkdir -p "$HOME/.config"
 stow -t $HOME home-zsh
 set -a
 . ./home-zsh/.zshenv
@@ -13,7 +14,7 @@ set +a
 # Antibody https://getantibody.github.io/
 
 echo Installing Antibody
-mkdir -p $ZDOTDIR/tools
+mkdir -p "$ZDOTDIR/tools"
 curl -sfL git.io/antibody | sh -s - -b $ZDOTDIR/tools
 
 echo Installing plugins
