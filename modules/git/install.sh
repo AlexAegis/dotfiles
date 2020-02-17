@@ -1,3 +1,3 @@
 #!/bin/sh
 
-git config --global credential.helper '/usr/bin/ksshaskpass'
+git config --global core.askpass /usr/bin/ksshaskpass
