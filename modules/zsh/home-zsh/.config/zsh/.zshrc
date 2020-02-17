@@ -7,14 +7,15 @@
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block, everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+  . "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 echo Starting zsh
 
-[[ ! -f $HOME/.profile ]] || source $HOME/.profile
-[[ ! -f $ZDOTDIR/.zshrc.default ]] || source $ZDOTDIR/.zshrc.default
-[[ ! -f $ZDOTDIR/.zsh-plugins.antibody.sh ]] || source $ZDOTDIR/.zsh-plugins.antibody.sh
+[[ ! -f $HOME/.profile ]] || . $HOME/.profile
+[[ ! -f $ZDOTDIR/.zshrc.default ]] || . $ZDOTDIR/.zshrc.default
+[[ ! -f $ZDOTDIR/.zshrc.local ]] || . $ZDOTDIR/.zshrc.local
+[[ ! -f $ZDOTDIR/.zsh-plugins.antibody.sh ]] || . $ZDOTDIR/.zsh-plugins.antibody.sh
 
 # Load any optional `sh` and `zsh` rc files from the .rc folder
 
@@ -27,7 +28,7 @@ export KEYTIMEOUT=1 # esc has a default timeout of 0.4 sec which is annoying in 
 # TODO: history plugin https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/history.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
-[[ ! -f $ZDOTDIR/.p10k.zsh ]] || source $ZDOTDIR/.p10k.zsh
+[[ ! -f $ZDOTDIR/.p10k.zsh ]] || . $ZDOTDIR/.p10k.zsh
 
 ## Plugin configurations
 

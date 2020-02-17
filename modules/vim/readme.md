@@ -14,3 +14,6 @@ TODO:
 ```vim
 set timeoutlen=1000 ttimeoutlen=0
 ```
+
+TODO: VIM IntelliSense / LSP
+<https://github.com/neoclide/coc.nvim>
