@@ -13,8 +13,8 @@ Notes about the guide:
 - Format the efi partition with FAT32, don't format the swap and the rest with ext4
 - also pacstrap `grub`, `networkmanager`, `vim`, `man-db`, `man-pages`, `zsh` and `intel-ucode` on intel systems or `amd-ucode` for amd systems.
 
-  ```
-  pacstrap /mnt base linux linux-framework grub networkmanager vim zsh man-db man-pages
+  ```sh
+  pacstrap /mnt base linux linux-framework grub networkmanager vim zsh man-db man-pages coreutils
   ```
 
 ## Preparation
