@@ -1,3 +1,5 @@
 #!/bin/sh
 
-stow -Rt / root-x
+#TODO: Should you create symlinks as this?
+
+sudo stow -Rt / root-x
