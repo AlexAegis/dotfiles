@@ -1,4 +1,4 @@
-# imwheel
+# [imwheel](https://wiki.archlinux.org/index.php/IMWheel)
 
 Mousewheel config
 
