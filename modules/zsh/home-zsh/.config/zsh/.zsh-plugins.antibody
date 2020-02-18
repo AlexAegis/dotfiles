@@ -1,3 +1,5 @@
+romkatv/zsh-defer
+romkatv/powerlevel10k
 robbyrussell/oh-my-zsh
 djui/alias-tips
 caarlos0/zsh-mkc
@@ -19,4 +21,3 @@ robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
 robbyrussell/oh-my-zsh path:plugins/themes
 softmoth/zsh-vim-mode
-romkatv/powerlevel10k

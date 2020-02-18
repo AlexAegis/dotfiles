@@ -5,6 +5,7 @@
 mkdir -p "$HOME/bin"
 mkdir -p "$HOME/.config"
 stow -t $HOME home-zsh
+# TODO: refactor this so zshenv is accessible as $HOME/.zshenv
 set -a
 . ./home-zsh/.zshenv
 set +a
@@ -22,3 +23,8 @@ antibody bundle < $ZDOTDIR/.zsh-plugins.antibody > $ZDOTDIR/.zsh-plugins.antibod
 
 echo Updating plugins
 antibody update
+
+echo Fixing permissions
+chmod 700 $HOME/.cache/antibody/*
+
+TODO: Apply zsh-defer source to applicable plugins

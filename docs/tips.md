@@ -7,3 +7,9 @@ command -v <program>
 ```
 
 Don't use `which`, it's relatively expensive
+
+## Check for insecure folders
+
+```sh
+compaudit | xargs chmod g-w,o-w
+```
