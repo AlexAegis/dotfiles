@@ -37,7 +37,10 @@ Expectations:
 
 - VERSIONING
 
-tar -c MODULENAME | sha1sum
+```sh
+tar --exclude='zsh/.tarhash' -c zsh | sha1sum > zsh/.tarhash
+```
+
 and save it in the repos module folder (so it doesn't conflict. It's gitignored anyways)
 dont forget to ignore the tarhashfile itself from the hashing
 
