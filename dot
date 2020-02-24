@@ -1,0 +1,115 @@
+#!/bin/sh
+# dot install
+# sets config 1 preset 0, opens up whiptail list without selections
+
+# dot install a b
+# installs module a b
+
+# dot -c install a b
+# opens up whiptail with a and b preselected
+
+# dot preset p
+# installs preset p
+
+# dot -c preset p
+# opens up whiptail with all the modules of p selected
+
+# dot preset
+# opens up a whiptail list of all the presets, selecting one installs it
+
+# dot -c preset
+# opens up a whiptail list of all the presets, selecting one opens it like dot -c preset p
+
+# dot -mp PATH
+# sets the m and p configs both to PATH which is the folders where the modules and presets live
+# may be ; separated
+
+# dot
+# dot help
+# dot -h
+# dot --help
+# opens up help
+
+# Pull and update submodules
+git submodule init
+git submodule update
+
+# if [ "${BASH_SOURCE[0]}" -ef "$0" ]
+# then
+#
+# 	choices=$(whiptail\
+# 		--title "Select"\
+# 		--checklist "Space changes selection, enter approves" 0 0 0\
+# 		zsh zsh ON\
+# 		fish fish OFF\
+# 		3>&1 1>&2 2>&3 3>&-)
+#
+# 	for choice in $choices
+# 	do
+# 		choice=$(echo $choice | xargs) # removing quotemarks
+# 		echo "Installing $choice"
+# 		source "./programs/$choice/install.sh"
+# 	done
+# fi
+
+function show_help() {
+	echo "install <modules>"
+}
+
+# Reset all variables that might be set
+modules_selected=
+config=0
+preset=
+verbose=0 # Variables to be evaluated as shell arithmetic should be initialized to a default or validated beforehand.
+
+while :; do
+	case $1 in
+	-h | -\? | --help) # Call a "show_help" function to display a synopsis, then exit.
+		show_help
+		exit
+		;;
+	-c | --config) # Makes it so a whiptail config will appear to customize installable modules
+		config=1
+		shift
+		;;
+	-p | preset) # Takes an option argument, ensuring it has been specified.
+		if [ -n "$2" ]; then
+			shift
+			modules_selected=$*
+		else
+			modules_selected=$(whiptail --title "Select" \
+				--checklist "Space changes selection, enter approves" 0 0 0 zsh zsh ON fish fish OFF 3>&1 1>&2 2>&3 3>&-)
+		fi
+		;;
+	i | install) # Takes an option argument, ensuring it has been specified.
+		if [ -n "$2" ]; then
+			shift
+			modules_selected=$*
+		else
+			modules_selected=$(whiptail --title "Select" \
+				--checklist "Space changes selection, enter approves" 0 0 0 zsh zsh ON fish fish OFF 3>&1 1>&2 2>&3 3>&-)
+		fi
+		;;
+	--) # End of all options.
+		shift
+		break
+		;;
+	-?*)
+		printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+		;;
+	*) # Default case: If no more options then break out of the loop.
+		break ;;
+	esac
+
+	shift
+done
+
+if [ -n "$modules_selected" ]; then
+	echo "$modules_selected"
+else
+	echo 'Nothing to install'
+fi
+
+function install() {
+	echo install 1 $1
+}

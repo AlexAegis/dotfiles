@@ -3,3 +3,5 @@
 # Adds execute rights to every .sh file under this
 # chmod +x !!
 find ./ -type f -iname "*.sh" -exec chmod +x {} \;
+
+# TODO: Expand to .fish and .ysh

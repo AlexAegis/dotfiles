@@ -1,4 +1,4 @@
-#!/usr/bin/zsh
+#!/bin/zsh
 # zsh startup file
 # start profiling
 zmodload zsh/zprof
@@ -19,7 +19,7 @@ echo Starting zsh
 
 # Load any optional `sh` and `zsh` rc files from the .rc folder
 
-. $HOME/bin/sourcein "$HOME/.rc/" ".*.[sh|zsh]"
+. $HOME/bin/sourcein "$HOME/.rc/" ".*\.\(sh\|zsh\)"
 
 ## zsh config
 
