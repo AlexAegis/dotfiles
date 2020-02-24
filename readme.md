@@ -2,6 +2,14 @@
 
 My Dotfiles
 
+## Prerequisites
+
+sh
+git
+stow
+tar
+sha1sum
+
 ## Installation
 
 ```bash
@@ -29,14 +37,9 @@ Expectations:
 
 - VERSIONING
 
-By default only reinstall stuff if the version changed maybe with a .version file
-in the module folder.
-or let me use a --force that will run it anyway
-
-For dependency resolvement use a .dependencies file
-
-Or for versioning make a hash out of the content of the module folder and compare that
-maybe stow can help list the files
+tar -c MODULENAME | sha1sum
+and save it in the repos module folder (so it doesn't conflict. It's gitignored anyways)
+dont forget to ignore the tarhashfile itself from the hashing
 
 - Should be environment aware
 

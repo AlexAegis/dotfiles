@@ -30,6 +30,12 @@
 # dot --help
 # opens up help
 
+# dot -f --force
+# by default dot compares a tarhash of the last installed module, and only reinstalls if it changed
+# if forced however it could skip this test.
+# It always updates the hash regardless of forcing or not
+# dont forget to ignore the hashfile itself from the hashing
+
 # Pull and update submodules
 git submodule init
 git submodule update
@@ -81,7 +87,7 @@ while :; do
 				--checklist "Space changes selection, enter approves" 0 0 0 zsh zsh ON fish fish OFF 3>&1 1>&2 2>&3 3>&-)
 		fi
 		;;
-	i | install) # Takes an option argument, ensuring it has been specified.
+	i | install) # Installs modules specified after it
 		if [ -n "$2" ]; then
 			shift
 			modules_selected=$*
