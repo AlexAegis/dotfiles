@@ -62,11 +62,22 @@ function show_help() {
 	echo "install <modules>"
 }
 
+function is_installed() {
+	echo $(command -v $1 2>/dev/null)
+}
+
 # Reset all variables that might be set
 modules_selected=
 config=0
 preset=
+modules_folder=$HOME/.dotfiles/modules
 verbose=0 # Variables to be evaluated as shell arithmetic should be initialized to a default or validated beforehand.
+
+# Package manager availablity
+has_pacman=$(is_installed pacman)
+has_apt=$(is_installed apt)
+echo has_pacman $has_pacman
+echo has_apt $has_apt
 
 while :; do
 	case $1 in
@@ -117,5 +128,21 @@ else
 fi
 
 function install() {
-	echo install 1 $1
+	if [ $has_apt ]; then
+		echo "apt is installed"
+		$("$modules_folder/$1/install.apt.sh")
+	fi
+
+	if [ $has_pacman ]; then
+		echo "pacman is installed"
+		$("$modules_folder/$1/install.pacman.sh")
+	fi
+
+	$("$modules_folder/$1/install.sh")
 }
+
+for module in $modules_selected; do
+	cd "${0%/*}"
+	echo Installing $module
+	install $module
+done
