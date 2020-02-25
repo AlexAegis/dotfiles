@@ -1,2 +1,2 @@
 #!/bin/sh
-sudo pacman -S fish
+sudo pacman -S --needed --noconfirm fish

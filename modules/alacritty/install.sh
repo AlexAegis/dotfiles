@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu alacritty
+pacman -Syu --needed --noconfirm alacritty

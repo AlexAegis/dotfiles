@@ -1,1 +1,1 @@
-sudo pacman -S fortune-mod
+sudo pacman -S --needed --noconfirm fortune-mod

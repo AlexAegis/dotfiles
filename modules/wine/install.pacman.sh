@@ -1,5 +1,5 @@
 #!/bin/sh
 
-sudo pacman -S wine
-sudo pacman -S winetricks
+sudo pacman -S --needed --noconfirm wine
+sudo pacman -S --needed --noconfirm winetricks
 winetricks tahoma corefonts ie8

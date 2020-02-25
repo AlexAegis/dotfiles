@@ -8,6 +8,14 @@ command -v <program>
 
 Don't use `which`, it's relatively expensive
 
+## Check what package a command belongs to
+
+With pacman:
+
+```sh
+pacman -Qo <program>
+```
+
 ## Check for insecure folders
 
 ```sh

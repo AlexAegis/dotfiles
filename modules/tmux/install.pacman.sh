@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -S tmux
+pacman -S --needed --noconfirm tmux

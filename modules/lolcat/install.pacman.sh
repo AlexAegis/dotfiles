@@ -1,1 +1,1 @@
-sudo pacman -S lolcat
+sudo pacman -S --needed --noconfirm lolcat

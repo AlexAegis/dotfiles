@@ -2,19 +2,17 @@
 
 My Dotfiles
 
+Installing packages require root priviliges. Installing configs however don't. If you give `dot` root priviliges it will install all packages, but when not, it will only return a list of what it nee
+
 ## Prerequisites
 
-sh
-git
-stow
-tar
-sha1sum
+The `base` module.
 
 ## Installation
 
 ```bash
 git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
-. ~/.dotfiles/install.sh
+~/.dotfiles/dot install
 ```
 
 TODO: Parameterize

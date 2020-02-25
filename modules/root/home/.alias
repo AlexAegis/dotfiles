@@ -3,4 +3,5 @@
 
 alias cl="clear"
 alias l="ls -al"
-alias dot="cd ~/.dotfiles"
+alias cdot="cd ~/.dotfiles"
+alias dot="$HOME/.dotfiles/dot"

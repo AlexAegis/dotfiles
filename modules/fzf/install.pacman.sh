@@ -1,2 +1,2 @@
 #!/bin/sh
-sudo pacman -S fzf
+sudo pacman -S --needed --noconfirm fzf

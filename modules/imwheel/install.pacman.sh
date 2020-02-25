@@ -1,6 +1,6 @@
 #!/bin/sh
 
-pacman -Syu imwheel
+pacman -Syu --needed --noconfirm imwheel
 
 mkdir -p "$HOME/.config"
 stow -t ~ home-imwheel

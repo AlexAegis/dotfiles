@@ -1,0 +1,7 @@
+# TODO: Idea: tag based installation
+# Each line here defines a tag
+# When installing modules by tag, dot will search for the presence
+# of the tags for each module
+base
+gui
+tui

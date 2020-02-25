@@ -1,4 +1,4 @@
 #!/bin/sh
 
-pacman -Syu rustup
+pacman -Syu --needed --noconfirm rustup
 rustup default stable

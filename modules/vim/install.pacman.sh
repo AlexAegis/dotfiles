@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo pacman -Syu vim
+sudo pacman -Syu --needed --noconfirm vim

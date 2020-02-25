@@ -1,0 +1,4 @@
+#!/bin/sh
+# Reads the NAME of the OS.
+
+cat /etc/os-release | grep "^NAME" | grep -oh "=.*" | tr -d '="'

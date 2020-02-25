@@ -1,1 +1,1 @@
-pacman -Syu stow
+pacman -Syu --needed --noconfirm stow

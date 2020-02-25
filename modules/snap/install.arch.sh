@@ -1,7 +1,7 @@
 #!/bin/sh
 # Dependencies: yay
 
-yay -Sya snapd
+${SUDO_USER:+sudo -u $SUDO_USER} yay -Sya snapd
 sudo systemctl enable snapd
 sudo systemctl start snapd
 

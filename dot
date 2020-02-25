@@ -58,11 +58,11 @@ git submodule update
 # 	done
 # fi
 
-function show_help() {
+show_help() {
 	echo "install <modules>"
 }
 
-function is_installed() {
+is_installed() {
 	echo $(command -v $1 2>/dev/null)
 }
 
@@ -127,20 +127,21 @@ else
 	echo 'Nothing to install'
 fi
 
-function install() {
-	if [ $has_apt ]; then
-		echo "apt is installed"
+install() {
+	if [ $has_apt ] && [ -f $modules_folder/$1/install.apt.sh ]; then
 		$("$modules_folder/$1/install.apt.sh")
 	fi
 
-	if [ $has_pacman ]; then
-		echo "pacman is installed"
+	if [ $has_pacman ] && [ -f $modules_folder/$1/install.pacman.sh ]; then
 		$("$modules_folder/$1/install.pacman.sh")
 	fi
 
-	$("$modules_folder/$1/install.sh")
+	if [ -f "$modules_folder/$1/install.sh" ]; then
+		$("$modules_folder/$1/install.sh")
+	fi
 }
 
+# Actual installation process
 for module in $modules_selected; do
 	cd "${0%/*}"
 	echo Installing $module

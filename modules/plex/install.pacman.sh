@@ -1,4 +1,4 @@
-yay -Syu plex-media-server
+${SUDO_USER:+sudo -u $SUDO_USER} yay -Syu plex-media-server
 
 systemctl enable plexmediaserver.service
 systemctl start plexmediaserver.service

@@ -1,5 +1,4 @@
 #!/bin/sh
-# Dependencies: curl
 
 SCRIPT_PATH=${0%/*}
 

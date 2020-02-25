@@ -1,3 +1,4 @@
 #!/bin/sh
 # Install package using pacman
-pacman -Syu zsh
+
+pacman -Syu --needed --noconfirm zsh

@@ -1,1 +1,1 @@
-sudo pacman -S cowsay
+sudo pacman -S --needed --noconfirm cowsay
