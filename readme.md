@@ -6,13 +6,22 @@ Installing packages require root priviliges. Installing configs however don't. I
 
 ## Prerequisites
 
-The `base` module.
+The `base` module. See [Installation](#Installation).
+This makes sure that `git` and `stow`, and some other packages are installed.
 
 ## Installation
 
-```bash
+```sh
 git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
-~/.dotfiles/dot install
+sudo -E ~/.dotfiles/dot install base
+```
+
+This will install [necessary packages](./modules/base/install.pacman.sh) and symlinks `dot` to `/usr/local/bin/dot`
+
+## Usage
+
+```sh
+dot install module
 ```
 
 TODO: Parameterize

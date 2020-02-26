@@ -136,6 +136,10 @@ install() {
 		$("$modules_folder/$1/install.pacman.sh")
 	fi
 
+	if [ -f "$modules_folder/$1/install.sudo.sh" ]; then
+		$("$modules_folder/$1/install.sudo.sh")
+	fi
+
 	if [ -f "$modules_folder/$1/install.sh" ]; then
 		$("$modules_folder/$1/install.sh")
 	fi
