@@ -13,7 +13,14 @@ This makes sure that `git` and `stow`, and some other packages are installed.
 
 ```sh
 git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
-sudo -E ~/.dotfiles/dot install base
+```
+
+> Read what dotlink does before you execute it with sudo
+
+Then to make `dot` available everywhere create a symlink of it with `dotlink`
+
+```sh
+sudo ~/.dotfiles/dotlink
 ```
 
 This will install [necessary packages](./modules/base/install.pacman.sh) and symlinks `dot` to `/usr/local/bin/dot`
