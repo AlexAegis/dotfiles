@@ -24,3 +24,9 @@ Quick way do disable any autoformatting during typing
 because many terminals just simulate paste by typing in
 the content of the clipboard (like in WSL)
 (maybe a quick tip when vim notices you typing incredibly fast)
+
+TODO: Set up plugins
+TODO: Try hard mode <https://github.com/wikitopian/hardmode>
+
+TODO: Remap caps lock to esc
+TODO: Remap semicolon to colon in normal mode
