@@ -6,6 +6,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'camspiers/animate.vim'
 Plug 'camspiers/lens.vim'
+Plug 'terryma/vim-multiple-cursors'
 call plug#end()
 
 " PlugInstall
