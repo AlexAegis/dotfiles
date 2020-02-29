@@ -1,4 +1,28 @@
 #!/bin/sh
+
+#      _       _
+#   __| | ___ | |_
+#  / _` |/ _ \| __|
+# | (_| | (_) | |_
+#  \__,_|\___/ \__|
+#
+# A simple dotmodule manager
+#
+# Dots main purpose is to invoke scripts defined in dotmodules
+# It is designed this way so each dotmodule is a self contained entity
+# which you can use without dot itself
+# Dots other functionality is dependency resolvement. Dotmodules can
+# depend on other dotmodules and it's dots job to install those beforehand
+# Dot is also capable of skipping installations if nothing is changed since the last one
+# This is done by hashing the tar of the module.
+#
+# Each dotmodule is unique and the only common part of each of them is
+# that you have to stow a folder to your home directory.
+# But besides that you might have to install packages too.
+# And packages are too can be installed differently on different systems
+#
+#
+
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 
@@ -62,15 +86,13 @@ show_help() {
 	echo "install <modules>"
 }
 
-is_installed() {
-	echo $(command -v $1 2>/dev/null)
-}
-
 # Reset all variables that might be set
 modules_selected=
 config=0
 preset=
+force=0
 modules_folder=$HOME/.dotfiles/modules
+hashfilename=".tarhash"
 verbose=0 # Variables to be evaluated as shell arithmetic should be initialized to a default or validated beforehand.
 
 # Package manager availablity
@@ -128,21 +150,35 @@ else
 fi
 
 install() {
-	if [ $has_apt ] && [ -f $modules_folder/$1/install.apt.sh ]; then
-		$("$modules_folder/$1/install.apt.sh")
+	# Only calculate the hashes if we going to use it
+	if [ "$force" = 0 ]; then
+		old_hash=$(cat "$modules_folder/$1/$hashfilename" >/dev/null 2>&1 &)
+		new_hash=$(tar --absolute-names --exclude="$modules_folder/$1/$hashfilename" -c "$modules_folder/$1" | sha1sum)
 	fi
 
-	if [ $has_pacman ] && [ -f $modules_folder/$1/install.pacman.sh ]; then
-		$("$modules_folder/$1/install.pacman.sh")
+	if
+		[ "$force" = 1 ] || [ "$old_hash" != "$new_hash" ]
+	then
+		echo Installing
+		if [ $has_apt ] && [ -f "$modules_folder/$1/install.apt.sh" ]; then
+			$("$modules_folder/$1/install.apt.sh")
+		fi
+		if [ $has_pacman ] && [ -f "$modules_folder/$1/install.pacman.sh" ]; then
+			$("$modules_folder/$1/install.pacman.sh")
+		fi
+		if [ -f "$modules_folder/$1/install.sudo.sh" ]; then
+			$("$modules_folder/$1/install.sudo.sh")
+		fi
+		if [ -f "$modules_folder/$1/install.sh" ]; then
+			$("$modules_folder/$1/install.sh")
+		fi
+
+		# Calculate fresh hash (always)
+		tar --absolute-names --exclude="$modules_folder/$1/$hashfilename" -c "$modules_folder/$1" | sha1sum >"$modules_folder/$1/$hashfilename"
+	else
+		echo "$1 already installed, no changes detected"
 	fi
 
-	if [ -f "$modules_folder/$1/install.sudo.sh" ]; then
-		$("$modules_folder/$1/install.sudo.sh")
-	fi
-
-	if [ -f "$modules_folder/$1/install.sh" ]; then
-		$("$modules_folder/$1/install.sh")
-	fi
 }
 
 # Actual installation process
