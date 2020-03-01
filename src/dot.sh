@@ -81,6 +81,7 @@ force=0
 modules_folder=$HOME/.dotfiles/modules
 hashfilename=".tarhash"
 dependenciesfilename=".dependencies"
+tagsfilename=".tags"
 verbose=0 # Variables to be evaluated as shell arithmetic should be initialized to a default or validated beforehand.
 dry=0     # When set, no installation will be done
 
@@ -106,6 +107,9 @@ while :; do
 		;;
 	-d | --dry) #  customize installable modules
 		dry=1
+		;;
+	-f | --force) # force installation
+		force=1
 		;;
 	-p | preset) # Takes an option argument, ensuring it has been specified.
 		if [ -n "$2" ]; then
@@ -146,12 +150,23 @@ if [ -z "$modules_selected" ]; then
 	exit
 fi
 
+# Returns every dotmodule that contains a specific tag
+# shellcheck disable=SC2016
+has_tag() {
+	grep -lRm 1 "$1" "$modules_folder"/*/"$tagsfilename" |
+		sed -r 's_^.*/([^/]*)/[^/]*$_\1_g'
+}
+
 get_dependencies() {
 	if [ -f "$modules_folder/$1/$dependenciesfilename" ]; then
-		deps=$(sed -e 's/[#:].*$//' -e '/^$/d' \
+		deps_and_tags=$(sed -e 's/#.*$//' -e '/^$/d' \
 			"$modules_folder/$1/$dependenciesfilename")
-		tags=$(echo "$deps" | sed -n '/:/p') # TODO: Resolve tags
+		deps=$(echo "$deps_and_tags" | sed -e 's/:.*$//')
 		echo "$deps"
+		tags=$(echo "$deps_and_tags" | sed -n '/:/p' | sed -e 's/://')
+		for tag in $tags; do
+			has_tag "$tag"
+		done
 	fi
 }
 
