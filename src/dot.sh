@@ -144,60 +144,90 @@ done
 echo $modules_selected
 if [ ! -n "$modules_selected" ]; then
 	echo 'Nothing to install'
+	exit
 fi
 
-install() {
-	# Only calculate the hashes if we going to use it
-	if [ "$force" = 0 ]; then
-		echo not forced
-		old_hash=$(cat "$modules_folder/$1/$hashfilename" 2>/dev/null)
-		new_hash=$(tar --absolute-names \
-			--exclude="$modules_folder/$1/$hashfilename" \
-			-c "$modules_folder/$1" | sha1sum)
-		[ $verbose = 1 ] && echo "$old_hash\n$new_hash"
+get_dependencies() {
+	if [ -f "$modules_folder/$1/$dependenciesfilename" ]; then
+		deps=$(sed -e 's/[#:].*$//' -e '/^$/d' \
+			$modules_folder/$1/$dependenciesfilename)
+		tags=$(echo "$deps" | sed -n '/:/p') # TODO: Resolve tags
+		echo "$deps"
+	fi
+}
+
+already_installed=""
+
+install_dependencies() {
+	# $1 module
+	# $2 dependencies
+	for dep in $2; do
+		local d=$dep
+		if [ -z "$(echo "$already_installed" | grep -w "$d")" ]; then
+			install_dependencies "$d" "$(get_dependencies "$d")"
+			install_module "$d"
+			already_installed="$already_installed $d"
+		fi
+	done
+}
+
+install_module() {
+
+	module=$1
+	shift
+
+	if [ ! -d "$modules_folder/$module/" ]; then
+		echo "Module $module not found. Skipping"
+		return 1
 	fi
 
-	if [ "$old_hash" != "$new_hash" ]; then
-		echo asdasde
+	# cd to dotmodule just in case a dotmodule
+	# is not suited for installation outside of it
+	cd "${0%/*}"
+	echo "Installing $module"
+
+	# Only calculate the hashes if we going to use it
+	if [ "$force" = 0 ]; then
+		old_hash=$(cat "$modules_folder/$module/$hashfilename" 2>/dev/null)
+		new_hash=$(tar --absolute-names \
+			--exclude="$modules_folder/$module/$hashfilename" \
+			-c "$modules_folder/$module" | sha1sum)
+		[ $verbose = 1 ] && echo "$old_hash\n$new_hash"
 	fi
 
 	if
 		[ "$force" = 1 ] || [ "$old_hash" != "$new_hash" ]
 	then
-		echo "Executing dotmodule"
-		if [ $has_apt ] && [ -f "$modules_folder/$1/install.apt.sh" ]; then
-			[ $dry != 1 ] && $("$modules_folder/$1/install.apt.sh")
+
+		if [ $has_apt ] &&
+			[ -f "$modules_folder/$module/install.apt.sh" ]; then
+			[ $dry != 1 ] && $("$modules_folder/$module/install.apt.sh")
 		fi
-		if [ $has_pacman ] && [ -f "$modules_folder/$1/install.pacman.sh" ]; then
-			[ $dry != 1 ] && $("$modules_folder/$1/install.pacman.sh")
+		if [ $has_pacman ] &&
+			[ -f "$modules_folder/$module/install.pacman.sh" ]; then
+			[ $dry != 1 ] && $("$modules_folder/$module/install.pacman.sh")
 		fi
-		if [ -f "$modules_folder/$1/install.sudo.sh" ]; then
-			[ $dry != 1 ] && $("$modules_folder/$1/install.sudo.sh")
+		if [ -f "$modules_folder/$module/install.sudo.sh" ]; then
+			[ $dry != 1 ] && $("$modules_folder/$module/install.sudo.sh")
 		fi
-		if [ -f "$modules_folder/$1/install.sh" ]; then
-			[ $dry != 1 ] && $("$modules_folder/$1/install.sh")
+		if [ -f "$modules_folder/$module/install.sh" ]; then
+			[ $dry != 1 ] && $("$modules_folder/$module/install.sh")
 		fi
 
 		# Calculate fresh hash (always)
-		[ $dry != 1 ] && tar --absolute-names --exclude="$modules_folder/$1/$hashfilename" -c "$modules_folder/$1" | sha1sum >"$modules_folder/$1/$hashfilename"
+		[ $dry != 1 ] && $(
+			tar --absolute-names \
+				--exclude="$modules_folder/$module/$hashfilename" \
+				-c "$modules_folder/$module" |
+				sha1sum >"$modules_folder/$module/$hashfilename"
+		)
+
 	else
-		echo "$1 already installed, no changes detected"
+		echo "$1 is already installed and no changes detected"
 	fi
 
 }
 
 # Actual installation process
-for module in $modules_selected; do
-	if [ -d "$modules_folder/$module/" ]; then
-		# cd to dotmodule just in case a dotmodule
-		# is not suited for installation outside of it
-		cd "${0%/*}"
-		echo Installing $module
-		if [ -f "$modules_folder/$module/$dependenciesfilename" ]; then
-			echo "Found dependencies..."
-		fi
-		install $module
-	else
-		echo "Module $module not found. Skipping"
-	fi
-done
+# This will install a non-existent module that depends on the selected modules
+install_dependencies "" "$modules_selected"
