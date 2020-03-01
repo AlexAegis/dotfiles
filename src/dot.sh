@@ -150,10 +150,12 @@ if [ -z "$modules_selected" ]; then
 	exit
 fi
 
-# Returns every dotmodule that contains a specific tag
-# shellcheck disable=SC2016
 has_tag() {
-	grep -lRm 1 "$1" "$modules_folder"/*/"$tagsfilename" |
+	# Returns every dotmodule that contains a specific tag
+	IFS='
+	'
+	# shellcheck disable=SC2016
+	grep -lRm 1 -- "$@" "$modules_folder"/*/"$tagsfilename" |
 		sed -r 's_^.*/([^/]*)/[^/]*$_\1_g'
 }
 
@@ -164,9 +166,8 @@ get_dependencies() {
 		deps=$(echo "$deps_and_tags" | sed -e 's/:.*$//')
 		echo "$deps"
 		tags=$(echo "$deps_and_tags" | sed -n '/:/p' | sed -e 's/://')
-		for tag in $tags; do
-			has_tag "$tag"
-		done
+		# shellcheck disable=SC2086
+		has_tag $tags
 	fi
 }
 
