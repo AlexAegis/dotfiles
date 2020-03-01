@@ -70,13 +70,13 @@ show_help() {
 }
 
 is_installed() {
-	echo $(command -v $1 2>/dev/null)
+	command -v "$1" 2>/dev/null
 }
 
 # Reset all variables that might be set
 modules_selected=
 config=0
-preset=
+# preset=
 force=0
 modules_folder=$HOME/.dotfiles/modules
 hashfilename=".tarhash"
@@ -141,8 +141,7 @@ while :; do
 	shift
 done
 
-echo $modules_selected
-if [ ! -n "$modules_selected" ]; then
+if [ -z "$modules_selected" ]; then
 	echo 'Nothing to install'
 	exit
 fi
@@ -150,7 +149,7 @@ fi
 get_dependencies() {
 	if [ -f "$modules_folder/$1/$dependenciesfilename" ]; then
 		deps=$(sed -e 's/[#:].*$//' -e '/^$/d' \
-			$modules_folder/$1/$dependenciesfilename)
+			"$modules_folder/$1/$dependenciesfilename")
 		tags=$(echo "$deps" | sed -n '/:/p') # TODO: Resolve tags
 		echo "$deps"
 	fi
@@ -183,7 +182,7 @@ install_module() {
 
 	# cd to dotmodule just in case a dotmodule
 	# is not suited for installation outside of it
-	cd "${0%/*}"
+	cd "${0%/*}" || return
 	echo "Installing $module"
 
 	# Only calculate the hashes if we going to use it
@@ -192,18 +191,18 @@ install_module() {
 		new_hash=$(tar --absolute-names \
 			--exclude="$modules_folder/$module/$hashfilename" \
 			-c "$modules_folder/$module" | sha1sum)
-		[ $verbose = 1 ] && echo "$old_hash\n$new_hash"
+		[ $verbose = 1 ] && printf "%s\n%s" "$old_hash" "$new_hash"
 	fi
 
 	if
 		[ "$force" = 1 ] || [ "$old_hash" != "$new_hash" ]
 	then
 
-		if [ $has_apt ] &&
+		if [ "$has_apt" ] &&
 			[ -f "$modules_folder/$module/install.apt.sh" ]; then
 			[ $dry != 1 ] && $("$modules_folder/$module/install.apt.sh")
 		fi
-		if [ $has_pacman ] &&
+		if [ "$has_pacman" ] &&
 			[ -f "$modules_folder/$module/install.pacman.sh" ]; then
 			[ $dry != 1 ] && $("$modules_folder/$module/install.pacman.sh")
 		fi
@@ -215,13 +214,11 @@ install_module() {
 		fi
 
 		# Calculate fresh hash (always)
-		[ $dry != 1 ] && $(
+		[ $dry != 1 ] &&
 			tar --absolute-names \
 				--exclude="$modules_folder/$module/$hashfilename" \
 				-c "$modules_folder/$module" |
-				sha1sum >"$modules_folder/$module/$hashfilename"
-		)
-
+			sha1sum >"$modules_folder/$module/$hashfilename"
 	else
 		echo "$1 is already installed and no changes detected"
 	fi
