@@ -65,6 +65,13 @@
 # git submodule init
 # git submodule update
 
+C_RESET='\033[0m'
+C_BLUE='\033[0;34m'
+C_CYAN='\033[0;36m'
+C_RED='\033[0;31m'
+C_WHITE='\033[0;37m'
+C_YELLOW='\033[0;33m'
+
 show_help() {
 	echo "install <modules>"
 }
@@ -79,18 +86,17 @@ config=0
 # preset=
 force=0
 modules_folder="$HOME/.dotfiles/modules" # TODO: use relative to script
+presets_folder="$HOME/.dotfiles/presets" # TODO: use relative to script
+preset_extension=".preset"
 hashfilename=".tarhash"
 dependenciesfilename=".dependencies"
 tagsfilename=".tags"
 verbose=0 # Print more
 dry=0     # When set, no installation will be done
 
-# Package manager availablity
-has_pacman=$(is_installed pacman)
-has_apt=$(is_installed apt)
-
-# echo has_pacman $has_pacman
-# echo has_apt $has_apt
+all_modules=$(find "$modules_folder/" -maxdepth 1 -mindepth 1 -printf "%f\n")
+all_presets=$(find "$presets_folder/" -maxdepth 1 -mindepth 1 \
+	-name '*.preset' -printf "%f\n" | sed 's/.preset//')
 
 while :; do
 	# echo "Evaluating $1"
@@ -111,7 +117,7 @@ while :; do
 	-f | --force) # force installation
 		force=1
 		;;
-	-p | preset) # Takes an option argument, ensuring it has been specified.
+	-p | --preset) # Takes an option argument, ensuring it has been specified.
 		if [ -n "$2" ]; then
 			shift
 			modules_selected=$*
@@ -145,13 +151,23 @@ while :; do
 	shift
 done
 
+[ $verbose = 1 ] && echo "$all_modules"
+[ $verbose = 1 ] && echo "$all_presets"
+
+# Package manager availablity
+has_pacman=$(is_installed pacman)
+has_apt=$(is_installed apt)
+
+[ $verbose = 1 ] && echo has_pacman "$has_pacman"
+[ $verbose = 1 ] && echo has_apt "$has_apt"
+
 if [ -z "$modules_selected" ]; then
 	echo 'Nothing to install'
 	exit
 fi
 
 has_tag() {
-	# Returns every dotmodule that contains a specific tag
+	# Returns every dotmodule that contains any of the tags
 	IFS='
 	'
 	# shellcheck disable=SC2016
@@ -159,15 +175,30 @@ has_tag() {
 		sed -r 's_^.*/([^/]*)/[^/]*$_\1_g'
 }
 
+in_preset() {
+	# returns every
+	if [ -f "$presets_folder/$1$preset_extension" ]; then
+		sed -e 's/#.*$//' -e '/^$/d' "$presets_folder/$1$preset_extension"
+	fi
+}
+
 get_dependencies() {
 	if [ -f "$modules_folder/$1/$dependenciesfilename" ]; then
-		deps_and_tags=$(sed -e 's/#.*$//' -e '/^$/d' \
+		sed -e 's/#.*$//' -e '/^$/d' "$modules_folder/$1/$dependenciesfilename"
+	fi
+}
+
+get_dependencies_deprec() {
+	if [ -f "$modules_folder/$1/$dependenciesfilename" ]; then
+		dtp=$(sed -e 's/#.*$//' -e '/^$/d' \
 			"$modules_folder/$1/$dependenciesfilename")
-		deps=$(echo "$deps_and_tags" | sed -e 's/:.*$//')
-		echo "$deps"
-		tags=$(echo "$deps_and_tags" | sed -n '/:/p' | sed -e 's/://')
+		dependencies=$(echo "$dtp" | sed 's/[:+].*$//')
+		echo "$dependencies"
+		tags=$(echo "$dtp" | sed -n '/:/p' | sed 's/://')
+		presets=$(echo "$dtp" | sed -n '/+/p' | sed 's/+//')
 		# shellcheck disable=SC2086
 		has_tag $tags
+		in_preset $presets
 	fi
 }
 
@@ -178,10 +209,47 @@ install_dependencies() {
 		if [ "$1" ]; then
 			[ $verbose = 1 ] && echo "    Trying to install $1..."
 			if [ "$(echo "$already_installed" | grep -w "$1")" = "" ]; then
-				# shellcheck disable=SC2046
-				install_dependencies $(get_dependencies "$1")
-				install_module "$1"
+				install_whatever "$1"
+				[ $verbose = 1 ] && echo "    done."
+			else
+				[ $verbose = 1 ] && echo "    Already resolved."
+			fi
+			shift
+		else
+			break
+		fi
+	done
+}
+
+install_whatever() {
+	while :; do
+		if [ "$1" ]; then
+			[ $verbose = 1 ] && echo "    Trying to install $1..."
+			if [ "$(echo "$already_installed" | grep -w "$1")" = "" ]; then
 				already_installed="$already_installed $1"
+				# shellcheck disable=SC2046
+				echo "Installing whatever $1"
+				case "$1" in
+				+*) # presets
+					for from_preset in $(in_preset "$(echo "$1" | cut -c2-)"); do
+						install_whatever "$from_preset"
+					done
+					;;
+				:*) # tags
+					echo "$C_RED asd tag $(has_tag "$1") $C_RESET"
+					for from_tag in $(has_tag "$(echo "$1" | cut -c2-)"); do
+						echo "$C_RED from tag $from_tag $C_RESET"
+						install_whatever "$from_tag"
+					done
+					;;
+				*) # modules
+					#TODO: remove for, there is a while here already
+					for from_dependencies in $(get_dependencies "$1"); do
+						install_whatever "$from_dependencies"
+					done
+					install_module "$1"
+					;;
+				esac
 				[ $verbose = 1 ] && echo "    done."
 			else
 				[ $verbose = 1 ] && echo "    Already resolved."
@@ -206,7 +274,7 @@ install_module() {
 	# cd to dotmodule just in case a dotmodule
 	# is not suited for installation outside of it
 	cd "${0%/*}" || return
-	echo "Installing $module"
+	echo "$C_BLUE Installing $module $C_RESET"
 
 	# Only calculate the hashes if we going to use it
 	if [ "$force" = 0 ]; then
@@ -255,4 +323,4 @@ install_module() {
 # Actual installation process
 # This will install a non-existent module that depends on the selected modules
 # shellcheck disable=SC2086
-install_dependencies $modules_selected
+install_whatever $modules_selected

@@ -1,5 +1,3 @@
 # Arch desktop
-# TODO: Support tags in presets, maybe with a `:` prefix
-# :gui
 zsh
 vim
