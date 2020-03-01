@@ -178,7 +178,7 @@ install_dependencies() {
 	# $2 dependencies
 	for dep in $2; do
 		local d=$dep
-		if [ -z "$(echo "$already_installed" | grep -w "$d")" ]; then
+		if [ "$(echo "$already_installed" | grep -w "$d")" = "" ]; then
 			install_dependencies "$d" "$(get_dependencies "$d")"
 			install_module "$d"
 			already_installed="$already_installed $d"
