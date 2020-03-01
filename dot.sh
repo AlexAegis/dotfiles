@@ -67,10 +67,11 @@
 # git submodule update
 
 C_RESET='\033[0m'
+C_RED='\033[0;31m'
+C_GREEN='\033[0;32m'
+C_YELLOW='\033[0;33m'
 C_BLUE='\033[0;34m'
 C_CYAN='\033[0;36m'
-C_RED='\033[0;31m'
-C_YELLOW='\033[0;33m'
 
 show_help() {
 	echo "install <modules>"
@@ -224,7 +225,7 @@ install_whatever() {
 install_module() {
 	while :; do
 		if [ "$1" ]; then
-
+			result=0
 			if [ ! -d "$modules_folder/$1/" ]; then
 				echo "Module $1 not found. Skipping"
 				return 1
@@ -249,33 +250,68 @@ install_module() {
 			if
 				[ "$force" = 1 ] || [ "$old_hash" != "$new_hash" ]
 			then
-				echo "${C_RED}Applying dotmodule $1$C_RESET"
+				[ $dry != 1 ] && echo "${C_CYAN}Applying dotmodule $1$C_RESET"
+
 				if [ "$has_apt" ] &&
 					[ -f "$modules_folder/$1/install.apt.sh" ]; then
 					# shellcheck disable=SC2091
-					[ $dry != 1 ] && $("$modules_folder/$1/install.apt.sh")
+					if [ $dry != 1 ]; then
+						(
+							"$modules_folder/$1/install.apt.sh"
+						)
+						result=$((result + $?))
+					fi
+
 				fi
 				if [ "$has_pacman" ] &&
 					[ -f "$modules_folder/$1/install.pacman.sh" ]; then
 					# shellcheck disable=SC2091
-					[ $dry != 1 ] && $("$modules_folder/$1/install.pacman.sh")
+					if [ $dry != 1 ]; then
+						[ $verbose = 1 ] && echo "Result before install.pacman.sh $1: $result"
+						(
+							"$modules_folder/$1/install.pacman.sh"
+						)
+						result=$((result + $?))
+						[ $verbose = 1 ] && echo "Result after install.pacman.sh $1: $result"
+					fi
 				fi
 				if [ -f "$modules_folder/$1/install.sudo.sh" ]; then
 					# shellcheck disable=SC2091
-					[ $dry != 1 ] && $("$modules_folder/$1/install.sudo.sh")
+					if [ $dry != 1 ]; then
+						(
+							"$modules_folder/$1/install.sudo.sh"
+						)
+						result=$((result + $?))
+					fi
 				fi
 				if [ -f "$modules_folder/$1/install.sh" ]; then
 					# shellcheck disable=SC2091
-					[ $dry != 1 ] && $("$modules_folder/$1/install.sh")
+					if [ $dry != 1 ]; then
+						[ $verbose = 1 ] && echo "Result before install.sh $1: $result"
+						(
+							"$modules_folder/$1/install.sh"
+						)
+						result=$((result + $?))
+						[ $verbose = 1 ] && echo "Result after install.sh $1: $result"
+					fi
 				fi
 
 				# Calculate fresh hash (always if not dryrunning)
-				[ $dry != 1 ] &&
+
+				if [ $dry != 1 ]; then
 					tar --absolute-names \
 						--exclude="$modules_folder/$1/$hashfilename" \
 						-c "$modules_folder/$1" |
-					sha1sum >"$modules_folder/$1/$hashfilename"
+						sha1sum >"$modules_folder/$1/$hashfilename"
+					if [ $dry != 1 ] && [ "$result" = 0 ]; then
+						printf "${C_GREEN}Successfully installed %s${C_RESET}\n" "$1"
+					else
+						printf "${C_RED}Installation failed %s${C_RESET}\n" "$1"
+					fi
+				fi
+
 			else
+
 				echo "$C_YELLOW! $1 is already installed and no changes" \
 					"are detected$C_RESET"
 			fi
@@ -286,16 +322,12 @@ install_module() {
 	done
 }
 
-# Actual installation process
-# This will install a non-existent module that depends on the selected modules
-
 if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 	modules_selected=$(whiptail --title "Select modules to install" \
 		--checklist "Space changes selection, enter approves" \
 		0 0 0 zsh zsh ON fish fish OFF 3>&1 1>&2 2>&3 3>&- |
 		sed 's/ /\n/g' |
 		trim_around)
-
 fi
 
 # shellcheck disable=SC2086
