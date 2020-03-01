@@ -78,11 +78,11 @@ modules_selected=
 config=0
 # preset=
 force=0
-modules_folder=$HOME/.dotfiles/modules
+modules_folder="$HOME/.dotfiles/modules" # TODO: use relative to script
 hashfilename=".tarhash"
 dependenciesfilename=".dependencies"
 tagsfilename=".tags"
-verbose=0 # Variables to be evaluated as shell arithmetic should be initialized to a default or validated beforehand.
+verbose=0 # Print more
 dry=0     # When set, no installation will be done
 
 # Package manager availablity
@@ -247,7 +247,7 @@ install_module() {
 				-c "$modules_folder/$module" |
 			sha1sum >"$modules_folder/$module/$hashfilename"
 	else
-		echo "$1 is already installed and no changes detected"
+		echo "$1 is already installed and no changes are detected"
 	fi
 
 }
