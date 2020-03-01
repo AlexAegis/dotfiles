@@ -174,14 +174,21 @@ get_dependencies() {
 already_installed=""
 
 install_dependencies() {
-	# $1 module
-	# $2 dependencies
-	for dep in $2; do
-		local d=$dep
-		if [ "$(echo "$already_installed" | grep -w "$d")" = "" ]; then
-			install_dependencies "$d" "$(get_dependencies "$d")"
-			install_module "$d"
-			already_installed="$already_installed $d"
+	while :; do
+		if [ "$1" ]; then
+			[ $verbose = 1 ] && echo "    Trying to install $1..."
+			if [ "$(echo "$already_installed" | grep -w "$1")" = "" ]; then
+				# shellcheck disable=SC2046
+				install_dependencies $(get_dependencies "$1")
+				install_module "$1"
+				already_installed="$already_installed $1"
+				[ $verbose = 1 ] && echo "    done."
+			else
+				[ $verbose = 1 ] && echo "    Already resolved."
+			fi
+			shift
+		else
+			break
 		fi
 	done
 }
@@ -216,16 +223,20 @@ install_module() {
 
 		if [ "$has_apt" ] &&
 			[ -f "$modules_folder/$module/install.apt.sh" ]; then
+			# shellcheck disable=SC2091
 			[ $dry != 1 ] && $("$modules_folder/$module/install.apt.sh")
 		fi
 		if [ "$has_pacman" ] &&
 			[ -f "$modules_folder/$module/install.pacman.sh" ]; then
+			# shellcheck disable=SC2091
 			[ $dry != 1 ] && $("$modules_folder/$module/install.pacman.sh")
 		fi
 		if [ -f "$modules_folder/$module/install.sudo.sh" ]; then
+			# shellcheck disable=SC2091
 			[ $dry != 1 ] && $("$modules_folder/$module/install.sudo.sh")
 		fi
 		if [ -f "$modules_folder/$module/install.sh" ]; then
+			# shellcheck disable=SC2091
 			[ $dry != 1 ] && $("$modules_folder/$module/install.sh")
 		fi
 
@@ -243,4 +254,5 @@ install_module() {
 
 # Actual installation process
 # This will install a non-existent module that depends on the selected modules
-install_dependencies "" "$modules_selected"
+# shellcheck disable=SC2086
+install_dependencies $modules_selected
