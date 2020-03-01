@@ -188,65 +188,26 @@ get_dependencies() {
 	fi
 }
 
-get_dependencies_deprec() {
-	if [ -f "$modules_folder/$1/$dependenciesfilename" ]; then
-		dtp=$(sed -e 's/#.*$//' -e '/^$/d' \
-			"$modules_folder/$1/$dependenciesfilename")
-		dependencies=$(echo "$dtp" | sed 's/[:+].*$//')
-		echo "$dependencies"
-		tags=$(echo "$dtp" | sed -n '/:/p' | sed 's/://')
-		presets=$(echo "$dtp" | sed -n '/+/p' | sed 's/+//')
-		# shellcheck disable=SC2086
-		has_tag $tags
-		in_preset $presets
-	fi
-}
-
-already_installed=""
-
-install_dependencies() {
-	while :; do
-		if [ "$1" ]; then
-			[ $verbose = 1 ] && echo "    Trying to install $1..."
-			if [ "$(echo "$already_installed" | grep -w "$1")" = "" ]; then
-				install_whatever "$1"
-				[ $verbose = 1 ] && echo "    done."
-			else
-				[ $verbose = 1 ] && echo "    Already resolved."
-			fi
-			shift
-		else
-			break
-		fi
-	done
-}
+resolved=""
 
 install_whatever() {
 	while :; do
 		if [ "$1" ]; then
 			[ $verbose = 1 ] && echo "    Trying to install $1..."
-			if [ "$(echo "$already_installed" | grep -w "$1")" = "" ]; then
-				already_installed="$already_installed $1"
-				# shellcheck disable=SC2046
-				echo "Installing whatever $1"
+			if [ "$(echo "$resolved" | grep -w "$1")" = "" ]; then
+				resolved="$resolved $1"
 				case "$1" in
 				+*) # presets
-					for from_preset in $(in_preset "$(echo "$1" | cut -c2-)"); do
-						install_whatever "$from_preset"
-					done
+					# shellcheck disable=SC2046
+					install_whatever $(in_preset "$(echo "$1" | cut -c2-)")
 					;;
 				:*) # tags
-					echo "$C_RED asd tag $(has_tag "$1") $C_RESET"
-					for from_tag in $(has_tag "$(echo "$1" | cut -c2-)"); do
-						echo "$C_RED from tag $from_tag $C_RESET"
-						install_whatever "$from_tag"
-					done
+					# shellcheck disable=SC2046
+					install_whatever $(has_tag "$(echo "$1" | cut -c2-)")
 					;;
 				*) # modules
-					#TODO: remove for, there is a while here already
-					for from_dependencies in $(get_dependencies "$1"); do
-						install_whatever "$from_dependencies"
-					done
+					# shellcheck disable=SC2046
+					install_whatever $(get_dependencies "$1")
 					install_module "$1"
 					;;
 				esac
@@ -274,7 +235,7 @@ install_module() {
 	# cd to dotmodule just in case a dotmodule
 	# is not suited for installation outside of it
 	cd "${0%/*}" || return
-	echo "$C_BLUE Installing $module $C_RESET"
+	echo "${C_BLUE}Installing $module$C_RESET"
 
 	# Only calculate the hashes if we going to use it
 	if [ "$force" = 0 ]; then
@@ -282,13 +243,13 @@ install_module() {
 		new_hash=$(tar --absolute-names \
 			--exclude="$modules_folder/$module/$hashfilename" \
 			-c "$modules_folder/$module" | sha1sum)
-		[ $verbose = 1 ] && printf "%s\n%s" "$old_hash" "$new_hash"
+		[ $verbose = 1 ] && printf "$C_RED%s\n%s\n$C_RESET" "$old_hash" "$new_hash"
 	fi
 
 	if
 		[ "$force" = 1 ] || [ "$old_hash" != "$new_hash" ]
 	then
-
+		echo "${C_RED}Applying dotmodule $module$C_RESET"
 		if [ "$has_apt" ] &&
 			[ -f "$modules_folder/$module/install.apt.sh" ]; then
 			# shellcheck disable=SC2091
@@ -308,14 +269,14 @@ install_module() {
 			[ $dry != 1 ] && $("$modules_folder/$module/install.sh")
 		fi
 
-		# Calculate fresh hash (always)
+		# Calculate fresh hash (always if not dryrunning)
 		[ $dry != 1 ] &&
 			tar --absolute-names \
 				--exclude="$modules_folder/$module/$hashfilename" \
 				-c "$modules_folder/$module" |
 			sha1sum >"$modules_folder/$module/$hashfilename"
 	else
-		echo "$1 is already installed and no changes are detected"
+		echo "$C_YELLOW! $module is already installed and no changes are detected$C_RESET"
 	fi
 
 }
