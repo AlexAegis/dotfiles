@@ -8,6 +8,8 @@
 #
 # A simple dotmodule manager
 #
+# Run with `sudo -E dot` if you need root in some module
+#
 # Dots main purpose is to invoke scripts defined in dotmodules
 # It is designed this way so each dotmodule is a self contained entity
 # which you can use without dot itself.
