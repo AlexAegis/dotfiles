@@ -84,12 +84,14 @@ is_installed() {
 }
 
 # Reset all variables that might be set
-IFS='|'
+IFS='
+'
 modules_selected=""
 resolved=""
 final_module_list=""
 config=0
 force=0
+fix_permissions=0
 modules_folder="$HOME/.dotfiles/modules" # TODO: use relative to script
 presets_folder="$HOME/.dotfiles/presets" # TODO: use relative to script
 preset_extension=".preset"
@@ -144,6 +146,9 @@ while :; do
 	-f | --force) # force installation
 		force=1
 		;;
+	-fp | --fix-permissions) # Adds executable rights to every scriptfile
+		fix_permissions=1
+		;;
 	-c | --config | --custom) # Ask for everything
 		config=1
 		;;
@@ -174,8 +179,6 @@ trim_around() {
 
 has_tag() {
 	# Returns every dotmodule that contains any of the tags
-	IFS='
-	'
 	# shellcheck disable=SC2016
 	grep -lRm 1 -- "$@" "$modules_folder"/*/"$tagsfilename" |
 		sed -r 's_^.*/([^/]*)/[^/]*$_\1_g'
@@ -215,7 +218,8 @@ install_whatever() {
 					if [ -z "$final_module_list" ]; then
 						final_module_list="$1"
 					else
-						final_module_list="$final_module_list $1"
+						final_module_list="$final_module_list
+$1"
 					fi
 					# install_module "$1"
 					;;
@@ -244,7 +248,7 @@ install_module() {
 
 			# cd to dotmodule just in case a dotmodule
 			# is not suited for installation outside of it
-			cd "${0%/*}" || return
+			# cd "${0%/*}" || return
 			echo "${C_BLUE}Installing $1$C_RESET"
 
 			# Only calculate the hashes if we going to use it
@@ -298,12 +302,14 @@ install_module() {
 				if [ -f "$modules_folder/$1/install.sh" ]; then
 					# shellcheck disable=SC2091
 					if [ $dry != 1 ]; then
-						[ $verbose = 1 ] && echo "Result before install.sh $1: $result"
+						[ $verbose = 1 ] && echo "Result before install.sh" \
+							"$1: $result"
 						(
 							"$modules_folder/$1/install.sh"
 						)
 						result=$((result + $?))
-						[ $verbose = 1 ] && echo "Result after install.sh $1: $result"
+						[ $verbose = 1 ] && echo "Result after install.sh" \
+							"$1: $result"
 					fi
 				fi
 
@@ -315,9 +321,11 @@ install_module() {
 						-c "$modules_folder/$1" |
 						sha1sum >"$modules_folder/$1/$hashfilename"
 					if [ $dry != 1 ] && [ "$result" = 0 ]; then
-						printf "${C_GREEN}Successfully installed %s${C_RESET}\n" "$1"
+						printf "${C_GREEN}Successfully installed \
+%s${C_RESET}\n" "$1"
 					else
-						printf "${C_RED}Installation failed %s${C_RESET}\n" "$1"
+						printf "${C_RED}Installation failed \
+%s${C_RESET}\n" "$1"
 					fi
 				fi
 
@@ -336,7 +344,7 @@ install_module() {
 if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 	modules_selected=$(whiptail --title "Select modules to install" \
 		--checklist "Space changes selection, enter approves" \
-		0 0 0 zsh zsh ON fish fish OFF 3>&1 1>&2 2>&3 3>&- |
+		0 0 0 zsh zsh ON vim vim OFF 3>&1 1>&2 2>&3 3>&- |
 		sed 's/ /\n/g' |
 		trim_around)
 fi
@@ -347,5 +355,12 @@ install_whatever $modules_selected
 [ $verbose = 1 ] && printf "${C_CYAN}Going to install:${C_RESET}\n%s\n" \
 	"$final_module_list"
 
+if [ "$fix_permissions" = 1 ]; then
+	# Fix permissions
+	echo "Fixing permissions..."
+	# Alternative with shebang search: grep -rIzl '^#!' $modules_folder
+	find $modules_folder -type f \
+		-regex ".*\.\(sh\|zsh\|bash\|fish\|dash\)" -exec chmod +x {} \;
+fi
 # shellcheck disable=SC2086
 install_module $final_module_list
