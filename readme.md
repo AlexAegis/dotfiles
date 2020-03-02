@@ -81,3 +81,10 @@ dont forget to ignore the tarhashfile itself from the hashing
   - if not install that,
 
 TODO Read: <http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/autoconf.html#Portable-Shell>
+
+TODO: Based on this remap keys as follows:
+<https://github.com/10ne1/carpalx-keyboard/blob/master/README>
+
+caps as is to esc
+caps with something is ctrl and something
+either long caps is caps or ctrl caps is caps. Or both
