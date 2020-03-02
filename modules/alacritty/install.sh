@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm alacritty
+stow -t "$HOME" -d "${0%/*}" .alacritty
