@@ -18,6 +18,9 @@ echo Starting zsh
 [[ ! -f $ZDOTDIR/.zsh-plugins.antibody.sh ]] || . $ZDOTDIR/.zsh-plugins.antibody.sh
 
 # Load any optional `sh` and `zsh` rc files from the .rc folder
+# ? The sourcein file can be referenced like this because
+# shellcheck source=/dev/null
+DIR="$HOME" REGEX=".*\.env" . "$HOME/bin/sourcein"
 
 . $HOME/bin/sourcein "$HOME/.rc/" ".*\.\(sh\|zsh\)"
 

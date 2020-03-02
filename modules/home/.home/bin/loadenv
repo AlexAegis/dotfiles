@@ -1,0 +1,12 @@
+#!/bin/sh
+# Loads every `*.env` file in the home and in the .env folder
+
+[ ! "$QUIET" ] && echo Loading Environment
+set -a
+# ? We actually can rely on the absolute path of `sourcein` here because
+# ? it is added by this module
+# shellcheck source=/dev/null
+DIR="$HOME" REGEX=".*\.env" . "$HOME/bin/sourcein"
+# shellcheck source=/dev/null
+DIR="$HOME/.env" REGEX=".*\.env" . "$HOME/bin/sourcein"
+set +a

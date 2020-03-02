@@ -1,7 +1,8 @@
 #!/bin/fish
 
-[ ! -f $HOME/.profile ] || fenv source $HOME/.profile
+[ ! -f "$HOME/.profile" ] || fenv source "$HOME/.profile"
 
-. $HOME/bin/sourcein.fish "$HOME/.rc/" ".*.[sh|zsh]"
+# TODO: Remove sourcein
+source "$HOME/bin/sourcein.fish" "$HOME/.rc/" ".*.[sh|fish]"
 
 fish_vi_key_bindings

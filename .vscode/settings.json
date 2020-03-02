@@ -3,5 +3,11 @@
 	"terminal.integrated.shell.linux": "zsh",
 	"editor.codeActionsOnSave": {
 		"source.fixAll.markdownlint": true
-	}
+	},
+	"shellcheck.ignorePatterns": {
+		"**/*.zsh": true,
+		"**/colormap": true,
+		"**/.zshrc": true
+	},
+	"editor.rulers": [80, 120]
 }

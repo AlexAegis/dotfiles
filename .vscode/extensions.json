@@ -15,6 +15,7 @@
 		"mads-hartmann.bash-ide-vscode",
 		"rogalmic.bash-debug",
 		"visualstudioexptteam.vscodeintellicode",
-		"timonwong.shellcheck"
+		"timonwong.shellcheck",
+		"bmalehorn.vscode-fish"
 	]
 }

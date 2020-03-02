@@ -8,7 +8,7 @@
 #
 # A simple dotmodule manager
 #
-# Run with `sudo -E dot` if you need root in some module
+# Run with `sudo -E dot` if you need root in some modules
 #
 # Dots main purpose is to invoke scripts defined in dotmodules
 # It is designed this way so each dotmodule is a self contained entity
@@ -84,6 +84,7 @@ is_installed() {
 }
 
 # Reset all variables that might be set
+IFS='|'
 modules_selected=""
 resolved=""
 final_module_list=""
@@ -98,9 +99,10 @@ tagsfilename=".tags"
 verbose=0 # Print more
 dry=0     # When set, no installation will be done
 # TODO: Only needed when printing and using whiptail. Lazy load it.
-all_modules=$(find "$modules_folder/" -maxdepth 1 -mindepth 1 -printf "%f\n")
+all_modules=$(find "$modules_folder/" -maxdepth 1 -mindepth 1 -printf "%f\n" |
+	sort)
 all_presets=$(find "$presets_folder/" -maxdepth 1 -mindepth 1 \
-	-name '*.preset' -printf "%f\n" | sed 's/.preset//')
+	-name '*.preset' -printf "%f\n" | sed 's/.preset//' | sort)
 all_tags=$(find "$modules_folder"/*/ -maxdepth 1 -mindepth 1 -name '.tags' \
 	-exec cat {} + | grep "^[^#;]" | sort | uniq)
 
@@ -151,6 +153,7 @@ while :; do
 	*) # Installs modules specified after it
 		if [ -n "$1" ]; then
 			modules_selected=$*
+			[ $verbose = 1 ] && echo "Initially selected: $modules_selected"
 		fi
 		break
 		;;
@@ -209,7 +212,11 @@ install_whatever() {
 				*) # modules
 					# shellcheck disable=SC2046
 					install_whatever $(get_dependencies "$1")
-					final_module_list="$final_module_list $1"
+					if [ -z "$final_module_list" ]; then
+						final_module_list="$1"
+					else
+						final_module_list="$final_module_list $1"
+					fi
 					# install_module "$1"
 					;;
 				esac
@@ -228,7 +235,9 @@ install_module() {
 	while :; do
 		if [ "$1" ]; then
 			result=0
-			if [ ! -d "$modules_folder/$1/" ]; then
+			[ $verbose = 1 ] && echo "Checking if module exists:" \
+				"$modules_folder/$1"
+			if [ ! -d "$modules_folder/$1" ]; then
 				echo "Module $1 not found. Skipping"
 				return 1
 			fi
