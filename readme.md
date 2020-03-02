@@ -2,11 +2,14 @@
 
 My Dotfiles
 
-Installing packages require root priviliges. Installing configs however don't. If you give `dot` root priviliges it will install all packages, but when not, it will only return a list of what it nee
+Installing packages require root priviliges. Installing configs however don't.
+If you give `dot` root priviliges it will install all packages, but when not,
+it will only return a list of what it nee
 
 ## Prerequisites
 
-A mostly [POSIX](https://en.wikipedia.org/wiki/POSIX) compliant shell on `/bin/sh`, like `dash`, or `bash`
+A [POSIX](https://en.wikipedia.org/wiki/POSIX) capable shell on `/bin/sh`
+I tested on `dash` and `bash`
 
 ## Installation
 
@@ -19,8 +22,8 @@ git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
 Then to make `dot` available everywhere create a symlink of it with `dotlink`
 
 ```sh
-sudo ~/.dotfiles/bin/dotlink
-sudo dot install base
+sudo ~/.dotfiles/dotlink.sh
+sudo -E dot install base
 ```
 
 This will symlink `dot` to `/usr/local/bin/dot` then installs the [necessary packages](./modules/base/install.pacman.sh) like git and stow
