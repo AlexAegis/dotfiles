@@ -13,3 +13,5 @@ Askpass
 ```bash
 git config --global core.askpass /usr/bin/ksshaskpass
 ```
+
+TODO: check <https://github.com/oem/dotfiles/blob/master/gitconfig>
