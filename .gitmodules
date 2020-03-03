@@ -1,0 +1,3 @@
+[submodule "modules/doom/.doom/.config/gzdoom/iwad"]
+	path = modules/doom/.doom/.config/gzdoom/iwad
+	url = https://github.com/dgeng/iwad
