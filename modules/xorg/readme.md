@@ -43,3 +43,6 @@ So for example:
 sudo udevadm hwdb --update
 sudo udevadm trigger /dev/input/event4
 ```
+
+TODO:
+<https://medium.com/njiuko/using-fzf-instead-of-dmenu-2780d184753f>

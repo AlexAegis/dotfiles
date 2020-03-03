@@ -11,7 +11,7 @@ pacman -Syu --needed --noconfirm breeze-gtk kde-gtk-config
 pacman -Syu --needed --noconfirm ksshaskpass
 
 # https://store.kde.org/ integration
-sudo pacman -S --needed --noconfirm qt5-base qt5-svg qt5-declarative qt5-quickcontrols
+pacman -S --needed --noconfirm qt5-base qt5-svg qt5-declarative qt5-quickcontrols
 ${SUDO_USER:+sudo -u $SUDO_USER} yay -S ocs-url
 
 mkdir -p "$HOME/.env"
