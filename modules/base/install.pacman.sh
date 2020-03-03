@@ -1,3 +1,3 @@
 #!/bin/sh
 
-sudo pacman -Syu --needed --noconfirm sh git stow tar coreutils
+sudo pacman -Syu --needed --noconfirm dash git stow tar coreutils

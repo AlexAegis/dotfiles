@@ -4,6 +4,11 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.markdownlint": true
 	},
+	"files.associations": {
+		".dependencies": "yaml",
+		".tags": "yaml",
+		"*.preset": "yaml"
+	},
 	"shellcheck.ignorePatterns": {
 		"**/*.zsh": true,
 		"**/colormap": true,

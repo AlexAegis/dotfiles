@@ -201,6 +201,7 @@ install_whatever() {
 	while :; do
 		if [ "$1" ]; then
 			[ $verbose = 1 ] && echo "Trying to install $1..."
+			# TODO: eval the dependency condition. Also setup supported vars
 			if [ "$(echo "$resolved" | grep -w "$1")" = "" ]; then
 				resolved="$resolved $1"
 				case "$1" in
