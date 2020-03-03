@@ -88,3 +88,6 @@ TODO: Based on this remap keys as follows:
 caps as is to esc
 caps with something is ctrl and something
 either long caps is caps or ctrl caps is caps. Or both
+
+TODO: Sudo handling. If sudo is not set throw warning. and run only install.sh
+If sudo is set but no E flag or u, exit immediately
