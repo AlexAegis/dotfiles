@@ -25,6 +25,12 @@
 #
 #
 
+# TODO: Uninstall by default unstow, if full uninstall then run the uninstall
+# TODO: scripts
+
+# TODO: Clash support. Use .clash file, if two modules clash, ask which to use
+# TODO: ? optional dep resolve
+
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 
