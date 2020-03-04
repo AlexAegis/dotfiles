@@ -1,13 +1,11 @@
 #!/bin/sh
-# Aliases
 
-alias cl="clear"
+alias ls="lsd"
+# TODO: Enable lsd date this when this resolves:
+# https://github.com/Peltoche/lsd/issues/332
+# alias ls="lsd --date=\"+%F %T\""
 
 # -A, --almost-all Do not list implied . and ..
 # -l, --long       Display extended file metadata as a table
 # -F, --classify   Append indicator (one of */=>@|) at the end of the file names
-alias l="ls -AlF"
-
-# dot specific
-alias cdot="cd ~/.dotfiles"
-alias sdot="sudo -E dot -fp"
+alias lt="ls -AlF --tree"
