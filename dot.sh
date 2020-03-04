@@ -31,6 +31,8 @@
 # TODO: Clash support. Use .clash file, if two modules clash, ask which to use
 # TODO: ? optional dep resolve
 
+# TODO: Auto stow at start of install
+# TODO: Auto unstow at end of uninstall
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 

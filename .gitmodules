@@ -1,3 +1,6 @@
 [submodule "modules/doom/.doom/.config/gzdoom/iwad"]
 	path = modules/doom/.doom/.config/gzdoom/iwad
 	url = https://github.com/dgeng/iwad.git
+[submodule "modules/powerline/.powerline/.config/powerline/fonts"]
+	path = modules/powerline/.powerline/.config/powerline/fonts
+	url = https://github.com/powerline/fonts
