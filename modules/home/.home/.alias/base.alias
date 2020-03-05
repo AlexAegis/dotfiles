@@ -1,0 +1,20 @@
+#!/bin/sh
+# Aliases
+
+## terminal
+
+alias cl="clear"
+
+## ls
+
+# Only set if not already set
+alias | grep -q ^ls= || alias ls="ls -a"
+# -A, --almost-all Do not list implied . and ..
+# -l, --long       Display extended file metadata as a table
+# -F, --classify   Append indicator (one of */=>@|) at the end of the file names
+alias | grep -q ^l= || alias l="ls -AlF"
+
+## dot
+
+alias cdot="cd ~/.dotfiles"
+alias sdot="sudo -E dot -fp"

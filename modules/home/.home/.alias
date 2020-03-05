@@ -1,6 +1,0 @@
-#!/bin/sh
-# Aliases
-
-alias cl="clear"
-alias l="ls -al"
-alias cdot="cd ~/.dotfiles"
