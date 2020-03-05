@@ -1,0 +1,4 @@
++arch ? [ $arch ]
++wsl-ubuntu ? [ $ubuntu ]
+ly
+bspwm
