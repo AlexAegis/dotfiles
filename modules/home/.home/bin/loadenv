@@ -1,6 +1,7 @@
 #!/bin/sh
-# Loads every `*.env` file in the home and in the .env folder
-# And every `*.alias` file in the home and in the .alias folder
+# Loads every `*.env` files in the home and in the .env.d folders
+# And every `*.alias` files in the home and in the .alias.d folders
+# And every `*.$LOADENV_RC_EXTS` files in the home and in the .rc.d folders
 
 [ ! "$QUIET" ] && echo "Loading Environment"
 set -a
@@ -9,11 +10,19 @@ set -a
 # shellcheck source=/dev/null
 DIR="$HOME" REGEX=".*\.env" . "$HOME/bin/sourcein"
 # shellcheck source=/dev/null
-DIR="$HOME/.env" REGEX=".*\.env" . "$HOME/bin/sourcein"
+DIR="$HOME/.env.d" REGEX=".*\.env" . "$HOME/bin/sourcein"
 
 [ ! "$QUIET" ] && echo "Loading Aliases"
 # shellcheck source=/dev/null
 DIR="$HOME" REGEX=".*\.alias" . "$HOME/bin/sourcein"
 # shellcheck source=/dev/null
-DIR="$HOME/.alias" REGEX=".*\.alias" . "$HOME/bin/sourcein"
+DIR="$HOME/.alias.d" REGEX=".*\.alias" . "$HOME/bin/sourcein"
+
+[ ! "$QUIET" ] && echo "Loading every \
+	.$(echo "${LOADENV_RC_EXTS-sh}" | sed 's@ @ .@g') rc files"
+# shellcheck source=/dev/null
+DIR="$HOME/.rc.d" \
+	REGEX=".*\.\($(echo "${LOADENV_RC_EXTS-sh}" | sed 's@ @\\|@g')\)" \
+	. "$HOME/bin/sourcein"
+
 set +a

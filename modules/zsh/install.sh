@@ -1,15 +1,9 @@
 #!/bin/sh
 
-SCRIPT_PATH=${0%/*}
-
 # Presourcing the environment file for the installation
-mkdir -p "$HOME/bin"
-mkdir -p "$HOME/.config"
-stow -d "$SCRIPT_PATH" -t "$HOME" .zsh
-# TODO: refactor this so zshenv is accessible as $HOME/.zshenv
-
-echo
+# dot links every file to $HOME before this script
 set -a
+# shellcheck disable=SC1090
 . "$HOME/.zshenv"
 set +a
 

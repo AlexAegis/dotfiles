@@ -1,5 +1,5 @@
 #!/bin/sh
-# source in folder
+# source everything in a folder
 IFS='
 '
 set -af

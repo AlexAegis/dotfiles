@@ -11,14 +11,12 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   . "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-[ ! "$QUIET" ] && echo "Starting zsh"
 # Order matters so you can overwrite stuff that the plugins load
 [ -f "$ZDOTDIR/.zsh-plugins.antibody.sh" ] && . "$ZDOTDIR/.zsh-plugins.antibody.sh"
 [ -f "$ZDOTDIR/.zshrc.default" ] && . "$ZDOTDIR/.zshrc.default"
 [ -f "$ZDOTDIR/.zshrc.local" ] && . "$ZDOTDIR/.zshrc.local"
-[ -f "$HOME/.profile" ] && . "$HOME/.profile"
-
-. "$HOME/bin/sourcein" "$HOME/.rc/" ".*\.\(sh\|zsh\)"
+export LOADENV_RC_EXTS="sh zsh"
+[ -f "$HOME/.profile" ] && QUIET=1 . "$HOME/.profile"
 
 ## zsh config
 

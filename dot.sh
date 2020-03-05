@@ -51,6 +51,8 @@
 # TODO: Create every folder in the module as an empty folder in $TARGET
 
 # TODO: dot --update -u if no modules are supplied then update every installed
+
+# TODO: If the module containes a git submodule. Check it out / update it
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 
@@ -284,7 +286,8 @@ install_module() {
 
 			# cd to dotmodule just in case a dotmodule
 			# is not suited for installation outside of it
-			# cd "${0%/*}" || return
+			cd "$modules_folder/$1" || return 1
+
 			echo "${C_BLUE}Installing $1$C_RESET"
 
 			# Only calculate the hashes if we going to use it
@@ -301,12 +304,22 @@ install_module() {
 			if
 				[ "$force" = 1 ] || [ "$old_hash" != "$new_hash" ]
 			then
+
+				if [ -e "$modules_folder/$1/.deprecated" ]; then
+					echo "${C_YELLOW}Warning: $1 is deprecated$C_RESET"
+					shift
+					continue
+				fi
+
 				[ $dry != 1 ] && echo "${C_CYAN}Applying dotmodule $1$C_RESET"
+
 				# ? This will force the stowed folder name to be the same as
 				# ? the module name with a dot. And that enforces unique stow
 				# ? modules which would otherwise conflict
 				# TODO: Mention this in the documentation, and move the ? there
-				[ $dry != 1 ] && stow -d "$modules_folder/$1/" -t "$HOME" ".$1"
+				if [ $dry != 1 ] && [ -e "$modules_folder/$1/.$1" ]; then
+					stow -d "$modules_folder/$1/" -t "$HOME" ".$1"
+				fi
 
 				# TODO: Abstract this mess
 				if [ "$has_apt" ] &&
@@ -403,7 +416,7 @@ if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 fi
 
 # shellcheck disable=SC2086
-install_whatever "base $modules_selected"
+install_whatever "base" $modules_selected
 
 [ $verbose = 1 ] && printf "${C_CYAN}Going to install:${C_RESET}\n%s\n" \
 	"$final_module_list"

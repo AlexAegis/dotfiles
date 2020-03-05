@@ -1,9 +1,10 @@
 #!/bin/sh
 
-# ? Not used here
-# stow -t "$HOME" -d "${0%/*}" .base
+# Create basic folders
 
 mkdir -p \
+	"$HOME/bin" \
+	"$HOME/.config" \
 	"$HOME/.env.d" \
-	"$HOME/.ec.d" \
+	"$HOME/.rc.d" \
 	"$HOME/.alias.d"
