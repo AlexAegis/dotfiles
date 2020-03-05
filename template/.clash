@@ -1,0 +1,7 @@
+# TODO: Clarify
+
+# This file containes modules that can't be present when this module
+# is installed.
+
+# When installing and two clashing modules are present then ask which one to
+# chose. If started with --no-interactive then just abort and print the clash.

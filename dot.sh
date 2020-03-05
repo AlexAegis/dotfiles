@@ -26,15 +26,22 @@
 #
 
 # TODO: Uninstall by default unstow, if full uninstall then run the uninstall
-# TODO: scripts
+# TODO: scripts, and uninstall should also remove the .tarhash file
 
 # TODO: Clash support. Use .clash file, if two modules clash, ask which to use
 # TODO: If a clashing module is already installed, abort, ask if interactive,
 # remove other if forced
-# TODO: ? optional dep resolve
+# TODO: ? optional dep resolve.
 
 # TODO: Auto stow at start of install
 # TODO: Auto unstow at end of uninstall
+
+# TODO: .dot file in a dotmodule that is sourced before installing that module
+
+# TODO: Fallback installation. Provide a $try_from_source when no packagemanager
+# TODO: files are present (or when a .dot file is present and has this var set)
+# TODO: See 'exa' module for example
+
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 
