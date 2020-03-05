@@ -42,6 +42,13 @@
 # TODO: files are present (or when a .dot file is present and has this var set)
 # TODO: See 'exa' module for example
 
+# TODO: track dangling dependencies. When installing leave a file in the module
+# TODO: that will store a snapshot of the dependencies. During uninstall check
+# TODO: If there is a dependency somewhere that is not directly installed.
+# TODO: (Or maybe dont and leave this to dot2)
+
+# TODO: cpt template
+
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 
