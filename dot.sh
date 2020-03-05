@@ -29,6 +29,8 @@
 # TODO: scripts
 
 # TODO: Clash support. Use .clash file, if two modules clash, ask which to use
+# TODO: If a clashing module is already installed, abort, ask if interactive,
+# remove other if forced
 # TODO: ? optional dep resolve
 
 # TODO: Auto stow at start of install
