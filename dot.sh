@@ -47,7 +47,6 @@
 # TODO: If there is a dependency somewhere that is not directly installed.
 # TODO: (Or maybe dont and leave this to dot2)
 
-# TODO: cpt template
 
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
@@ -175,6 +174,13 @@ while :; do
 		;;
 	-c | --config | --custom) # Ask for everything
 		config=1
+		;;
+	-sc | --scaffold) # Ask for everything
+		# TODO: cpt template and dot --scaffold command to create from template
+		# TODO: Use the remaining inputs as module folders to scaffold using cpt
+		# TODO: If cpt is not available then try install it with cargo first
+		# TODO: If no cargo is available then prompt the user to install it
+		exit 0
 		;;
 	-?*)
 		printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
