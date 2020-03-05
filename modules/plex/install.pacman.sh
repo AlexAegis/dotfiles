@@ -1,8 +1,4 @@
-${SUDO_USER:+sudo -u $SUDO_USER} yay -Syu plex-media-server
+#!/bin/sh
 
-systemctl enable plexmediaserver.service
-systemctl start plexmediaserver.service
-
-# https://wiki.archlinux.org/index.php/NTFS-3G
-
-# http://localhost:32400/web/
+${SUDO_USER:+sudo -u $SUDO_USER} \
+	yay -Syu --needed --noconfirm plex-media-server

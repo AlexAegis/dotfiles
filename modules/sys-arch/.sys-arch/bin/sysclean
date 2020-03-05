@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Clean up cache
+rm -f /var/cache/pacman/pkg/*

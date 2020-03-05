@@ -47,7 +47,10 @@
 # TODO: If there is a dependency somewhere that is not directly installed.
 # TODO: (Or maybe dont and leave this to dot2)
 
+# TODO: Before installing a module (Right before autostowing)
+# TODO: Create every folder in the module as an empty folder in $TARGET
 
+# TODO: dot --update -u if no modules are supplied then update every installed
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 
@@ -134,6 +137,7 @@ all_tags=$(find "$modules_folder"/*/ -maxdepth 1 -mindepth 1 -name '.tags' \
 # Package manager availablity
 has_pacman=$(is_installed pacman)
 has_apt=$(is_installed apt)
+has_systemd=$(is_installed sysctl)
 
 while :; do
 	# echo "Evaluating $1"
@@ -200,6 +204,7 @@ done
 if [ $verbose = 1 ]; then
 	echo "has_pacman? $has_pacman"
 	echo "has_apt? $has_apt"
+	echo "has_systemd? $has_systemd"
 fi
 
 trim_around() {
@@ -297,7 +302,13 @@ install_module() {
 				[ "$force" = 1 ] || [ "$old_hash" != "$new_hash" ]
 			then
 				[ $dry != 1 ] && echo "${C_CYAN}Applying dotmodule $1$C_RESET"
+				# ? This will force the stowed folder name to be the same as
+				# ? the module name with a dot. And that enforces unique stow
+				# ? modules which would otherwise conflict
+				# TODO: Mention this in the documentation, and move the ? there
+				[ $dry != 1 ] && stow -d "$modules_folder/$1/" -t "$HOME" ".$1"
 
+				# TODO: Abstract this mess
 				if [ "$has_apt" ] &&
 					[ -f "$modules_folder/$1/install.apt.sh" ]; then
 					# shellcheck disable=SC2091
@@ -307,18 +318,19 @@ install_module() {
 						)
 						result=$((result + $?))
 					fi
-
 				fi
 				if [ "$has_pacman" ] &&
 					[ -f "$modules_folder/$1/install.pacman.sh" ]; then
 					# shellcheck disable=SC2091
 					if [ $dry != 1 ]; then
-						[ $verbose = 1 ] && echo "Result before install.pacman.sh $1: $result"
+						[ $verbose = 1 ] &&
+							echo "Result before install.pacman.sh $1: $result"
 						(
 							"$modules_folder/$1/install.pacman.sh"
 						)
 						result=$((result + $?))
-						[ $verbose = 1 ] && echo "Result after install.pacman.sh $1: $result"
+						[ $verbose = 1 ] &&
+							echo "Result after install.pacman.sh $1: $result"
 					fi
 				fi
 				if [ -f "$modules_folder/$1/install.sudo.sh" ]; then
@@ -326,6 +338,16 @@ install_module() {
 					if [ $dry != 1 ]; then
 						(
 							"$modules_folder/$1/install.sudo.sh"
+						)
+						result=$((result + $?))
+					fi
+				fi
+				if [ "$has_systemd" ] &&
+					[ -f "$modules_folder/$1/install.systemd.sh" ]; then
+					# shellcheck disable=SC2091
+					if [ $dry != 1 ]; then
+						(
+							"$modules_folder/$1/install.systemd.sh"
 						)
 						result=$((result + $?))
 					fi
@@ -381,7 +403,7 @@ if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 fi
 
 # shellcheck disable=SC2086
-install_whatever $modules_selected
+install_whatever "base $modules_selected"
 
 [ $verbose = 1 ] && printf "${C_CYAN}Going to install:${C_RESET}\n%s\n" \
 	"$final_module_list"
@@ -389,8 +411,8 @@ install_whatever $modules_selected
 if [ "$fix_permissions" = 1 ]; then
 	# Fix permissions
 	echo "Fixing permissions..."
-	# Alternative with shebang search: grep -rIzl '^#!' $modules_folder
-	find $modules_folder -type f \
+	# TODO: Alternative with shebang search: grep -rIzl '^#!' $modules_folder
+	find "$modules_folder" -type f \
 		-regex ".*\.\(sh\|zsh\|bash\|fish\|dash\)" -exec chmod +x {} \;
 fi
 # shellcheck disable=SC2086

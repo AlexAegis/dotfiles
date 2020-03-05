@@ -1,3 +1,4 @@
 #!/bin/sh
 
-${SUDO_USER:+sudo -u $SUDO_USER} yay -Syu --needed --noconfirm brutal-doom
+${SUDO_USER:+sudo -u $SUDO_USER} \
+	yay -Syu --needed --noconfirm brutal-doom

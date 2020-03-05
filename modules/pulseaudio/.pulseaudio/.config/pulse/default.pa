@@ -8,3 +8,4 @@
 set-card-profile alsa_card.pci-0000_00_1f.3 output:iec958-stereo+input:analog-stereo
 
 # TODO: Set defaults here
+# TODO: Generalize

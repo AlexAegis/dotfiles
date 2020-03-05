@@ -1,7 +1,11 @@
 #!/bin/sh
 
+[ ! "$QUIET" ] && echo "Loading .profile"
+
 # POSIX compliant Defaults sourced from every other shell
 #
 # Load environmental variables and aliases
+# set -a
 # shellcheck disable=SC1090
-[ -e "$HOME/bin/loadenv" ] && QUIET=1 . "$HOME/bin/loadenv"
+[ -e "$HOME/bin/loadenv" ] && . "$HOME/bin/loadenv"
+# set +a

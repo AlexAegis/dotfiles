@@ -1,5 +1,7 @@
 #!/usr/bin/zsh
 
+[ "$VERBOSE" = 1 ] && echo "Loading .zshenv"
+
 # Common environment TODO handled by .zlogin
 # . $HOME/.profile
 

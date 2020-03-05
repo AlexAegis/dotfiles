@@ -10,7 +10,7 @@ find-up() {
 }
 
 cdnvm() {
-	cd "$@"
+	cd "$@" || exit 1
 	nvm_path=$(find-up .nvmrc | tr -d '[:space:]')
 
 	# If there are no .nvmrc file, use the default nvm version
@@ -51,4 +51,5 @@ cdnvm() {
 		fi
 	fi
 }
+
 alias cd='cdnvm'

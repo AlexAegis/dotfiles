@@ -36,3 +36,9 @@ expac -S -H M '%k\t%n'
 ```sh
 pacman -Quq|xargs expac -S -H M '%k\t%n' | sort -sh
 ```
+
+Folder size
+
+```sh
+du -sh .
+```
