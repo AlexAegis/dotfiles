@@ -262,35 +262,58 @@ get_dependencies() {
 	fi
 }
 
-install_whatever() {
+get_entry() {
+	echo "$1" | cut -d '?' -f 1 | sed 's/ $//'
+}
+
+get_condition() {
+	echo "$1" | cut -d '?' -s -f 2- | sed 's/^ //'
+}
+
+install_entry() {
 	while :; do
 		if [ "$1" ]; then
-			[ $verbose = 1 ] && echo "Trying to install $1..."
-			# TODO: eval the dependency condition. Also setup supported vars
+			# Extracting condition, if there is
+			condition="$(get_condition "$1")"
+
+			if [ $verbose = 1 ]; then
+				echo "${C_YELLOW}Trying to install $(get_entry "$1")...$C_RESET"
+				[ "$condition" ] &&
+					echo "${C_YELLOW}...with condition $condition...$C_RESET"
+			fi
+
+			if ! eval "$condition"; then
+				echo "${C_YELLOW}Condition ($condition) for $1" \
+					"did not met, skipping$C_RESET"
+				shift
+				continue
+			fi
+
 			if [ "$(echo "$resolved" | grep -w "$1")" = "" ]; then
-				resolved="$resolved $1"
+				resolved="$resolved
+$1"
 				case "$1" in
 				+*) # presets
 					# shellcheck disable=SC2046
-					install_whatever $(in_preset "$(echo "$1" | cut -c2-)")
+					install_entry $(in_preset "$(get_entry "$1" | cut -c2-)")
 					;;
 				:*) # tags
 					# shellcheck disable=SC2046
-					install_whatever $(has_tag "$(echo "$1" | cut -c2-)")
+					install_entry $(has_tag "$(get_entry "$1" | cut -c2-)")
 					;;
 				*) # modules
 					# shellcheck disable=SC2046
-					install_whatever $(get_dependencies "$1")
+					install_entry $(get_dependencies "$(get_entry "$1")")
 					if [ -z "$final_module_list" ]; then
-						final_module_list="$1"
+						final_module_list="$(get_entry "$1")"
 					else
 						final_module_list="$final_module_list
-$1"
+$(get_entry "$1")"
 					fi
 					# install_module "$1"
 					;;
 				esac
-				[ $verbose = 1 ] && echo "...done installing $1"
+				[ $verbose = 1 ] && echo "...done resolving $1"
 			else
 				[ $verbose = 1 ] && echo "...already resolved $1"
 			fi
@@ -324,7 +347,12 @@ install_module() {
 				new_hash=$(tar --absolute-names \
 					--exclude="$modules_folder/$1/$hashfilename" \
 					-c "$modules_folder/$1" | sha1sum)
-				[ $verbose = 1 ] && printf "$C_RED%s\n%s\n$C_RESET" \
+
+				if [ "$old_hash" = "$new_hash" ]; then
+					match=$C_GREEN
+				fi
+
+				[ $verbose = 1 ] && printf "${match-$C_RED}%s\n%s\n$C_RESET" \
 					"$old_hash" \
 					"$new_hash"
 			fi
@@ -334,7 +362,7 @@ install_module() {
 			then
 
 				if [ -e "$modules_folder/$1/.deprecated" ]; then
-					echo "${C_YELLOW}Warning: $1 is deprecated$C_RESET"
+					echo "${C_YELLOW}! Warning: $1 is deprecated$C_RESET"
 					shift
 					continue
 				fi
@@ -444,7 +472,7 @@ if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 fi
 
 # shellcheck disable=SC2086
-install_whatever "base" $modules_selected
+install_entry "base" $modules_selected
 
 [ $verbose = 1 ] && printf "${C_CYAN}Going to install:${C_RESET}\n%s\n" \
 	"$final_module_list"
