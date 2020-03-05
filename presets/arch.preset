@@ -1,6 +1,6 @@
 # Arch desktop
 sys-arch
-home
+home ? [ 1 = 1 ]
 :shelltool
 zsh
 vim

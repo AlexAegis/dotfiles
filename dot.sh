@@ -289,7 +289,7 @@ install_entry() {
 				continue
 			fi
 
-			if [ "$(echo "$resolved" | grep -w "$1")" = "" ]; then
+			if [ "$(echo "$resolved" | grep "$1")" = "" ]; then
 				resolved="$resolved
 $1"
 				case "$1" in
@@ -367,7 +367,9 @@ install_module() {
 					continue
 				fi
 
-				[ $dry != 1 ] && echo "${C_CYAN}Applying dotmodule $1$C_RESET"
+				[ "$dry" = 1 ] && echo "${C_RED}$1 would be installed!$C_RESET"
+
+				[ "$dry" != 1 ] && echo "${C_CYAN}Applying dotmodule $1$C_RESET"
 
 				# ? This will force the stowed folder name to be the same as
 				# ? the module name with a dot. And that enforces unique stow
