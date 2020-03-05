@@ -140,6 +140,13 @@ all_tags=$(find "$modules_folder"/*/ -maxdepth 1 -mindepth 1 -name '.tags' \
 has_pacman=$(is_installed pacman)
 has_apt=$(is_installed apt)
 has_systemd=$(is_installed sysctl)
+# TODO: Only valid on systemd distros
+distribution=$(grep "^NAME" /etc/os-release | grep -oh "=.*" | tr -d '="')
+arch=$(if [ "$distribution" = 'Arch Linux' ]; then echo 1; fi)
+void=$(if [ "$distribution" = 'Void Linux' ]; then echo 1; fi)
+debian=$(if [ "$distribution" = 'Debian GNU/Linux' ]; then echo 1; fi)
+ubuntu=$(if [ "$distribution" = 'Ubuntu' ]; then echo 1; fi)
+fedora=$(if [ "$distribution" = 'Fedora' ]; then echo 1; fi)
 
 while :; do
 	# echo "Evaluating $1"
@@ -152,6 +159,8 @@ while :; do
 		printf "${C_BLUE}All available modules:${C_RESET}\n%s\n" "$all_modules"
 		printf "${C_BLUE}All available presets:${C_RESET}\n%s\n" "$all_presets"
 		printf "${C_BLUE}All available tags:${C_RESET}\n%s\n" "$all_tags"
+		printf "${C_BLUE}All available environmental variables\
+:${C_RESET}\n%s\n" "$all_tags"
 		exit
 		;;
 	-lm | --list-modules)
@@ -164,6 +173,25 @@ while :; do
 		;;
 	-lt | --list-tags)
 		printf "${C_BLUE}All available tags:${C_RESET}\n%s\n" "$all_tags"
+		exit
+		;;
+	-le | --list-environment)
+		echo "${C_BLUE}All available environmental variables:${C_RESET}
+\$distribution: $distribution (Value of NAME in /etc/os-release)
+\$has_pacman: $has_pacman
+\$has_apt: $has_apt
+\$has_systemd: $has_systemd
+\$arch: $arch (is set when \$distribution is 'Arch Linux')
+\$void: $void (is set when \$distribution is 'Void Linux')
+\$debian: $debian (is set when \$distribution is 'Debian GNU/Linux')
+\$ubuntu: $ubuntu (is set when \$distribution is 'Ubuntu')
+\$fedora: $fedora (is set when \$distribution is 'Fedora')
+
+anything you find in dot.sh
+anything you pass to it. For example:
+	TEST=1 dot 'base ? [ \$TEST = 1 ]' # this would pass
+	TEST=1 dot 'base ? [ \$TEST = 0 ]' # this do not
+"
 		exit
 		;;
 	-v | --verbose) # Verbose printing TODO: Pass to the dotmodules
