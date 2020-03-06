@@ -17,4 +17,5 @@ pass init "$(gpg --list-secret-keys |
 	tail -1 |
 	sed 's/^      //')"
 
-pass insert dev/github
+echo "Enter password on the first line then the username on the second."
+pass insert --multiline dev/github

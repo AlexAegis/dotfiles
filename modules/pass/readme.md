@@ -1,7 +1,10 @@
 # [pass](https://wiki.archlinux.org/index.php/Pass)
 
-TODO: git integrate
+Use multiline to storte username
+First line is always the password, the second one is the username
 
 ```sh
-git config --global credential.helper /usr/bin/pass-git-helper
+pass insert --multiline
 ```
+
+TODO: fix sudoers that pass always require sudo and password? Investigate
