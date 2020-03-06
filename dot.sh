@@ -7,7 +7,7 @@
 #  \__,_|\___/ \__|
 #
 # A simple dotmodule manager
-#
+# TODO: Rice this script https://stackoverflow.com/questions/430078
 # Run with `sudo -E dot` if you need root in some modules
 #
 # Dots main purpose is to invoke scripts defined in dotmodules
@@ -440,6 +440,11 @@ install_module() {
 				# Calculate fresh hash (always if not dryrunning)
 
 				if [ $dry != 1 ]; then
+
+				#	TODO ${SUDO_USER:+sudo -u $SUDO_USER} "$(tar --absolute-names \
+				#		--exclude="$modules_folder/$1/$hashfilename" \
+				#		-c "$modules_folder/$1" |
+				#		sha1sum >"$modules_folder/$1/$hashfilename")"
 					tar --absolute-names \
 						--exclude="$modules_folder/$1/$hashfilename" \
 						-c "$modules_folder/$1" |

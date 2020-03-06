@@ -1,3 +1,3 @@
 #!/bin/sh
 
-mkdir -p "$HOME/.ssh"
+# TODO: run genkeys
