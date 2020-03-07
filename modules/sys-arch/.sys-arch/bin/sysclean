@@ -1,4 +1,7 @@
 #!/bin/sh
 
+# remove orphaned packages
+# shellcheck disable=SC2046
+pacman -Rns $(pacman -Qtdq)
 # Clean up cache
 rm -f /var/cache/pacman/pkg/*
