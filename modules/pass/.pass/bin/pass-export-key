@@ -1,5 +1,8 @@
 #!/bin/sh
 
 # Copy the resulting file after export to a more secure place
-gpg --export-secret-keys "$(cat "$HOME/.password-store/.gpg-id")" \
+gpg --armor --export-secret-keys "$(cat "$HOME/.password-store/.gpg-id")" \
 	>"${1-$HOME/pass-private-key.asc}"
+
+gpg --armor --export "$(cat "$HOME/.password-store/.gpg-id")" \
+	>"${1-$HOME/pass-public-key.asc}"

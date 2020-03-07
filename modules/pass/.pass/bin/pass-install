@@ -15,7 +15,7 @@ if [ "$(id -u)" = 0 ]; then
 	exit 1
 fi
 
-if ! [ -e "$SCRIPT_PATH/origin" ]; then
+if ! [ "$ORIGIN" ]; then
 	# No origin file, do local setup
 	echo "Origin file is missing, creating a local store instead of cloning one"
 	echo "If you want to clone instead, revert this script by removing the\
@@ -24,7 +24,7 @@ if ! [ -e "$SCRIPT_PATH/origin" ]; then
 
 	echo "Creating a fresh gpg key "
 
-	gengpg "Pass keychain key"
+	gengpg "Pass"
 
 	last_key="$(gpg --list-secret-keys |
 		grep "^      " |
@@ -67,7 +67,7 @@ or fix the origin file"
 
 		if ! [ -e "$HOME"/.password-store/.gpg-id ]; then
 			echo "Repo cloned but had no gpg-id, generating new one.."
-			gengpg "Pass keychain key"
+			gengpg "Pass"
 
 			last_key="$(gpg --list-secret-keys |
 				grep "^      " |
@@ -92,7 +92,7 @@ or fix the origin file"
 				if [ "$FULL_RESET" = 1 ]; then
 					echo "Doing a pass reset"
 
-					gengpg "Pass keychain key"
+					gengpg "Pass"
 
 					last_key="$(gpg --list-secret-keys |
 						grep "^      " |
@@ -115,7 +115,12 @@ from ~/pass-private-key.asc"
 						exit 1
 					fi
 				else
-					echo "The ~/pass-private-key.asc file does not exist."
+					echo "The ~/pass-private-key.asc file does not exist.
+
+If you are trying to reset this repo, delete the
+~/.password-store/.gpg-id file. This module then will prompt you to generate
+a new key."
+
 					exit 1
 				fi
 			fi
