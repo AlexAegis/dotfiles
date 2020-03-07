@@ -16,12 +16,6 @@ Notes about the guide:
   ```sh
   pacstrap /mnt base linux linux-framework grub networkmanager vim zsh man-db man-pages coreutils
   ```
-TODO: /etc/defaults/grub edit
-Update grub config with:
-
-```sh
-grub-mkconfig -o /boot/grub/grub.cfg
-```
 
 ## Preparation
 

@@ -1,0 +1,5 @@
+#!/bin/sh
+# Replaces the value of $2 to $3 in $1 if exists, adds if not
+# TODO: If commented line with $2 is found, use that
+
+sed -i "/^${2}=/{h;s/=.*/=${3}/};\${x;/^$/{s//${2}=${3}/;H};x}" "${1}"
