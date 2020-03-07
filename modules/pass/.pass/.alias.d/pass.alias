@@ -1,0 +1,4 @@
+#!/bin/sh
+
+alias passpull="pass git pull"
+alias passpush="pass git push"
