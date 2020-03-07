@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu figlet
+pacman -Syu --needed --noconfirm figlet

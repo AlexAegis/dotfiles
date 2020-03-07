@@ -111,6 +111,8 @@ is_installed() {
 	command -v "$1" 2>/dev/null
 }
 
+SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
+
 # Reset all variables that might be set
 IFS='
 '
@@ -118,10 +120,11 @@ modules_selected=""
 resolved=""
 final_module_list=""
 config=0
+skip_root=0
 force=0
 fix_permissions=0
-modules_folder="$HOME/.dotfiles/modules" # TODO: use relative to script
-presets_folder="$HOME/.dotfiles/presets" # TODO: use relative to script
+modules_folder="$SCRIPT_PATH/modules" # TODO: use relative to script
+presets_folder="$SCRIPT_PATH/presets" # TODO: use relative to script
 preset_extension=".preset"
 hashfilename=".tarhash"
 dependenciesfilename=".dependencies"
@@ -133,13 +136,16 @@ all_modules=$(find "$modules_folder/" -maxdepth 1 -mindepth 1 -printf "%f\n" |
 	sort)
 all_presets=$(find "$presets_folder/" -maxdepth 1 -mindepth 1 \
 	-name '*.preset' -printf "%f\n" | sed 's/.preset//' | sort)
+#shellcheck disable=SC2016
+all_installed=$(grep -lm 1 -- "" "$modules_folder"/**/.tarhash |
+	sed -r 's_^.*/([^/]*)/[^/]*$_\1_g' | sort)
 all_tags=$(find "$modules_folder"/*/ -maxdepth 1 -mindepth 1 -name '.tags' \
 	-exec cat {} + | grep "^[^#;]" | sort | uniq)
 
 # Package manager availablity
-has_pacman=$(is_installed pacman)
-has_apt=$(is_installed apt)
-has_systemd=$(is_installed sysctl)
+pacman=$(is_installed pacman)
+apt=$(is_installed apt)
+sysctl=$(is_installed sysctl)
 # TODO: Only valid on systemd distros
 distribution=$(grep "^NAME" /etc/os-release | grep -oh "=.*" | tr -d '="')
 arch=$(if [ "$distribution" = 'Arch Linux' ]; then echo 1; fi)
@@ -155,12 +161,31 @@ while :; do
 		show_help
 		exit
 		;;
+	-u | --update) # Run update.sh on every installed dotmodule
+		for mod in $all_installed; do
+			echo "Updating $mod..."
+			if [ -e "$modules_folder/$mod/update.sh" ]; then
+				(
+					"$modules_folder/$mod/update.sh"
+				)
+			else
+				echo "${C_YELLOW}$mod does not have an update file. \
+Skipping...${C_RESET}"
+			fi
+		done
+		exit
+		;;
 	-la | --list-all)
 		printf "${C_BLUE}All available modules:${C_RESET}\n%s\n" "$all_modules"
 		printf "${C_BLUE}All available presets:${C_RESET}\n%s\n" "$all_presets"
 		printf "${C_BLUE}All available tags:${C_RESET}\n%s\n" "$all_tags"
 		printf "${C_BLUE}All available environmental variables\
 :${C_RESET}\n%s\n" "$all_tags"
+		exit
+		;;
+	-li | --list-installed)
+		printf "${C_BLUE}All installed modules:${C_RESET}\n%s\n" \
+			"$all_installed"
 		exit
 		;;
 	-lm | --list-modules)
@@ -178,9 +203,9 @@ while :; do
 	-le | --list-environment)
 		echo "${C_BLUE}All available environmental variables:${C_RESET}
 \$distribution: $distribution (Value of NAME in /etc/os-release)
-\$has_pacman: $has_pacman
-\$has_apt: $has_apt
-\$has_systemd: $has_systemd
+\$pacman: $pacman
+\$apt: $apt
+\$sysctl: $sysctl
 \$arch: $arch (is set when \$distribution is 'Arch Linux')
 \$void: $void (is set when \$distribution is 'Void Linux')
 \$debian: $debian (is set when \$distribution is 'Debian GNU/Linux')
@@ -209,6 +234,9 @@ anything you pass to it. For example:
 	-c | --config | --custom) # Ask for everything
 		config=1
 		;;
+	-sr | --skip-root) # Skip root scripts
+		skip_root=1
+		;;
 	-sc | --scaffold) # Ask for everything
 		# TODO: cpt template and dot --scaffold command to create from template
 		# TODO: Use the remaining inputs as module folders to scaffold using cpt
@@ -232,9 +260,9 @@ anything you pass to it. For example:
 done
 
 if [ $verbose = 1 ]; then
-	echo "has_pacman? $has_pacman"
-	echo "has_apt? $has_apt"
-	echo "has_systemd? $has_systemd"
+	echo "pacman? $pacman"
+	echo "apt? $apt"
+	echo "sysctl? $sysctl"
 fi
 
 trim_around() {
@@ -376,79 +404,101 @@ install_module() {
 				# ? modules which would otherwise conflict
 				# TODO: Mention this in the documentation, and move the ? there
 				if [ $dry != 1 ] && [ -e "$modules_folder/$1/.$1" ]; then
-					stow -d "$modules_folder/$1/" -t "$HOME" ".$1"
+					[ $verbose = 1 ] && echo "Stowing .$1 in $modules_folder/$1/ to $HOME"
+
+					if [ "$SUDO_USER" ]; then
+						sudo -E -u "$SUDO_USER" \
+							stow -d "$modules_folder/$1/" \
+							-t "$HOME" ".$1"
+					else
+						stow -d "$modules_folder/$1/" \
+							-t "$HOME" ".$1"
+					fi
+
 				fi
 
-				# TODO: Abstract this mess
-				if [ "$has_apt" ] &&
-					[ -f "$modules_folder/$1/install.apt.sh" ]; then
-					# shellcheck disable=SC2091
+				sripts_in_module=$(find "$modules_folder/$1/" -type f \
+					-regex ".*/[0-9\]\..*\.sh" | sed 's|.*/||' | sort)
+
+				[ $verbose = 1 ] && echo "Scripts in module for $1 are:
+$sripts_in_module"
+				sripts_to_almost_run=
+				for script in $sripts_in_module; do
+					direct_dependency=$(echo "$script" | cut -d '.' -f 3)
+					if [ "$(command -v "$direct_dependency" 2>/dev/null)" ] ||
+						[ "$direct_dependency" = "fallback" ]; then
+						sripts_to_almost_run="$sripts_to_almost_run
+$script"
+					fi
+				done
+				sripts_to_run=
+				for script in $sripts_to_almost_run; do
+					index=$(echo "$script" | cut -d '.' -f 1 |
+						sed 's/-.*//')
+					direct_dependency=$(echo "$script" | cut -d '.' -f 3)
+					# Only keep fallbacks if they are alone in their index
+					if [ "$direct_dependency" = "fallback" ]; then
+						if [ "$(echo "$sripts_to_almost_run" |
+							grep -c "$index.*")" = 1 ]; then
+							sripts_to_run="$sripts_to_run
+$script"
+						fi
+					else
+						sripts_to_run="$sripts_to_run
+$script"
+					fi
+				done
+				[ $verbose = 1 ] && echo "Scripts to run for $1 are:
+$sripts_to_run"
+
+				# Run the resulting script list
+				for script in $sripts_to_run; do
+					echo "Running $script..."
+
+					privilige=$(echo "$script" | cut -d '.' -f 2 |
+						sed 's/-.*//')
+
 					if [ $dry != 1 ]; then
-						(
-							"$modules_folder/$1/install.apt.sh"
-						)
+						if [ "$privilige" = "root" ] ||
+							[ "$privilige" = "sudo" ]; then
+							if [ "$skip_root" = 0 ]; then
+								(
+									sudo "$modules_folder/$1/$script"
+								)
+							else
+								echo "${C_YELLOW}Skipping $script${C_RESET}"
+							fi
+						else
+							if [ "$SUDO_USER" ]; then
+								(
+									sudo -u "$SUDO_USER" "$modules_folder/$1/$script"
+								)
+							else
+								(
+									"$modules_folder/$1/$script"
+								)
+							fi
+						fi
 						result=$((result + $?))
 					fi
-				fi
-				if [ "$has_pacman" ] &&
-					[ -f "$modules_folder/$1/install.pacman.sh" ]; then
-					# shellcheck disable=SC2091
-					if [ $dry != 1 ]; then
-						[ $verbose = 1 ] &&
-							echo "Result before install.pacman.sh $1: $result"
-						(
-							"$modules_folder/$1/install.pacman.sh"
-						)
-						result=$((result + $?))
-						[ $verbose = 1 ] &&
-							echo "Result after install.pacman.sh $1: $result"
-					fi
-				fi
-				if [ -f "$modules_folder/$1/install.sudo.sh" ]; then
-					# shellcheck disable=SC2091
-					if [ $dry != 1 ]; then
-						(
-							"$modules_folder/$1/install.sudo.sh"
-						)
-						result=$((result + $?))
-					fi
-				fi
-				if [ "$has_systemd" ] &&
-					[ -f "$modules_folder/$1/install.systemd.sh" ]; then
-					# shellcheck disable=SC2091
-					if [ $dry != 1 ]; then
-						(
-							"$modules_folder/$1/install.systemd.sh"
-						)
-						result=$((result + $?))
-					fi
-				fi
-				if [ -f "$modules_folder/$1/install.sh" ]; then
-					# shellcheck disable=SC2091
-					if [ $dry != 1 ]; then
-						[ $verbose = 1 ] && echo "Result before install.sh" \
-							"$1: $result"
-						(
-							"$modules_folder/$1/install.sh"
-						)
-						result=$((result + $?))
-						[ $verbose = 1 ] && echo "Result after install.sh" \
-							"$1: $result"
-					fi
-				fi
+				done
 
 				# Calculate fresh hash (always if not dryrunning)
 
 				if [ $dry != 1 ]; then
+					if [ "$SUDO_USER" ]; then
+						sudo -E -u "$SUDO_USER" \
+							tar --absolute-names \
+							--exclude="$modules_folder/$1/$hashfilename" \
+							-c "$modules_folder/$1" |
+							sha1sum >"$modules_folder/$1/$hashfilename"
+					else
+						tar --absolute-names \
+							--exclude="$modules_folder/$1/$hashfilename" \
+							-c "$modules_folder/$1" |
+							sha1sum >"$modules_folder/$1/$hashfilename"
+					fi
 
-					#	TODO ${SUDO_USER:+sudo -u $SUDO_USER} "$(tar --absolute-names \
-					#		--exclude="$modules_folder/$1/$hashfilename" \
-					#		-c "$modules_folder/$1" |
-					#		sha1sum >"$modules_folder/$1/$hashfilename")"
-					tar --absolute-names \
-						--exclude="$modules_folder/$1/$hashfilename" \
-						-c "$modules_folder/$1" |
-						sha1sum >"$modules_folder/$1/$hashfilename"
 					if [ $dry != 1 ] && [ "$result" = 0 ]; then
 						printf "${C_GREEN}Successfully installed \
 %s${C_RESET}\n" "$1"
@@ -486,10 +536,13 @@ install_entry "base" $modules_selected
 
 if [ "$fix_permissions" = 1 ]; then
 	# Fix permissions, except in submodules
-	echo "Fixing permissions..."
-	submodules=$(git submodule status | sed -e 's/^ *//' -e 's/ *$//' | rev |
-		cut -d ' ' -f 2- | rev | cut -d ' ' -f 2- |
-		sed -e 's@^@-not -path "**/@' -e 's@$@/*"@' | tr '\n' ' ')
+	echo "Fixing permissions in $SCRIPT_PATH... "
+	submodules=$(
+		cd "$SCRIPT_PATH" || exit
+		git submodule status | sed -e 's/^ *//' -e 's/ *$//' | rev |
+			cut -d ' ' -f 2- | rev | cut -d ' ' -f 2- |
+			sed -e 's@^@-not -path "**/@' -e 's@$@/*"@' | tr '\n' ' '
+	)
 
 	eval "find $modules_folder -type f \( $submodules \) \
 -regex '.*\.\(sh\|zsh\|bash\|fish\|dash\)' -exec chmod +x {} \;"

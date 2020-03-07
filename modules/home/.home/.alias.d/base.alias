@@ -1,6 +1,10 @@
 #!/bin/sh
 # Aliases
 
+## System
+
+alias restart="sudo reboot now"
+
 ## terminal
 
 alias cl="clear"

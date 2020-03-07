@@ -64,7 +64,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 If you installed NetworkManager you'll also have to enable it's systemd unit by
 
 ```zsh
-systemctl enable NetworkManager.service
+systemctl enable --now NetworkManager.service
 ```
 
 > `enable` allows it to run it on boot, but not `start` it right away.

@@ -1,0 +1,128 @@
+#!/bin/sh
+
+# This script will either clone or create a pass repository for you
+# And will either create or import a gpg key for it
+
+SCRIPT_PATH=$(
+	cd "${0%/*}" || exit
+	pwd
+)
+
+echo "Script path: $SCRIPT_PATH"
+
+if [ "$(id -u)" = 0 ]; then
+	echo "Can't run with root priviliges!"
+	exit 1
+fi
+
+if ! [ -e "$SCRIPT_PATH/origin" ]; then
+	# No origin file, do local setup
+	echo "Origin file is missing, creating a local store instead of cloning one"
+	echo "If you want to clone instead, revert this script by removing the\
+~/.password-store folder"
+	mkdir -p "$HOME/.password-store"
+
+	echo "Creating a fresh gpg key "
+
+	gengpg "Pass keychain key"
+
+	last_key="$(gpg --list-secret-keys |
+		grep "^      " |
+		tail -1 |
+		sed 's/^      //')"
+
+	# initializing pass using the last key
+	pass init "$last_key"
+
+else
+
+	if [ -z "$ORIGIN" ]; then
+		# Origin empty, exit
+		echo "Create a git repo somewhere and then copy the url of it in the"
+		"file called 'origin'. Or delete the file to make a locale pass setup"
+		exit 1
+	else
+		# Origin file has content, clone it
+
+		if [ -e "$HOME/.password-store" ]; then
+			echo "password-store folder already present"
+			existing_origin="$(
+				cd "$HOME/.password-store" || exit
+				git config remote.origin.url
+			)"
+
+			if [ "$ORIGIN" = "$existing_origin" ]; then
+				echo "It has the same origin as in \$ORIGIN. Skip \
+cloning, update instead."
+				pass git pull
+			else
+				echo "Unknown store, it points to $existing_origin. Remove it \
+or fix the origin file"
+				exit 1
+			fi
+		else
+			echo 'Cloning origin password-store...'
+			git clone "$ORIGIN" "$HOME/.password-store"
+		fi
+
+		if ! [ -e "$HOME"/.password-store/.gpg-id ]; then
+			echo "Repo cloned but had no gpg-id, generating new one.."
+			gengpg "Pass keychain key"
+
+			last_key="$(gpg --list-secret-keys |
+				grep "^      " |
+				tail -1 |
+				sed 's/^      //')"
+
+			# initializing pass using the last key
+			pass init "$last_key"
+		fi
+
+		# If the clone is successful, check if the gpg key of the cloned repo
+		# is already imported or not. If not try to import it from a local place
+		# And check again
+		# If it still fails the script will exit. Recover your private key and
+		# place it in `~/pass-private-key.asc` or pass it to this script
+		for i in "1 2"; do
+			if [ "$(gpg --list-keys \
+				"$(cat "$HOME"/.password-store/.gpg-id)" 2>/dev/null)" ]; then
+				echo "Password stores gpg key is present"
+
+				# If doing a full reset (see user-reset.sh)
+				if [ "$FULL_RESET" = 1 ]; then
+					echo "Doing a pass reset"
+
+					gengpg "Pass keychain key"
+
+					last_key="$(gpg --list-secret-keys |
+						grep "^      " |
+						tail -1 |
+						sed 's/^      //')"
+
+					# initializing pass using the last key
+					pass init "$last_key"
+				fi
+				break
+			else
+				echo "Password stores gpg key isn't present. Trying to import \
+from ~/pass-private-key.asc"
+
+				if [ -e "$HOME/pass-private-key.asc" ]; then
+					if [ "$(./.pass/bin/pass-import-key)" ]; then
+						echo "Password import successful.. checking again"
+					else
+						echo "Password import failed for the ${i}th time"
+						exit 1
+					fi
+				else
+					echo "The ~/pass-private-key.asc file does not exist."
+					exit 1
+				fi
+			fi
+		done
+	fi
+fi
+
+# Enable the git helper extension
+git config --global credential.helper /usr/bin/pass-git-helper
+git config --global credential.useHttpPath true

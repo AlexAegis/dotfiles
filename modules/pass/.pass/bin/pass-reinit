@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Reinitialize the pass repo
+FULL_RESET=1 pass-install

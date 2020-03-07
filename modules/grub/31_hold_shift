@@ -35,9 +35,9 @@ export TEXTDOMAINDIR="${datarootdir}/locale"
 found_other_os=
 
 if [ "x${GRUB_HIDDEN_TIMEOUT_QUIET}" = "xtrue" ]; then
-	verbose=
+  verbose=
 else
-	verbose=" --verbose"
+  verbose=" --verbose"
 fi
 
 cat <<EOF
@@ -49,7 +49,7 @@ if [ "x\${timeout}" != "x-1" ]; then
       set timeout=0
     fi
   else
-    if sleep$verbose --interruptible 3 ; then
+    if sleep$verbose --interruptible 0 ; then
       set timeout=0
     fi
   fi
