@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Removes every word from $1 that occurs in $2
 remove_words() {
 	for a in $1; do
@@ -12,5 +14,11 @@ remove_words() {
 		fi
 	done
 
-	echo $res
+	echo "$res"
+}
+
+# Pipable trimmer
+# By default trims spaces
+trim() {
+	rev | cut -d "${1- }" -f 2- | rev | cut -d "${1- }" -f 2-
 }

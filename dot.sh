@@ -441,10 +441,10 @@ install_module() {
 
 				if [ $dry != 1 ]; then
 
-				#	TODO ${SUDO_USER:+sudo -u $SUDO_USER} "$(tar --absolute-names \
-				#		--exclude="$modules_folder/$1/$hashfilename" \
-				#		-c "$modules_folder/$1" |
-				#		sha1sum >"$modules_folder/$1/$hashfilename")"
+					#	TODO ${SUDO_USER:+sudo -u $SUDO_USER} "$(tar --absolute-names \
+					#		--exclude="$modules_folder/$1/$hashfilename" \
+					#		-c "$modules_folder/$1" |
+					#		sha1sum >"$modules_folder/$1/$hashfilename")"
 					tar --absolute-names \
 						--exclude="$modules_folder/$1/$hashfilename" \
 						-c "$modules_folder/$1" |
@@ -485,11 +485,15 @@ install_entry "base" $modules_selected
 	"$final_module_list"
 
 if [ "$fix_permissions" = 1 ]; then
-	# Fix permissions
+	# Fix permissions, except in submodules
 	echo "Fixing permissions..."
-	# TODO: Alternative with shebang search: grep -rIzl '^#!' $modules_folder
-	find "$modules_folder" -type f \
-		-regex ".*\.\(sh\|zsh\|bash\|fish\|dash\)" -exec chmod +x {} \;
+	submodules=$(git submodule status | sed -e 's/^ *//' -e 's/ *$//' | rev |
+		cut -d ' ' -f 2- | rev | cut -d ' ' -f 2- |
+		sed -e 's@^@-not -path "**/@' -e 's@$@/*"@' | tr '\n' ' ')
+
+	eval "find $modules_folder -type f \( $submodules \) \
+-regex '.*\.\(sh\|zsh\|bash\|fish\|dash\)' -exec chmod +x {} \;"
+
 fi
 # shellcheck disable=SC2086
 install_module $final_module_list
