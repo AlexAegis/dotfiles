@@ -42,3 +42,9 @@ Folder size
 ```sh
 du -sh .
 ```
+
+Get the home folder of the invoker regardless of sudo
+
+```sh
+invoker_home=$(getent passwd "${SUDO_USER-$USER}" | cut -d: -f6)
+```

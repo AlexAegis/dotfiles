@@ -45,6 +45,8 @@
 # TODO: dot --update -u if no modules are supplied then update every installed
 
 # TODO: If the module containes a git submodule. Check it out / update it
+
+# TODO: clash feature support tags, see if something from that tag is installed
 # dot install
 # sets config 1 preset 0, opens up whiptail list without selections
 
