@@ -4,4 +4,4 @@ alt + a
 	notify-send "sxhkrd.d cool-retro-term"  && cool-retro-term
 
 alt + t
-	notify-send "sxhkrd.d is loaded"
+	notify-send "sxhkrd.d is loaded!"
