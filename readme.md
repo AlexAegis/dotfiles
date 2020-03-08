@@ -1,15 +1,14 @@
-# dotfiles
+# [dot.sh](./dot.sh)
 
-My Dotfiles
+[dot.sh](./dot.sh) and my dotfiles as a live example
 
-Installing packages require root priviliges. Installing configs however don't.
-If you give `dot` root priviliges it will install all packages, but when not,
-it will only return a list of what it nee
+![Automation](https://imgs.xkcd.com/comics/automation.png)
 
 ## Prerequisites
 
 A [POSIX](https://en.wikipedia.org/wiki/POSIX) capable shell on `/bin/sh`
-I tested on `dash` and `bash`
+to run `dot` itself.
+I tested on `dash` and `bash`.
 
 ## Installation
 
@@ -19,75 +18,33 @@ git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
 
 > Read what dotlink does before you execute it with sudo
 
-Then to make `dot` available everywhere create a symlink of it with `dotlink`
+Then to make `dot` available everywhere create a symlink of it with
+[`dotlink`](./dotlink.sh)
 
 ```sh
 sudo ~/.dotfiles/dotlink.sh
-sudo -E dot install base
 ```
 
-This will symlink `dot` to `/usr/local/bin/dot` then installs the [necessary packages](./modules/base/install.pacman.sh) like git and stow
+This will symlink `dot` to `/usr/local/bin/dot` so it's more convinient to use.
 
 ## Usage
 
 ```sh
-dot install module
+dot [-] modules...
 ```
 
 TODO: Parameterize
 
-## Goals
+## Priviliges
 
-Use an interactive config
-Be able to detect (by hostname) my pc (hardware based configs like audio)
-Be able to detect distro (and use the correct installers)
-And make a folder stucture to represent this
+Installing packages require root priviliges. Installing configs however don't.
+But you don't want to clutter your home folder with files owned by `root`.
+That's why `dot` handles privileges based on the name of the module scripts.
+A user priviliged script will always run with your user even if you run dot with
+`sudo` and likewise a root priviliged script with always try to invoke sudo.
 
-1. TMUX
-2. SHELL
-3. SSH and Security (PW protected primary, optional passwordless secondary)
-   Option to use a global password in every later configuration step, or
-   ask every time.
+## Versioning
 
-![Automation](https://imgs.xkcd.com/comics/automation.png)
-
-Expectations:
-
-- VERSIONING
-
-```sh
-tar --exclude='zsh/.tarhash' -c zsh | sha1sum > zsh/.tarhash
-```
-
-and save it in the repos module folder (so it doesn't conflict. It's gitignored anyways)
-dont forget to ignore the tarhashfile itself from the hashing
-
-- Should be environment aware
-
-  > Should work on different type of distros
-  > options to fail hard or force as much as it can
-
-- Revertable changes
-
-  > try using symlinks everywhere, collect
-  > the installed symlinks in an uninstall script)
-
-- Differentiate between being an owner and a guest. (Setup on remote)
-
-- Provide update script for git based packages
-
-- Dependency resolve:
-  - check if dependency is fulfilled or not with unique script in the module
-  - if not install that,
-
-TODO Read: <http://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/autoconf.html#Portable-Shell>
-
-TODO: Based on this remap keys as follows:
-<https://github.com/10ne1/carpalx-keyboard/blob/master/README>
-
-caps as is to esc
-caps with something is ctrl and something
-either long caps is caps or ctrl caps is caps. Or both
-
-TODO: Sudo handling. If sudo is not set throw warning. and run only install.sh
-If sudo is set but no E flag or u, exit immediately
+Already installed dotmodules will be only reinstalled if the module has changed
+or when forced with `-f`. This is done by making a `sha1` checksum of the `tar`
+of the folder and saving it into a file called `.tarhash` in the module.

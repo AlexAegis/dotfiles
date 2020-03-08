@@ -1,5 +1,4 @@
-# sxhkd
+# [sxhkd](https://github.com/baskerville/sxhkd)
 
-```
- --config %h/.config/sxhkd/conf.d/*
-```
+This module sets up `sxhkd` as a systemd user daemon and loads every config
+from `~/.config/sxhkd/sxhkdrc.d/*`

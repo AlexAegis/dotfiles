@@ -294,6 +294,39 @@ get_condition() {
 	echo "$1" | cut -d '?' -s -f 2- | sed 's/^ //'
 }
 
+execute_scripts_for_module() {
+	for script in $2; do
+		echo "Running $script..."
+
+		privilige=$(echo "$script" | cut -d '.' -f 2 |
+			sed 's/-.*//')
+
+		if [ $dry != 1 ]; then
+			if [ "$privilige" = "root" ] ||
+				[ "$privilige" = "sudo" ]; then
+				if [ "$skip_root" = 0 ]; then
+					(
+						sudo "$modules_folder/$1/$script"
+					)
+				else
+					echo "${C_YELLOW}Skipping $script${C_RESET}"
+				fi
+			else
+				if [ "$SUDO_USER" ]; then
+					(
+						sudo -u "$SUDO_USER" "$modules_folder/$1/$script"
+					)
+				else
+					(
+						"$modules_folder/$1/$script"
+					)
+				fi
+			fi
+			result=$((result + $?))
+		fi
+	done
+}
+
 install_entry() {
 	while :; do
 		if [ "$1" ]; then
@@ -395,12 +428,18 @@ install_module() {
 
 				[ "$dry" != 1 ] && echo "${C_CYAN}Applying dotmodule $1$C_RESET"
 
+				init_sripts_in_module=$(find "$modules_folder/$1/" -type f \
+					-regex "^.*/init\..*\.sh$" | sed 's|.*/||' | sort)
+
+				execute_scripts_for_module "$1" "$init_sripts_in_module"
+
 				# ? This will force the stowed folder name to be the same as
 				# ? the module name with a dot. And that enforces unique stow
 				# ? modules which would otherwise conflict
 				# TODO: Mention this in the documentation, and move the ? there
 				if [ $dry != 1 ] && [ -e "$modules_folder/$1/.$1" ]; then
-					[ $verbose = 1 ] && echo "Stowing .$1 in $modules_folder/$1/ to $HOME"
+					[ $verbose = 1 ] &&
+						echo "Stowing .$1 in $modules_folder/$1/ to $HOME"
 
 					if [ "$SUDO_USER" ]; then
 						sudo -E -u "$SUDO_USER" \
@@ -414,7 +453,7 @@ install_module() {
 				fi
 
 				sripts_in_module=$(find "$modules_folder/$1/" -type f \
-					-regex ".*/[0-9\]\..*\.sh" | sed 's|.*/||' | sort)
+					-regex "^.*/[0-9\]\..*\.sh$" | sed 's|.*/||' | sort)
 
 				[ $verbose = 1 ] && echo "Scripts in module for $1 are:
 $sripts_in_module"
@@ -448,36 +487,7 @@ $script"
 $sripts_to_run"
 
 				# Run the resulting script list
-				for script in $sripts_to_run; do
-					echo "Running $script..."
-
-					privilige=$(echo "$script" | cut -d '.' -f 2 |
-						sed 's/-.*//')
-
-					if [ $dry != 1 ]; then
-						if [ "$privilige" = "root" ] ||
-							[ "$privilige" = "sudo" ]; then
-							if [ "$skip_root" = 0 ]; then
-								(
-									sudo "$modules_folder/$1/$script"
-								)
-							else
-								echo "${C_YELLOW}Skipping $script${C_RESET}"
-							fi
-						else
-							if [ "$SUDO_USER" ]; then
-								(
-									sudo -u "$SUDO_USER" "$modules_folder/$1/$script"
-								)
-							else
-								(
-									"$modules_folder/$1/$script"
-								)
-							fi
-						fi
-						result=$((result + $?))
-					fi
-				done
+				execute_scripts_for_module "$1" "$sripts_to_run"
 
 				# Calculate fresh hash (always if not dryrunning)
 
