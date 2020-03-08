@@ -27,6 +27,7 @@
 	cp = cherry-pick
 	sub = submodule update --init --recursive
 	dd = diff --cached
+	lc = config --list --show-origin
 
 [color]
 	ui = true
