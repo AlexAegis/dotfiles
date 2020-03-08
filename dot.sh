@@ -8,7 +8,6 @@
 #
 # A simple dotmodule manager
 # TODO: Rice this script https://stackoverflow.com/questions/430078
-# Run with `sudo -E dot` if you need root in some modules
 #
 # Dots main purpose is to invoke scripts defined in dotmodules
 # It is designed this way so each dotmodule is a self contained entity
@@ -30,7 +29,7 @@
 
 # TODO: Clash support. Use .clash file, if two modules clash, ask which to use
 # TODO: If a clashing module is already installed, abort, ask if interactive,
-# remove other if forced
+# TODO: remove other if forced
 
 # TODO: Auto unstow at end of uninstall
 
@@ -47,48 +46,6 @@
 # TODO: If the module containes a git submodule. Check it out / update it
 
 # TODO: clash feature support tags, see if something from that tag is installed
-# dot install
-# sets config 1 preset 0, opens up whiptail list without selections
-
-# dot install a b
-# installs module a b
-
-# dot -c install a b
-# opens up whiptail with a and b preselected
-
-# dot preset p
-# installs preset p
-
-# dot -c preset p
-# opens up whiptail with all the modules of p selected
-
-# dot preset
-# opens up a whiptail list of all the presets, selecting one installs it
-
-# dot -c preset
-# opens up a whiptail list of all the presets, selecting one opens it
-# like dot -c preset p
-
-# dot -mp PATH
-# sets the m and p configs both to PATH which is the folders where the
-# modules and presets live. It can be `;` separated.
-
-# dot
-# dot help
-# dot -h
-# dot --help
-# opens up help
-
-# dot -f --force
-# by default dot compares a tarhash of the last installed module, and only
-# reinstalls if it changed
-# if forced however it could skip this test.
-# It always updates the hash regardless of forcing or not
-# dont forget to ignore the hashfile itself from the hashing
-
-# Pull and update submodules
-# git submodule init
-# git submodule update
 
 C_RESET='\033[0m'
 C_RED='\033[0;31m'
@@ -105,11 +62,11 @@ is_installed() {
 	command -v "$1" 2>/dev/null
 }
 
+# Environment
 script_path="$(dirname "$(readlink -f "$0")")"
-
 user_home=$(getent passwd "${SUDO_USER-$USER}" | cut -d: -f6)
 
-# Reset all variables that might be set
+# Config
 IFS='
 '
 modules_selected=""
@@ -118,6 +75,9 @@ final_module_list=""
 config=0
 skip_root=0
 force=0
+update=0
+all=0
+no_expand=0
 fix_permissions=0
 modules_folder="$script_path/modules"
 presets_folder="$script_path/presets"
@@ -128,6 +88,7 @@ tagsfilename=".tags"
 verbose=0 # Print more
 dry=0     # When set, no installation will be done
 
+# Config file sourcing
 if [ -e "$user_home/.config/dot/dotrc" ]; then
 	# shellcheck disable=SC1090
 	. "$user_home/.config/dot/dotrc"
@@ -163,6 +124,8 @@ all_tags=$(find "$modules_folder"/*/ -maxdepth 1 -mindepth 1 -name '.tags' \
 pacman=$(is_installed pacman)
 apt=$(is_installed apt)
 sysctl=$(is_installed sysctl)
+systemctl=$(is_installed systemctl)
+systemd=$systemctl
 # TODO: Only valid on systemd distros
 distribution=$(grep "^NAME" /etc/os-release | grep -oh "=.*" | tr -d '="')
 arch=$(if [ "$distribution" = 'Arch Linux' ]; then echo 1; fi)
@@ -171,27 +134,13 @@ debian=$(if [ "$distribution" = 'Debian GNU/Linux' ]; then echo 1; fi)
 ubuntu=$(if [ "$distribution" = 'Ubuntu' ]; then echo 1; fi)
 fedora=$(if [ "$distribution" = 'Fedora' ]; then echo 1; fi)
 
+## Argument handling
+
 while :; do
 	# echo "Evaluating $1"
 	case $1 in
 	-h | -\? | --help) # Show help.
 		show_help
-		exit
-		;;
-	-u | --update) # Run update.sh on every installed dotmodule
-
-		echo "Update handlingit not done"
-		# 		for mod in $all_installed; do
-		# 			echo "Updating $mod..."
-		# 			if [ -e "$modules_folder/$mod/update.sh" ]; then
-		# 				(
-		# 					"$modules_folder/$mod/update.sh"
-		# 				)
-		# 			else
-		# 				echo "${C_YELLOW}$mod does not have an update file. \
-		# Skipping...${C_RESET}"
-		# 			fi
-		# 		done
 		exit
 		;;
 	-la | --list-all)
@@ -225,6 +174,8 @@ while :; do
 \$pacman: $pacman
 \$apt: $apt
 \$sysctl: $sysctl
+\$systemctl: $systemctl
+\$systemd: $systemd
 \$arch: $arch (is set when \$distribution is 'Arch Linux')
 \$void: $void (is set when \$distribution is 'Void Linux')
 \$debian: $debian (is set when \$distribution is 'Debian GNU/Linux')
@@ -241,6 +192,12 @@ anything you pass to it. For example:
 	-v | --verbose) # Verbose printing TODO: Pass to the dotmodules
 		verbose=1
 		;;
+	-u | --update) # Run only update scripts
+		update=1
+		;;
+	-a | --all) # Run all modules
+		all=1
+		;;
 	-d | --dry) #  customize installable modules
 		dry=1
 		;;
@@ -253,10 +210,13 @@ anything you pass to it. For example:
 	-c | --config | --custom) # Ask for everything
 		config=1
 		;;
+	-ne | --no-expand) # Disables dependency resolvement, run only selected
+		no_expand=1
+		;;
 	-sr | --skip-root) # Skip root scripts
 		skip_root=1
 		;;
-	-sc | --scaffold) # Ask for everything
+	-sc | -cpt | --scaffold) # Ask for everything
 		# TODO: cpt template and dot --scaffold command to create from template
 		# TODO: Use the remaining inputs as module folders to scaffold using cpt
 		# TODO: If cpt is not available then try install it with cargo first
@@ -398,7 +358,6 @@ $1"
 						final_module_list="$final_module_list
 $(get_entry "$1")"
 					fi
-					# execute_module "$1"
 					;;
 				esac
 				[ $verbose = 1 ] && echo "...done resolving $1"
@@ -418,24 +377,31 @@ init_module() {
 	execute_scripts_for_module "$1" "$init_sripts_in_module"
 }
 
-update_module() {
-	update_sripts_in_module=$(find "$modules_folder/$1/" -type f \
-		-regex "^.*/update\..*\.sh$" | sed 's|.*/||' | sort)
-	execute_scripts_for_module "$1" "$update_sripts_in_module"
+update_modules() {
+	while :; do
+		if [ "$1" ]; then
+			update_sripts_in_module=$(find "$modules_folder/$1/" -type f \
+				-regex "^.*/update\..*\.sh$" | sed 's|.*/||' | sort)
+			execute_scripts_for_module "$1" "$update_sripts_in_module"
+			shift
+		else
+			break
+		fi
+	done
 }
 
 stow_module() {
 	if [ $dry != 1 ] && [ -e "$modules_folder/$1/.$1" ]; then
 		[ $verbose = 1 ] &&
-			echo "Stowing .$1 in $modules_folder/$1/ to $HOME"
+			echo "Stowing .$1 in $modules_folder/$1/ to $user_home"
 
 		if [ "$SUDO_USER" ]; then
 			sudo -E -u "$SUDO_USER" \
 				stow -d "$modules_folder/$1/" \
-				-t "$HOME" ".$1"
+				-t "$user_home" ".$1"
 		else
 			stow -d "$modules_folder/$1/" \
-				-t "$HOME" ".$1"
+				-t "$user_home" ".$1"
 		fi
 
 	fi
@@ -503,7 +469,7 @@ hash_module() {
 	fi
 }
 
-execute_module() {
+execute_modules() {
 	while :; do
 		if [ "$1" ]; then
 			result=0
@@ -574,7 +540,7 @@ execute_module() {
 	done
 }
 
-if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
+if [ "$all" = 0 ] && [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 	modules_selected=$(whiptail --title "Select modules to install" \
 		--checklist "Space changes selection, enter approves" \
 		0 0 0 zsh zsh ON vim vim OFF 3>&1 1>&2 2>&3 3>&- |
@@ -582,8 +548,19 @@ if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 		trim_around)
 fi
 
+## Execution
+
 # shellcheck disable=SC2086
-expand_entry "base" $modules_selected
+if [ "$all" = 1 ]; then
+	expand_entry $all_modules
+else
+	# shellcheck disable=SC2086
+	if [ "$no_expand" = 1 ]; then
+		final_module_list=$modules_selected
+	else
+		expand_entry "base" $modules_selected
+	fi
+fi
 
 [ $verbose = 1 ] && printf "${C_CYAN}Going to install:${C_RESET}\n%s\n" \
 	"$final_module_list"
@@ -591,5 +568,11 @@ expand_entry "base" $modules_selected
 if [ "$fix_permissions" = 1 ]; then
 	do_fix_permissions
 fi
-# shellcheck disable=SC2086
-execute_module $final_module_list
+
+if [ "$update" = 1 ]; then
+	# shellcheck disable=SC2086
+	update_modules $final_module_list
+else
+	# shellcheck disable=SC2086
+	execute_modules $final_module_list
+fi

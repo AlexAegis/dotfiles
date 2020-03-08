@@ -21,4 +21,3 @@ alias | grep -q ^l= || alias l="ls -AlF"
 ## dot
 
 alias cdot="cd ~/.dotfiles"
-alias sdot="sudo -E dot -fp"

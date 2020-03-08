@@ -1,1 +1,1 @@
-rust ? [ $pacman = 0 ]
+rust ? [ ! $pacman ]

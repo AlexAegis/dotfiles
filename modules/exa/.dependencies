@@ -1,1 +1,1 @@
-rust ? [ $try_from_source ]
+rust ? [ ! $pacman ]
