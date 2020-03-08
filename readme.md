@@ -2,6 +2,14 @@
 
 [dot.sh](./dot.sh) and my dotfiles as a live example
 
+## What is dot
+
+It's a single shell script designed to install programs and personal configs
+in bulk in a highly configurable and environmentally aware way using as simple
+techniques as possible.
+
+### It's my first shell script project so please leave issues if you have any
+
 ![Automation](https://imgs.xkcd.com/comics/automation.png)
 
 ## Prerequisites
@@ -34,6 +42,14 @@ dot [-] modules...
 ```
 
 TODO: Parameterize
+
+## Features
+
+Dot
+
+### Dotmodules
+
+### Installi
 
 ## Priviliges
 

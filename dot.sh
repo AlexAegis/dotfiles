@@ -105,7 +105,9 @@ is_installed() {
 	command -v "$1" 2>/dev/null
 }
 
-SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
+script_path="$(dirname "$(readlink -f "$0")")"
+
+user_home=$(getent passwd "${SUDO_USER-$USER}" | cut -d: -f6)
 
 # Reset all variables that might be set
 IFS='
@@ -117,14 +119,35 @@ config=0
 skip_root=0
 force=0
 fix_permissions=0
-modules_folder="$SCRIPT_PATH/modules" # TODO: use relative to script
-presets_folder="$SCRIPT_PATH/presets" # TODO: use relative to script
+modules_folder="$script_path/modules"
+presets_folder="$script_path/presets"
 preset_extension=".preset"
 hashfilename=".tarhash"
 dependenciesfilename=".dependencies"
 tagsfilename=".tags"
 verbose=0 # Print more
 dry=0     # When set, no installation will be done
+
+if [ -e "$user_home/.config/dot/dotrc" ]; then
+	# shellcheck disable=SC1090
+	. "$user_home/.config/dot/dotrc"
+fi
+
+if [ -e "$user_home/.config/dotrc" ]; then
+	# shellcheck disable=SC1090
+	. "$user_home/.config/dotrc"
+fi
+
+if [ -e "$user_home/.dotrc" ]; then
+	# shellcheck disable=SC1090
+	. "$user_home/.dotrc"
+fi
+
+if [ -e "./.dotrc" ]; then
+	# shellcheck disable=SC1090,SC1091
+	. "./.dotrc"
+fi
+
 # TODO: Only needed when printing and using whiptail. Lazy load it.
 all_modules=$(find "$modules_folder/" -maxdepth 1 -mindepth 1 -printf "%f\n" |
 	sort)
@@ -255,11 +278,19 @@ anything you pass to it. For example:
 	shift
 done
 
-if [ $verbose = 1 ]; then
-	echo "pacman? $pacman"
-	echo "apt? $apt"
-	echo "sysctl? $sysctl"
-fi
+do_fix_permissions() {
+	# Fix permissions, except in submodules
+	echo "Fixing permissions in $script_path... "
+	submodules=$(
+		cd "$script_path" || exit
+		git submodule status | sed -e 's/^ *//' -e 's/ *$//' | rev |
+			cut -d ' ' -f 2- | rev | cut -d ' ' -f 2- |
+			sed -e 's@^@-not -path "**/@' -e 's@$@/*"@' | tr '\n' ' '
+	)
+
+	eval "find $modules_folder -type f \( $submodules \) \
+-regex '.*\.\(sh\|zsh\|bash\|fish\|dash\)' -exec chmod +x {} \;"
+}
 
 trim_around() {
 	# removes the first and last characters from every line
@@ -327,7 +358,7 @@ execute_scripts_for_module() {
 	done
 }
 
-install_entry() {
+expand_entry() {
 	while :; do
 		if [ "$1" ]; then
 			# Extracting condition, if there is
@@ -352,22 +383,22 @@ $1"
 				case "$1" in
 				+*) # presets
 					# shellcheck disable=SC2046
-					install_entry $(in_preset "$(get_entry "$1" | cut -c2-)")
+					expand_entry $(in_preset "$(get_entry "$1" | cut -c2-)")
 					;;
 				:*) # tags
 					# shellcheck disable=SC2046
-					install_entry $(has_tag "$(get_entry "$1" | cut -c2-)")
+					expand_entry $(has_tag "$(get_entry "$1" | cut -c2-)")
 					;;
 				*) # modules
 					# shellcheck disable=SC2046
-					install_entry $(get_dependencies "$(get_entry "$1")")
+					expand_entry $(get_dependencies "$(get_entry "$1")")
 					if [ -z "$final_module_list" ]; then
 						final_module_list="$(get_entry "$1")"
 					else
 						final_module_list="$final_module_list
 $(get_entry "$1")"
 					fi
-					# install_module "$1"
+					# execute_module "$1"
 					;;
 				esac
 				[ $verbose = 1 ] && echo "...done resolving $1"
@@ -381,7 +412,98 @@ $(get_entry "$1")"
 	done
 }
 
+init_module() {
+	init_sripts_in_module=$(find "$modules_folder/$1/" -type f \
+		-regex "^.*/init\..*\.sh$" | sed 's|.*/||' | sort)
+	execute_scripts_for_module "$1" "$init_sripts_in_module"
+}
+
+update_module() {
+	update_sripts_in_module=$(find "$modules_folder/$1/" -type f \
+		-regex "^.*/update\..*\.sh$" | sed 's|.*/||' | sort)
+	execute_scripts_for_module "$1" "$update_sripts_in_module"
+}
+
+stow_module() {
+	if [ $dry != 1 ] && [ -e "$modules_folder/$1/.$1" ]; then
+		[ $verbose = 1 ] &&
+			echo "Stowing .$1 in $modules_folder/$1/ to $HOME"
+
+		if [ "$SUDO_USER" ]; then
+			sudo -E -u "$SUDO_USER" \
+				stow -d "$modules_folder/$1/" \
+				-t "$HOME" ".$1"
+		else
+			stow -d "$modules_folder/$1/" \
+				-t "$HOME" ".$1"
+		fi
+
+	fi
+}
+
 install_module() {
+	sripts_in_module=$(find "$modules_folder/$1/" -type f \
+		-regex "^.*/[0-9\]\..*\.sh$" | sed 's|.*/||' | sort)
+
+	[ $verbose = 1 ] && echo "Scripts in module for $1 are:
+$sripts_in_module"
+	sripts_to_almost_run=
+	for script in $sripts_in_module; do
+		direct_dependency=$(echo "$script" | cut -d '.' -f 3)
+		if [ "$(command -v "$direct_dependency" 2>/dev/null)" ] ||
+			[ "$direct_dependency" = "fallback" ]; then
+			sripts_to_almost_run="$sripts_to_almost_run
+$script"
+		fi
+	done
+	sripts_to_run=
+	for script in $sripts_to_almost_run; do
+		index=$(echo "$script" | cut -d '.' -f 1 |
+			sed 's/-.*//')
+		direct_dependency=$(echo "$script" | cut -d '.' -f 3)
+		# Only keep fallbacks if they are alone in their index
+		if [ "$direct_dependency" = "fallback" ]; then
+			if [ "$(echo "$sripts_to_almost_run" |
+				grep -c "$index.*")" = 1 ]; then
+				sripts_to_run="$sripts_to_run
+$script"
+			fi
+		else
+			sripts_to_run="$sripts_to_run
+$script"
+		fi
+	done
+	[ $verbose = 1 ] && echo "Scripts to run for $1 are:
+$sripts_to_run"
+
+	# Run the resulting script list
+	execute_scripts_for_module "$1" "$sripts_to_run"
+}
+
+hash_module() {
+	if [ "$SUDO_USER" ]; then
+		sudo -E -u "$SUDO_USER" \
+			tar --absolute-names \
+			--exclude="$modules_folder/$1/$hashfilename" \
+			-c "$modules_folder/$1" |
+			sha1sum >"$modules_folder/$1/$hashfilename"
+	else
+		tar --absolute-names \
+			--exclude="$modules_folder/$1/$hashfilename" \
+			-c "$modules_folder/$1" |
+			sha1sum >"$modules_folder/$1/$hashfilename"
+	fi
+
+	if [ $dry != 1 ] && [ "$result" = 0 ]; then
+		printf "${C_GREEN}Successfully installed \
+%s${C_RESET}\n" "$1"
+	else
+		printf "${C_RED}Installation failed \
+%s${C_RESET}\n" "$1"
+	fi
+}
+
+execute_module() {
 	while :; do
 		if [ "$1" ]; then
 			result=0
@@ -428,90 +550,16 @@ install_module() {
 
 				[ "$dry" != 1 ] && echo "${C_CYAN}Applying dotmodule $1$C_RESET"
 
-				init_sripts_in_module=$(find "$modules_folder/$1/" -type f \
-					-regex "^.*/init\..*\.sh$" | sed 's|.*/||' | sort)
+				init_module "$1"
 
-				execute_scripts_for_module "$1" "$init_sripts_in_module"
+				stow_module "$1"
 
-				# ? This will force the stowed folder name to be the same as
-				# ? the module name with a dot. And that enforces unique stow
-				# ? modules which would otherwise conflict
-				# TODO: Mention this in the documentation, and move the ? there
-				if [ $dry != 1 ] && [ -e "$modules_folder/$1/.$1" ]; then
-					[ $verbose = 1 ] &&
-						echo "Stowing .$1 in $modules_folder/$1/ to $HOME"
-
-					if [ "$SUDO_USER" ]; then
-						sudo -E -u "$SUDO_USER" \
-							stow -d "$modules_folder/$1/" \
-							-t "$HOME" ".$1"
-					else
-						stow -d "$modules_folder/$1/" \
-							-t "$HOME" ".$1"
-					fi
-
-				fi
-
-				sripts_in_module=$(find "$modules_folder/$1/" -type f \
-					-regex "^.*/[0-9\]\..*\.sh$" | sed 's|.*/||' | sort)
-
-				[ $verbose = 1 ] && echo "Scripts in module for $1 are:
-$sripts_in_module"
-				sripts_to_almost_run=
-				for script in $sripts_in_module; do
-					direct_dependency=$(echo "$script" | cut -d '.' -f 3)
-					if [ "$(command -v "$direct_dependency" 2>/dev/null)" ] ||
-						[ "$direct_dependency" = "fallback" ]; then
-						sripts_to_almost_run="$sripts_to_almost_run
-$script"
-					fi
-				done
-				sripts_to_run=
-				for script in $sripts_to_almost_run; do
-					index=$(echo "$script" | cut -d '.' -f 1 |
-						sed 's/-.*//')
-					direct_dependency=$(echo "$script" | cut -d '.' -f 3)
-					# Only keep fallbacks if they are alone in their index
-					if [ "$direct_dependency" = "fallback" ]; then
-						if [ "$(echo "$sripts_to_almost_run" |
-							grep -c "$index.*")" = 1 ]; then
-							sripts_to_run="$sripts_to_run
-$script"
-						fi
-					else
-						sripts_to_run="$sripts_to_run
-$script"
-					fi
-				done
-				[ $verbose = 1 ] && echo "Scripts to run for $1 are:
-$sripts_to_run"
-
-				# Run the resulting script list
-				execute_scripts_for_module "$1" "$sripts_to_run"
+				install_module "$1"
 
 				# Calculate fresh hash (always if not dryrunning)
 
 				if [ $dry != 1 ]; then
-					if [ "$SUDO_USER" ]; then
-						sudo -E -u "$SUDO_USER" \
-							tar --absolute-names \
-							--exclude="$modules_folder/$1/$hashfilename" \
-							-c "$modules_folder/$1" |
-							sha1sum >"$modules_folder/$1/$hashfilename"
-					else
-						tar --absolute-names \
-							--exclude="$modules_folder/$1/$hashfilename" \
-							-c "$modules_folder/$1" |
-							sha1sum >"$modules_folder/$1/$hashfilename"
-					fi
-
-					if [ $dry != 1 ] && [ "$result" = 0 ]; then
-						printf "${C_GREEN}Successfully installed \
-%s${C_RESET}\n" "$1"
-					else
-						printf "${C_RED}Installation failed \
-%s${C_RESET}\n" "$1"
-					fi
+					hash_module "$1"
 				fi
 
 			else
@@ -535,24 +583,13 @@ if [ -z "$modules_selected" ] || [ "$config" = 1 ]; then
 fi
 
 # shellcheck disable=SC2086
-install_entry "base" $modules_selected
+expand_entry "base" $modules_selected
 
 [ $verbose = 1 ] && printf "${C_CYAN}Going to install:${C_RESET}\n%s\n" \
 	"$final_module_list"
 
 if [ "$fix_permissions" = 1 ]; then
-	# Fix permissions, except in submodules
-	echo "Fixing permissions in $SCRIPT_PATH... "
-	submodules=$(
-		cd "$SCRIPT_PATH" || exit
-		git submodule status | sed -e 's/^ *//' -e 's/ *$//' | rev |
-			cut -d ' ' -f 2- | rev | cut -d ' ' -f 2- |
-			sed -e 's@^@-not -path "**/@' -e 's@$@/*"@' | tr '\n' ' '
-	)
-
-	eval "find $modules_folder -type f \( $submodules \) \
--regex '.*\.\(sh\|zsh\|bash\|fish\|dash\)' -exec chmod +x {} \;"
-
+	do_fix_permissions
 fi
 # shellcheck disable=SC2086
-install_module $final_module_list
+execute_module $final_module_list
