@@ -1,1 +1,1 @@
-rust
+rust ? [ $pacman = 0 ]
