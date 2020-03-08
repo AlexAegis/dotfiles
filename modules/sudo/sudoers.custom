@@ -1,0 +1,15 @@
+## sudoers file.
+## sudo visudo -c -q -f sudoers.wheel
+##
+## /etc/sudoers priviliges:
+## -r--r----- 1 root root
+##
+## This file NOT NECESSARILY has to be edited with the 'visudo' command as root.
+## Failure to use 'visudo' may result in syntax or file permission errors
+## that prevent sudo from running.
+##
+## See the 0.root.sh file for the details on why.
+##
+
+%wheel ALL=(ALL) NOPASSWD: ALL
+%wheel ALL=(ALL) PASSWD: /sbin/pass
