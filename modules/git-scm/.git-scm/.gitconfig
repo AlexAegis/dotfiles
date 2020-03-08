@@ -1,0 +1,41 @@
+[user]
+	name = AlexAegis
+	email = alexaegis@gmail.com
+
+[github]
+	user = AlexAegis
+
+[core]
+	askpass = /usr/bin/ksshaskpass
+
+[credential]
+	helper = /usr/bin/pass-git-helper
+	useHttpPath = true
+
+[push]
+	default = upstream
+
+[alias]
+	ci = commit -v
+	co = checkout
+	st = status
+	br = branch
+	df = diff
+	lg = log -p
+	who = shortlog -s --
+	rb = rebase
+	cp = cherry-pick
+	sub = submodule update --init --recursive
+	dd = diff --cached
+
+[color]
+	ui = true
+
+[help]
+	autoCorrect = 20
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

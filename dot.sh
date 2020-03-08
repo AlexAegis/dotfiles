@@ -31,16 +31,8 @@
 # TODO: Clash support. Use .clash file, if two modules clash, ask which to use
 # TODO: If a clashing module is already installed, abort, ask if interactive,
 # remove other if forced
-# TODO: ? optional dep resolve.
 
-# TODO: Auto stow at start of install
 # TODO: Auto unstow at end of uninstall
-
-# TODO: .dot file in a dotmodule that is sourced before installing that module
-
-# TODO: Fallback installation. Provide a $try_from_source when no packagemanager
-# TODO: files are present (or when a .dot file is present and has this var set)
-# TODO: See 'exa' module for example
 
 # TODO: track dangling dependencies. When installing leave a file in the module
 # TODO: that will store a snapshot of the dependencies. During uninstall check
