@@ -1,0 +1,3 @@
+# fnm
+
+Fast Node manager
