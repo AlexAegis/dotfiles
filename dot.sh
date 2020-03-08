@@ -154,17 +154,19 @@ while :; do
 		exit
 		;;
 	-u | --update) # Run update.sh on every installed dotmodule
-		for mod in $all_installed; do
-			echo "Updating $mod..."
-			if [ -e "$modules_folder/$mod/update.sh" ]; then
-				(
-					"$modules_folder/$mod/update.sh"
-				)
-			else
-				echo "${C_YELLOW}$mod does not have an update file. \
-Skipping...${C_RESET}"
-			fi
-		done
+
+		echo "Update handlingit not done"
+		# 		for mod in $all_installed; do
+		# 			echo "Updating $mod..."
+		# 			if [ -e "$modules_folder/$mod/update.sh" ]; then
+		# 				(
+		# 					"$modules_folder/$mod/update.sh"
+		# 				)
+		# 			else
+		# 				echo "${C_YELLOW}$mod does not have an update file. \
+		# Skipping...${C_RESET}"
+		# 			fi
+		# 		done
 		exit
 		;;
 	-la | --list-all)

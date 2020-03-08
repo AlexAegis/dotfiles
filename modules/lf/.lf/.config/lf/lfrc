@@ -1,0 +1,22 @@
+## settings
+
+set hidden
+set scrolloff 10
+set tabstop 4
+set icons
+set color256
+set timefmt '2006 Jan _2 Mon 15:04:05'
+set info size:time
+set ratios '1:2'
+set wrapscroll
+set number
+
+# Split words by default in zsh
+set shell zsh
+set shellopts '-eu:--shwordsplit'
+set ifs "\n"
+set filesep "\n"  # default already
+
+## bindings
+map <c-r> reload
+# map <enter> shell

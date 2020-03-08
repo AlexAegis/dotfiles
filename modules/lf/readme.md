@@ -1,3 +1,5 @@
-# lf
+# [lf](https://github.com/gokcehan/lf)
 
-File Manager
+Terminal File Manager
+
+[Tips](https://github.com/gokcehan/lf/wiki/Tips)
