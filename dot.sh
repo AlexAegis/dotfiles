@@ -46,6 +46,21 @@
 
 # TODO: If the module containes a git submodule. Check it out / update it
 
+# TODO: Experiment with paralell execution (sort dependencies into a tree)
+# TODO: Right now every dependency is sorted into a column and executed
+# TODO: sequentially. The new executor would treat everything in one column
+# TODO: and one indentation as modules that can be executed paralelly
+# TODO: then pass everything below as a dependency list to it with one level
+# TODO: of indentation removed
+# TODO: make a test modules directory with modules with logs and sleeps
+# TODO: Also a buffer output is needed to display this
+# TODO: It should keep a buffer as high as many modules are currently being
+# TODO: installed and then do the logging above it like normal
+# TODO: Or have an indented section below each entry with a preview log
+# TODO: or both
+# TODO: investigate if feasible
+# TODO: add flags to disable or enable paralell work
+# TODO: add a .lock file with PID into each module just in case and remove after
 
 C_RESET='\033[0m'
 C_RED='\033[0;31m'
