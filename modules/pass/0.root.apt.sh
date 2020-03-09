@@ -1,4 +1,3 @@
 #!/bin/sh
 
-apt install pass
-# Todo: install missing git helper
+apt install -y pass pass-git-helper
