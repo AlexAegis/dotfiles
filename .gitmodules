@@ -6,3 +6,9 @@ ignore = dirty
 path = modules/powerline/.powerline/.config/powerline/fonts
 url = https://github.com/powerline/fonts
 ignore = dirty
+[submodule "modules/tmux/oh-my-tmux"]
+	path = modules/tmux/oh-my-tmux
+	url = https://github.com/gpakosz/.tmux
+[submodule "modules/tmux/.tmux/.config/tmux/oh-my-tmux"]
+	path = modules/tmux/.tmux/.config/tmux/oh-my-tmux
+	url = https://github.com/gpakosz/.tmux
