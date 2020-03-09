@@ -12,6 +12,7 @@ alias renv='. "$HOME/bin/loadenv"'
 ## terminal
 
 alias cl="clear"
+alias cd..="echo 'You missed a space again!' && cd .."
 
 ## ls
 

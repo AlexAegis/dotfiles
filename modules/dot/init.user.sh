@@ -1,3 +1,5 @@
 #!/bin/sh
 
-mkdir -p "$HOME/.alias.d"
+mkdir -p \
+	"$HOME/.alias.d" \
+	"$HOME/.config/zsh/compdef"
