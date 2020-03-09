@@ -5,6 +5,10 @@
 
 alias restart="sudo reboot now"
 
+## Environment
+
+alias renv='. "$HOME/bin/loadenv"'
+
 ## terminal
 
 alias cl="clear"
