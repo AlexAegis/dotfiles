@@ -24,12 +24,15 @@
 #
 #
 
+# TODO: Enable line end comments (just strip #.*$ from every line)
 # TODO: Uninstall by default unstow, if full uninstall then run the uninstall
 # TODO: scripts, and uninstall should also remove the .tarhash file
 
 # TODO: Clash support. Use .clash file, if two modules clash, ask which to use
 # TODO: If a clashing module is already installed, abort, ask if interactive,
 # TODO: remove other if forced
+
+# TODO: clash feature support tags, see if something from that tag is installed
 
 # TODO: Auto unstow at end of uninstall
 
@@ -41,11 +44,8 @@
 # TODO: Before installing a module (Right before autostowing)
 # TODO: Create every folder in the module as an empty folder in $TARGET
 
-# TODO: dot --update -u if no modules are supplied then update every installed
-
 # TODO: If the module containes a git submodule. Check it out / update it
 
-# TODO: clash feature support tags, see if something from that tag is installed
 
 C_RESET='\033[0m'
 C_RED='\033[0;31m'
