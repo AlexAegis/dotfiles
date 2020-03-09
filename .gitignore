@@ -11,3 +11,6 @@ CTestTestfile.cmake
 _deps
 .tarhash
 .DS_Store
+
+# logfiles
+*.log
