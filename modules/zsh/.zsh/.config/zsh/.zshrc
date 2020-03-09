@@ -29,6 +29,9 @@ export KEYTIMEOUT=1 # esc has a default timeout of 0.4 sec which is annoying in 
 
 ## Plugin configurations
 
+# Powerline10k settings
+export POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=true
+
 # zsh-users/zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444"
