@@ -94,8 +94,9 @@ update=0
 all=0
 no_expand=0
 fix_permissions=0
-modules_folder="$script_path/modules"
-presets_folder="$script_path/presets"
+# TODO: Support multiple folders
+modules_folder=${DOT_MODULES_FOLDER:-"$script_path/modules"}
+presets_folder=${DOT_PRESETS_FOLDER:-"$script_path/presets"}
 preset_extension=".preset"
 hashfilename=".tarhash"
 dependenciesfilename=".dependencies"
