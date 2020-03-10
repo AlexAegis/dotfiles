@@ -14,5 +14,8 @@
 		"**/colormap": true,
 		"**/.zshrc": true
 	},
-	"editor.rulers": [80, 120]
+	"editor.rulers": [
+		{ "column": 80, "color": "#ffffff10" },
+		{ "column": 120, "color": "#6666668e" }
+	]
 }
