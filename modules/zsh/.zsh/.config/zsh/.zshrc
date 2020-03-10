@@ -4,10 +4,7 @@
 [ "$BENCH" ] && zmodload zsh/zprof
 
 # Custom Compdef
-fpath=(
-	~/.config/zsh/compdef
-	$fpath
-)
+fpath=(~/.config/zsh/compdef $fpath)
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top
 # of ~/.config/zsh/.zshrc. Initialization code that may require console input

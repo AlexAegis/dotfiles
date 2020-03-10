@@ -1,6 +1,5 @@
 #!/bin/sh
 
-rm -rf ~/.oh-my-zsh # remove oh-my-zsh
 rm -rf ~/.config/zsh
 rm -rf ~/.zshenv
 rm -rf ~/.zcompdump*
