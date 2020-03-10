@@ -416,7 +416,20 @@ remove_modules() {
 			remove_sripts_in_module=$(find "$modules_folder/$1/" -type f \
 				-regex "^.*/remove\..*\.sh$" | sed 's|.*/||' | sort)
 			execute_scripts_for_module "$1" "$remove_sripts_in_module"
+
+			# unstow
+			if [ "$SUDO_USER" ]; then
+			sudo -E -u "$SUDO_USER" \
+				stow -D -d "$modules_folder/$1/" \
+				-t "$user_home" ".$1"
+			else
+				stow -D -d "$modules_folder/$1/" \
+					-t "$user_home" ".$1"
+			fi
+
+			# remove hashfile to mark as uninstalled
 			rm  "$modules_folder/$1/$hashfilename"
+
 			shift
 		else
 			break
