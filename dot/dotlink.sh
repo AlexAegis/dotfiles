@@ -6,4 +6,4 @@ DOT_PATH=$(
 )
 
 # Using a symlink to make dot available without modifying the PATH
-ln -sf "$DOT_PATH/dot.sh" "/usr/local/bin/dot"
+ln -sf "$DOT_PATH/dot/dot.sh" "/usr/local/bin/dot"

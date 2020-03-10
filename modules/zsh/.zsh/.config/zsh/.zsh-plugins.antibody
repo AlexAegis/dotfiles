@@ -3,6 +3,7 @@ romkatv/powerlevel10k
 robbyrussell/oh-my-zsh
 djui/alias-tips
 caarlos0/zsh-mkc
+AlexAegis/dotfiles path:plugins/dot
 zsh-users/zsh-completions
 zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting
@@ -20,4 +21,3 @@ robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
 robbyrussell/oh-my-zsh path:plugins/themes
 softmoth/zsh-vim-mode
-AlexAegis/dotfiles path:plugins/dot
