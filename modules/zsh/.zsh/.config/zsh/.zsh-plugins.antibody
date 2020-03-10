@@ -1,17 +1,10 @@
 romkatv/powerlevel10k
-
-
 alexaegis/dot
 djui/alias-tips
 caarlos0/zsh-mkc
 softmoth/zsh-vim-mode
 
 robbyrussell/oh-my-zsh
-zsh-users/zsh-completions
-zsh-users/zsh-autosuggestions
-zsh-users/zsh-syntax-highlighting
-zsh-users/zsh-history-substring-search
-
 robbyrussell/oh-my-zsh path:plugins/archlinux
 robbyrussell/oh-my-zsh path:plugins/bgnotify
 robbyrussell/oh-my-zsh path:plugins/cargo
@@ -24,3 +17,9 @@ robbyrussell/oh-my-zsh path:plugins/fzf
 robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
 robbyrussell/oh-my-zsh path:plugins/themes
+# Completions must be after oh-my-zsh
+
+zsh-users/zsh-completions
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-history-substring-search
