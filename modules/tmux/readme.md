@@ -8,3 +8,5 @@ TODO:
 ```sh
 set -s escape-time 0
 ```
+
+https://www.hamvocke.com/blog/a-guide-to-customizing-your-tmux-conf/

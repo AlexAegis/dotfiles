@@ -1,9 +1,12 @@
+## plugins
 romkatv/powerlevel10k
 alexaegis/dot
 djui/alias-tips
 caarlos0/zsh-mkc
 softmoth/zsh-vim-mode
 
+## oh-my-zsh
+# collects completions
 robbyrussell/oh-my-zsh
 robbyrussell/oh-my-zsh path:plugins/archlinux
 robbyrussell/oh-my-zsh path:plugins/bgnotify
@@ -17,8 +20,8 @@ robbyrussell/oh-my-zsh path:plugins/fzf
 robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
 robbyrussell/oh-my-zsh path:plugins/themes
-# Completions must be after oh-my-zsh
 
+## completions must be after oh-my-zsh
 zsh-users/zsh-completions
 zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting
