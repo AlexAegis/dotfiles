@@ -3,7 +3,6 @@ romkatv/powerlevel10k
 robbyrussell/oh-my-zsh
 djui/alias-tips
 caarlos0/zsh-mkc
-AlexAegis/dotfiles path:plugins/dot
 zsh-users/zsh-completions
 zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting

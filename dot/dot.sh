@@ -78,7 +78,8 @@ is_installed() {
 }
 
 # Environment
-script_path="$(dirname "$(readlink -f "$0")")"
+# script_path="$(dirname "$(readlink -f "$0")")"
+dotfiles_folder="${DOTFILES-"$HOME/.dotfiles"}"
 user_home=$(getent passwd "${SUDO_USER-$USER}" | cut -d: -f6)
 
 # Config
@@ -96,8 +97,8 @@ all=0
 no_expand=0
 fix_permissions=0
 # TODO: Support multiple folders
-modules_folder=${DOT_MODULES_FOLDER:-"$script_path/modules"}
-presets_folder=${DOT_PRESETS_FOLDER:-"$script_path/presets"}
+modules_folder=${DOT_MODULES_FOLDER:-"$dotfiles_folder/modules"}
+presets_folder=${DOT_PRESETS_FOLDER:-"$dotfiles_folder/presets"}
 preset_extension=".preset"
 hashfilename=".tarhash"
 dependenciesfilename=".dependencies"
@@ -262,9 +263,9 @@ done
 
 do_fix_permissions() {
 	# Fix permissions, except in submodules
-	echo "Fixing permissions in $script_path... "
+	echo "Fixing permissions in $dotfiles_folder... "
 	submodules=$(
-		cd "$script_path" || exit
+		cd "$dotfiles_folder" || exit
 		git submodule status | sed -e 's/^ *//' -e 's/ *$//' | rev |
 			cut -d ' ' -f 2- | rev | cut -d ' ' -f 2- |
 			sed -e 's@^@-not -path "**/@' -e 's@$@/*"@' | tr '\n' ' '
@@ -421,9 +422,9 @@ remove_modules() {
 
 			# unstow
 			if [ "$SUDO_USER" ]; then
-			sudo -E -u "$SUDO_USER" \
-				stow -D -d "$modules_folder/$1/" \
-				-t "$user_home" ".$1"
+				sudo -E -u "$SUDO_USER" \
+					stow -D -d "$modules_folder/$1/" \
+					-t "$user_home" ".$1"
 			else
 				stow -D -d "$modules_folder/$1/" \
 					-t "$user_home" ".$1"
