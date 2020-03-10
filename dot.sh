@@ -214,6 +214,8 @@ anything you pass to it. For example:
 		;;
 	-r | --remove) # Run only remove scripts
 		remove=1
+		# TODO: until orphan handling is done, do not touch other modules
+		no_expand=1
 		;;
 	-a | --all) # Run all modules
 		all=1
@@ -428,7 +430,8 @@ remove_modules() {
 			fi
 
 			# remove hashfile to mark as uninstalled
-			rm  "$modules_folder/$1/$hashfilename"
+			[ -e "$modules_folder/$1/$hashfilename" ] &&
+				rm "$modules_folder/$1/$hashfilename"
 
 			shift
 		else
