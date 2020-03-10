@@ -91,6 +91,7 @@ config=0
 skip_root=0
 force=0
 update=0
+remove=0
 all=0
 no_expand=0
 fix_permissions=0
@@ -131,7 +132,7 @@ all_modules=$(find "$modules_folder/" -maxdepth 1 -mindepth 1 -printf "%f\n" |
 all_presets=$(find "$presets_folder/" -maxdepth 1 -mindepth 1 \
 	-name '*.preset' -printf "%f\n" | sed 's/.preset//' | sort)
 #shellcheck disable=SC2016
-all_installed=$(grep -lm 1 -- "" "$modules_folder"/**/.tarhash |
+all_installed=$(grep -lm 1 -- "" "$modules_folder"/**/$hashfilename |
 	sed -r 's_^.*/([^/]*)/[^/]*$_\1_g' | sort)
 all_tags=$(find "$modules_folder"/*/ -maxdepth 1 -mindepth 1 -name '.tags' \
 	-exec cat {} + | grep "^[^#;]" | sort | uniq)
@@ -210,6 +211,9 @@ anything you pass to it. For example:
 		;;
 	-u | --update) # Run only update scripts
 		update=1
+		;;
+	-r | --remove) # Run only remove scripts
+		remove=1
 		;;
 	-a | --all) # Run all modules
 		all=1
@@ -406,6 +410,20 @@ update_modules() {
 	done
 }
 
+remove_modules() {
+	while :; do
+		if [ "$1" ]; then
+			remove_sripts_in_module=$(find "$modules_folder/$1/" -type f \
+				-regex "^.*/remove\..*\.sh$" | sed 's|.*/||' | sort)
+			execute_scripts_for_module "$1" "$remove_sripts_in_module"
+			rm  "$modules_folder/$1/$hashfilename"
+			shift
+		else
+			break
+		fi
+	done
+}
+
 stow_module() {
 	if [ $dry != 1 ] && [ -e "$modules_folder/$1/.$1" ]; then
 		[ $verbose = 1 ] &&
@@ -585,7 +603,10 @@ if [ "$fix_permissions" = 1 ]; then
 	do_fix_permissions
 fi
 
-if [ "$update" = 1 ]; then
+if [ "$remove" = 1 ]; then
+	# shellcheck disable=SC2086
+	remove_modules $final_module_list
+elif [ "$update" = 1 ]; then
 	# shellcheck disable=SC2086
 	update_modules $final_module_list
 else

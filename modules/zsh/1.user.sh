@@ -23,7 +23,8 @@ echo "Updating plugins"
 antibody update
 
 echo "Fixing permissions"
-chmod 700 "$HOME"/.cache/antibody/*
-chmod 700 "$HOME"/.config/zsh/compdef/*
+
+chmod -R 700 "$HOME"/.cache/antibody
+chmod -R 700 "$HOME"/.config/zsh/
 
 # TODO: Apply zsh-defer source to applicable plugins
