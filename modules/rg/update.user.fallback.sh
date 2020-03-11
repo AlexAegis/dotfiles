@@ -1,3 +1,3 @@
 #!/bin/sh
 
-cargo install-update ripgrep
+cargo install ripgrep
