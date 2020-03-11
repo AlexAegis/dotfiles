@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt install p7zip-full p7zip-rar
+apt install -y p7zip-full p7zip-rar

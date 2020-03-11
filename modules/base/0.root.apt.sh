@@ -2,6 +2,6 @@
 
 add-apt-repository universe
 
-apt update
-apt upgrade
-apt install dash git stow tar coreutils
+apt update -y
+apt upgrade -y
+apt install -y dash git stow tar coreutils

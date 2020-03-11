@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt install bash
+apt install -y bash

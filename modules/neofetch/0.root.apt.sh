@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt install neofetch
+apt install -y neofetch
