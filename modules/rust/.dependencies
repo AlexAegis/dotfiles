@@ -1,0 +1,3 @@
+# for env loading
+home
+curl ? [ ! $pacman ]
