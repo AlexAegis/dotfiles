@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# TODO: Add flags
+alias nf="neofetch"
