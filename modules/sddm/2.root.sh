@@ -1,7 +1,8 @@
 #!/bin/sh
 
 echo '[X11]
-MinimumVT=7' >"/etc/sddm.conf.d/tty.conf"
+MinimumVT=1' \
+	>"/etc/sddm.conf.d/tty.conf"
 
 # install theme https://github.com/RadRussianRus/sddm-slice
 # TODO: update this particular submodule

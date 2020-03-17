@@ -1,0 +1,10 @@
+[Unit]
+Description=xbindkeys
+PartOf=graphical-session.target
+
+[Service]
+ExecStart=echo "This could load an xbindkeys file but its only an example"
+Restart=always
+
+[Install]
+WantedBy=xsession.target

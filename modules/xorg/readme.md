@@ -2,6 +2,10 @@
 
 TODO: This whole mouse config does not work, right now I'm using imwheel. might be a better option as it can be user specific.
 
+## systemd and user services
+
+<https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg>
+
 ## Mouse config
 
 Using `lsusb` check the id of your pointer device.
