@@ -15,3 +15,6 @@
 [submodule "modules/tmux/.tmux/.config/tmux/oh-my-tmux"]
 	path = modules/tmux/.tmux/.config/tmux/oh-my-tmux
 	url = https://github.com/gpakosz/.tmux
+[submodule "modules/sddm/.sddm/.config/sddm/themes/sddm-slice"]
+	path = modules/sddm/.sddm/.config/sddm/themes/sddm-slice
+	url = https://github.com/RadRussianRus/sddm-slice.git
