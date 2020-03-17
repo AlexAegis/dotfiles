@@ -1,0 +1,15 @@
+[General]
+# background=capitan-mountain.jpg
+# type=image
+font=TerminessTTF Nerd Font Mono
+# font=VictorMono Nerd Font
+# background color. Defaults to #222222.
+color_bg=#141414
+# main color. Defaults to #dddddd.
+color_main=#f54b25
+# dimmed main color. Defaults to #888888.
+color_dimmed=#73382a
+# color that contrasting to both main and dimmed. Defaults to #1f1f1f.
+color_contrast=#121212
+
+# TODO: Implement cross system colours

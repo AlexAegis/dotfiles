@@ -1,0 +1,3 @@
+# bat
+
+A `cat` replacement

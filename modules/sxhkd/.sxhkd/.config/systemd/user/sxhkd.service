@@ -8,4 +8,4 @@ ExecStart=/bin/sh -c '/usr/bin/sxhkd $HOME/.config/sxhkd/sxhkdrc.d/*'
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
