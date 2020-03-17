@@ -1,6 +1,7 @@
 [Unit]
 Description=Simple X Hotkey Daemon
 Documentation=man:sxhkd(1)
+PartOf=graphical-session.target
 
 [Service]
 ExecStart=/bin/sh -c '/usr/bin/sxhkd $HOME/.config/sxhkd/sxhkdrc.d/*'

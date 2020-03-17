@@ -1,0 +1,4 @@
+# TODO: Let KDE modeless stuff float in its original position
+bspc rule -a plasmashell state=floating border=off layer=normal
+bspc rule -a krunner state=floating border=off
+#  bspc rule -a plasmashell manage=off
