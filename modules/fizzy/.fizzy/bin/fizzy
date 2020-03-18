@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# has to be bash or zsh
+konsole -e /bin/bash -c \
+	'$HOME/bin/executables | fzf |\
+ (nohup ${SHELL:-"/bin/sh"} &) >/dev/null 2>&1'
+
+# TODO: Make it appear centered with a fixed size
+
+# TODO: Make sure it works without KDE

@@ -1,0 +1,22 @@
+Gtk-Message: 00:56:00.411: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:00.820: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:01.368: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:01.589: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:02.269: Failed to load module "appmenu-gtk-module"
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x590005,name=PHttpChannel::Msg_Cancel) Closed channel: cannot send/recv
+
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x59002D,name=PHttpChannel::Msg_SetPriority) Closed channel: cannot send/recv
+
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x370134,name=PContent::Msg_DetachBrowsingContext) Closed channel: cannot send/recv
+
+Gtk-Message: 00:56:15.345: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:15.620: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:15.884: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:16.170: Failed to load module "appmenu-gtk-module"
+Gtk-Message: 00:56:16.591: Failed to load module "appmenu-gtk-module"
+
+###!!! [Child][MessageChannel] Error: (msgtype=0x370134,name=PContent::Msg_DetachBrowsingContext) Closed channel: cannot send/recv
+
