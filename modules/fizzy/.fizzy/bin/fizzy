@@ -1,10 +1,18 @@
 #!/bin/sh
 
-# has to be bash or zsh
-konsole -e /bin/bash -c \
-	'$HOME/bin/executables | fzf |\
- (nohup ${SHELL:-"/bin/sh"} &) >/dev/null 2>&1'
+# shellcheck disable=SC2004,SC2016
 
-# TODO: Make it appear centered with a fixed size
+res=$(xdpyinfo | grep -oP 'dimensions:\s+\K\S+')
+sw=$(echo "$res" | cut -d 'x' -f 1)
+sh=$(echo "$res" | cut -d 'x' -f 2)
+hw=$((($sw / 2) - ($ww / 2)))
+hh=$((($sh / 2) - ($wh / 2)))
+ww=$(($sw / 3))
+wh=$(($sh / 3))
 
-# TODO: Make sure it works without KDE
+konsole --hide-menubar --hide-tabbar --title "fizzywin" \
+	--stylesheet "$HOME/.config/fizzy/fizzy.css" \
+	--geometry "$ww"x"$wh"+"$hw"+"$hh" \
+	-e /bin/bash -c \
+	'$HOME/bin/executables | fzf |
+(nohup ${SHELL:-"/bin/sh"} &) >/dev/null 2>&1'

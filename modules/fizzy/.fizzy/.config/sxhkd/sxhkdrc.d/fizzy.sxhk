@@ -1,4 +1,4 @@
-super + @space
+super + space
 	~/bin/fizzy
 
 super + n

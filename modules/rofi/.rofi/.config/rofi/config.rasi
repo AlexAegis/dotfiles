@@ -1,0 +1,14 @@
+configuration {
+ modi: "window,drun,ssh,combi";
+ theme: "solarized";
+ font: "Inconsolata 16";
+ combi-modi: "window,drun,ssh";
+ display-drun: ">";
+ matching: "fuzzy";
+ sorting-method: "fzf";
+ sort: true;
+ show-icons: true;
+ icon-theme: "candy-icons";
+ theme: ".config/rofi/rofi-themes/User Themes/oxide.rasi";
+}
+
