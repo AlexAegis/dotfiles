@@ -36,3 +36,35 @@ inoremap <silent><expr><bs>
   \ &backspace =~? '.*eol\&.*start\&.*indent\&' &&
   \ !search('\S','nbW',line('.')) ? (col('.') != 1 ? "\<C-U>" : "") .
   \ "\<bs>" . (getline(line('.')-1) =~ '\S' ? "" : "\<C-F>") : "\<bs>"
+
+" TODO: Make non printable characters show in only visual mode (always)
+" How non-printable things are shown
+set list                              " show non-print characters,...
+set listchars=trail:⋅,nbsp:⋅,tab:▷⋅   " for tabs and trailing spaces
+set number                            " show line number for current line,...
+set relativenumber                    " and relative line numbers for others
+set cursorline                        " highlight the line with the cursor
+set wildmenu                          " use command-line completion menu,...
+set wildmode=longest:full             " with wildmode
+set autoindent                        " enable auto-indentation
+
+" How Search behaves
+"set ignorecase                        " assume patterns are case insensitive,...
+set smartcase                         " ...when lowercase-only is used
+set incsearch                         " start searching as you type
+
+" How IO behave
+set ttyfast                           " assume the terminal is fast
+set mouse=a                           " enable mouse in all modes
+
+
+
+" Tweak how Gvim looks
+set guifont=Inconsolata-g\ Medium\ 11 " set font in gvim
+set guioptions-=T                     " no toolbar in gvim
+set guioptions-=m                     " no menubar in gvim
+set guioptions-=r                     " no right scrollbar in gvim
+set guioptions-=L                     " no left scrollbar when v.split in gvim
+
+
+" TODO: Check this out: https://dev.to/gaveen/my-vim-story-594d

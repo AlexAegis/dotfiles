@@ -41,7 +41,7 @@ zstyle ':completion:*' special-dirs false
 ## Plugin configurations
 
 # Powerline10k settings
-# TODO: bugged an removes autocomplete suggestions
+# TODO: bugged and removes autocomplete suggestions
 export POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=false
 
 # zsh-users/zsh-autosuggestions
