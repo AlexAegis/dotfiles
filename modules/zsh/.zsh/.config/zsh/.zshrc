@@ -33,6 +33,8 @@ export KEYTIMEOUT=1 # esc has a default timeout of 0.4 sec which is annoying in 
 
 ## Base config
 
+# TODO: https://raw.githubusercontent.com/romkatv/zsh4humans/master/.zshrc
+
 # autocomplete should include hidden files
 setopt globdots
 # but not current and parent directories
@@ -42,7 +44,7 @@ zstyle ':completion:*' special-dirs false
 
 # Powerline10k settings
 # TODO: bugged and removes autocomplete suggestions
-export POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=false
+export POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=true
 
 # zsh-users/zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions

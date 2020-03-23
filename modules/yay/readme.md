@@ -1,0 +1,3 @@
+# yay
+
+AUR helper

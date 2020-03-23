@@ -4,6 +4,8 @@ alexaegis/dot
 djui/alias-tips
 caarlos0/zsh-mkc
 softmoth/zsh-vim-mode
+Aloxaf/fzf-tab
+junegunn/fzf
 
 ## oh-my-zsh
 # collects completions
