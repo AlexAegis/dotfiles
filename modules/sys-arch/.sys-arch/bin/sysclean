@@ -3,5 +3,11 @@
 # remove orphaned packages
 # shellcheck disable=SC2046
 pacman -Rns $(pacman -Qtdq)
-# Clean up cache
-rm -f /var/cache/pacman/pkg/*
+## Clean up cache
+# ? Note: a pacman hook already clears the cache
+# remove all but the latest version
+paccache -rk 1
+# remove cache of uninstalled packages
+paccache -ruk0
+# clear the aur cache, fully. This one is not part of the pacman hook
+yay --aur -Scc --noconfirm

@@ -38,6 +38,7 @@ fi
 ## DESKTOP ENVIRONMENT
 # Starting Desktop Environment (Default KDE)
 echo "xinit"
+exec bspwm
 # session=${1:-kde}
 #
 # case $session in

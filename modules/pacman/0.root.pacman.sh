@@ -56,3 +56,18 @@ log=/var/log/pacman-aria2.log
 
 # And put this: 'XferCommand = echo Downloading %u ... && /usr/bin/aria2c --conf-path=/root/.aria2/pacman-aria2.conf %u'
 # into: /etc/pacman.conf
+
+# Create pacman hook for automatic cache cleaning
+mkdir -p '/etc/pacman.d/hooks'
+
+echo '[Trigger]
+Operation = Upgrade
+Operation = Install
+Operation = Remove
+Type = Package
+Target = *
+[Action]
+Description = Cleaning pacman cache...
+When = PostTransaction
+Exec = /usr/bin/paccache -r -k 2
+' >'/etc/pacman.d/hooks/clean_package_cache.hook'

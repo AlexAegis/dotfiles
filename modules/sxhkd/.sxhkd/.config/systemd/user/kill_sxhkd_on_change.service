@@ -1,0 +1,10 @@
+[Unit]
+Description=Entr Watch Hotkeys
+Documentation=man:entr(1)
+
+[Service]
+ExecStart=%h/bin/kill_sxhkd_on_change
+ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+
+[Install]
+WantedBy=default.target

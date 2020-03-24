@@ -1,0 +1,21 @@
+[Unit]
+Description=Dunst notification daemon
+Documentation=man:dunst(1)
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.Notifications
+ExecStart=/usr/bin/dunst
+ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+# Try to restart no matter how the process ended
+Restart=always
+# Restart in 5 second intervals
+RestartSec=5
+# Try to restart up to 3 times
+StartLimitBurst=3
+# Don't try to restart after 60 seconds
+StartLimitIntervalSec=60
+
+[Install]
+WantedBy=xsession.target

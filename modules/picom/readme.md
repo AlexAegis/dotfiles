@@ -1,3 +1,1 @@
-# picom
-
-TODO Use with bspwm setup
+# [picom](https://wiki.archlinux.org/index.php/Picom)

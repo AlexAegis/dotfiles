@@ -1,7 +1,7 @@
 
 # terminal emulator
 alt + a
-	notify-send "sxhkrd.d cool-retro-term"  && cool-retro-term
+	notify-send "sxhkrd.d cool-retro-term" && cool-retro-term
 
 alt + t
 	notify-send "sxhkrd.d is loaded!"

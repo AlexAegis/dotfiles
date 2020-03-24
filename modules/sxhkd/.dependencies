@@ -1,2 +1,4 @@
-systemd ? [ $systemd ]
+systemd ? [ $systemctl ]
 xorg
+# autoreload config
+entr
