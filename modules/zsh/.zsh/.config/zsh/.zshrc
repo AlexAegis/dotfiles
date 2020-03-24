@@ -44,7 +44,7 @@ zstyle ':completion:*' special-dirs false
 
 # Powerline10k settings
 # TODO: bugged and removes autocomplete suggestions
-export POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=true
+export POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=false
 
 # zsh-users/zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
