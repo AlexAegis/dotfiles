@@ -1,0 +1,2 @@
+yay ? [ $pacman ]
+snap ? [ ! $pacman ]
