@@ -3,7 +3,8 @@ Description=Entr Watch Environment
 Documentation=man:entr(1)
 
 [Service]
-ExecStart=%h/.entr/bin/entr-notifications.sh
+Type=forking
+ExecStart=%h/.config/entr/bin/entr-start-watchers.sh
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 
 [Install]

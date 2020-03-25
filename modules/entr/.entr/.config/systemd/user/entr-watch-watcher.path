@@ -1,0 +1,6 @@
+[Path]
+Unit=entr-watch-watcher.service
+PathChanged=%h/.config/entr/watchers
+
+[Install]
+WantedBy=default.target

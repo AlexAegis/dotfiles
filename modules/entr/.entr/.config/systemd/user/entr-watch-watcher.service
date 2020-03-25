@@ -1,0 +1,13 @@
+[Unit]
+Description=Entr watch autorestarter
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl restart --user entr-watch.service
+# Restart at most 5 times...
+StartLimitBurst=5
+# ...in a 10 second interval
+StartLimitIntervalSec=10
+
+[Install]
+WantedBy=default.target
