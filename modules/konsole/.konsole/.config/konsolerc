@@ -8,7 +8,7 @@ Favorites=
 ShowMenuBarByDefault=false
 
 [MainWindow]
-Height 1080=535
+Height 1080=1073
 Height 2160=720
 Height 540=255
 MenuBar=Disabled
