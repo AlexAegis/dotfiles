@@ -1,0 +1,7 @@
+
+## take a rectangular screenshot to the clipboard or to a file
+# -r, --region               Capture a rectangular region of the screen
+# -b, --background           Take a screenshot and exit without showing the GUI
+# -c, --clipboard            In background mode, copy screenshot to clipboard
+super + {_,shift + }{_,ctrl + }v
+	spectacle -b {_,-r} {-c,_}

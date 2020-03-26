@@ -6,6 +6,28 @@ TODO: This whole mouse config does not work, right now I'm using imwheel. might 
 
 <https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg>
 
+## Monitor Layout
+
+### Config
+
+To use a different layout than the default create it a file for it:
+To use a `.conf` file create a `35-layout-<layout-name>.conf` file
+in the `~/.config/xorg/layout/` folder or here in this module in the same
+place.
+
+> To use this set the `LAYOUT_USE_CONF` variable to `1` (default)
+
+> After using this method the module has to be
+
+Or a layout script in the same place named `<layout-name>.layout`.
+
+> To use this set the `LAYOUT_USE_CONF` variable to `0`
+
+### Without root access
+
+To define the monitor layout use `arandr` and save the configuration file
+to the `.config/xorg/layout` folder
+
 ## Mouse config
 
 Using `lsusb` check the id of your pointer device.

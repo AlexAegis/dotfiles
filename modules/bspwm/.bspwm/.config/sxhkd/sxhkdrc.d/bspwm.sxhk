@@ -33,7 +33,7 @@ super + g
 #
 
 # set the window state
-super + {t,shift + t,s,f}
+super + {t,shift + t,f,z}
 	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
 
 # set the node flags
@@ -61,6 +61,8 @@ super + bracket{left,right}
 	bspc desktop -f {prev,next}.local
 
 # focus the last node/desktop
+# TODO: while holding shift continue down the history (with no repeats)
+# Reset on release
 super + {grave,Tab}
 	bspc {node,desktop} -f last
 

@@ -1,3 +1,4 @@
 #!/bin/sh
 
+# start X on the same tty where the login happened
 exec /usr/bin/X -nolisten tcp "$@" vt"$XDG_VTNR"

@@ -1,6 +1,0 @@
-#!/bin/sh
-
-# this just straigth up kills sxhkd if one of the config files
-# changed. It's up to the running service to keep it alive
-find "$HOME"/.config/sxhkd/sxhkdrc.d/* \
-	"$HOME"/.config/sxhkd/sxhkdrc | entr -d -p pkill -USR1 -x sxhkd

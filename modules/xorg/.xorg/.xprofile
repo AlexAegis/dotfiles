@@ -1,0 +1,11 @@
+#!/bin/sh
+# refresh environment
+# shellcheck disable=SC1090
+
+if [ -e "$LAYOUT" ] && [ "$LAYOUT_USE_CONF" = "0" ]; then
+	. "$HOME/bin/loadenv"
+	# load layout
+	layout_file="$HOME/.config/xorg/layout/$LAYOUT.layout"
+
+	[ -x "$layout_file" ] && . "$layout_file"
+fi

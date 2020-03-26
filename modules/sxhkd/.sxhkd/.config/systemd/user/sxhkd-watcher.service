@@ -1,9 +1,9 @@
 [Unit]
-Description=Entr watch autorestarter
+Description=Sxhkd autorestarter
 
 [Service]
 Type=oneshot
-ExecStart=notify-send 'Reload Entr' && /usr/bin/systemctl restart --user entr-watch.service
+ExecStart=%h/.config/sxhkd/bin/sxhkd-restart-service.sh
 # Restart at most 5 times...
 StartLimitBurst=5
 # ...in a 10 second interval

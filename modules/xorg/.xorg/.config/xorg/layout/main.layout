@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# ? this is here mostly for reference because on this setup I use
+# ? root configuration
+
+# layout for my main setup, to refresh or generate a new, use 'arandr'
+xrandr --output DP-0.8 --mode 1920x1080 --pos 0x540 --rotate normal \
+	--output DP-2 --primary --mode 3840x2160 --pos 1920x0 --rotate normal

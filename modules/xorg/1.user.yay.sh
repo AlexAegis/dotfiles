@@ -1,4 +1,5 @@
 #!/bin/sh
 
 # list xinit as a session
-yay -Syu --needed --noconfirm xinit-xsession
+# ? not used. Maybe with non systemd systems
+# yay -Syu --needed --noconfirm xinit-xsession
