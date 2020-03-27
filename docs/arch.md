@@ -1,16 +1,20 @@
 # Install Arch
 
-First always check the
-[Installation guide](https://wiki.archlinux.org/index.php/installation_guide)
-to see if anything changed.
-
-This step-by-step guide has some slight changes compared to the online guide
-and an easy to follow structure.
+This step-by-step guide has some slight changes compared to the online
+[Installation guide][guide] and an easy to follow structure. The bootloader
+configuration is done beforesystem configuration so if anything would go wrong,
+it's not much progress tolose. This way the hardware specific steps are
+grouped together at the beginning up to step 12.
 
 ## Step by step Installation
 
 This assumes US keyboard layout for the installation. Setting it to your
-preference can wait until the setup is done.
+preference can wait until the setup is done. If you wan't to do the temporary
+keyboard layout change anyway (for passwords it can be useful to use your
+native layout) then check the [set the keyboard layout][guide] section in the
+guide.
+
+[guide]: https://wiki.archlinux.org/index.php/installation_guide
 
 1. Create a live USB
 
@@ -116,6 +120,7 @@ preference can wait until the setup is done.
    2. Mount the `boot` partition
 
       ```sh
+      mkdir /mnt/boot
       mount /dev/sdb1 /mnt/boot
       ```
 
@@ -136,7 +141,7 @@ preference can wait until the setup is done.
 
 9. Install the system
 
-   1. Install at least the `base`, `linux`, `linux-firmware` and
+   1. Install at least the `base`, `linux`, `linux-firmware`, `sudo` and
       `networkmanager` packages using `pacstrap`, and also install every other
       necessary packages like `git`, `vim`, `zsh`, `dash`, `man`. Or install
       them from the installed system. None of them are necessary right now
@@ -147,13 +152,13 @@ preference can wait until the setup is done.
       > and `pacman`
 
       ```sh
-      pacstrap /mnt base linux linux-firmware networkmanager
+      pacstrap /mnt base linux linux-firmware networkmanager sudo
       ```
 
    2. If you want to edit the bootloader from the installed system, install it.
 
       ```sh
-      pacstrap /mnt grub
+      pacstrap /mnt grub efibootmgr
       ```
 
    3. If you'd like to use the scripts available in the live install like
@@ -253,14 +258,49 @@ preference can wait until the setup is done.
     arch-chroot /mnt
     ```
 
-13. Set up timezone
+13. Set up the bootloader
+
+    > Assuming `grub`
+
+    1. Install grub
+
+       > If not already
+
+       ```sh
+       pacman -Su grub efibootmgr
+       ```
+
+    2. Install the bootloader
+
+       > You have to do this from `chroot` (You are here since step 12.)
+       > If it says 'error: /boot doesn't look like an EFI partition.'
+       > it's likely because you forgot to format it using `FAT32`
+       > Run `mkfs.fat -F32 /dev/sd??` on the boot partition
+
+       ```sh
+       grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+       ```
+
+    3. Auto configure grub using the images it can find in `/boot`
+
+       > These images are the linux kernels you installed and the microcode
+       > updates
+
+       ```sh
+       grub-mkconfig -o /boot/grub/grub.cfg
+       ```
+
+    > The installation is practically done, but some configurations are needed
+    > and can be done while we are `chroot`ed in the new system anyway.
+
+14. Set up timezone
 
     ```sh
     ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime
     hwclock --systohc
     ```
 
-14. Set up locale
+15. Set up locale
 
     1. Open up the `locale.gen` file for edit
 
@@ -290,13 +330,15 @@ preference can wait until the setup is done.
        echo 'LANG=en_US.UTF-8' > /etc/locale.conf
        ```
 
-    5. Set your keyboard layout
+    5. If your keyboard layout is not `us`, set it
+
+       > The available keymaps can be accessed through `localectl list-keymaps`
 
        ```sh
-       echo 'KEYMAP=de-latin1' > /etc/vconsole.conf
+       echo 'KEYMAP=us' > /etc/vconsole.conf
        ```
 
-15. Set up network
+16. Set up network
 
     1. Set your `hostname`
 
@@ -311,7 +353,7 @@ preference can wait until the setup is done.
        ```sh
        echo '127.0.0.1    localhost
        ::1           localhost
-       127.0.1.1     myhostname.localdomain myhostname' > /etc/hostname
+       127.0.1.1     myhostname.localdomain myhostname' > /etc/hosts
        ```
 
     3. Enable the NetworkManager
@@ -322,39 +364,14 @@ preference can wait until the setup is done.
        systemctl enable NetworkManager.service
        ```
 
-16. Set up root password
+17. Set up root password
 
     ```sh
     passwd
     ```
 
-17. Set up the bootloader
+18. Create users
 
-    > Assuming `grub`
-
-    1. Install grub
-
-       ```sh
-       pacman -Su grub efibootmgr
-       ```
-
-    2. Install the bootloader
-
-       > You have to do this from `chroot` (You are here since step 12.)
-       > If it says 'error: /boot doesn't look like an EFI partition.'
-       > it's likely because you forgot to format it using `FAT32`
-       > Run `mkfs.fat -F32 /dev/sd??` on the boot partition
-
-       ```sh
-       grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-       ```
-
-    3. Configure microcode updates
-
-       ```sh
-       grub-mkconfig -o /boot/grub/grub.cfg
-       ```
-
-18. Reboot into the installed system
+19. Reboot into the installed system
 
     > Keep the Live installation for emergency recoveries
