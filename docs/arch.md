@@ -343,7 +343,7 @@ guide.
     1. Set your `hostname`
 
        ```sh
-       echo 'HOST=myhostname' > /etc/hostname
+       echo 'myhostname' > /etc/hostname
        ```
 
     2. Add it to the `hosts` file
@@ -372,6 +372,22 @@ guide.
 
 18. Create users
 
+    1. Create an admin user for yourself
+
+       ```sh
+       useradd -m -U -G wheel,root -s /bin/zsh alex
+       ```
+
+    2. Optionally create a guest user
+
+       > Good for experimenting how things work in an unpriviliged environment
+
+       ```sh
+       useradd -m -U -s /bin/zsh guest
+       ```
+
 19. Reboot into the installed system
 
     > Keep the Live installation for emergency recoveries
+
+20. Install your dotfiles

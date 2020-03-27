@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Only install it if it's correct
+if [ -z "$(sudo visudo -c -q -f "$1")" ]; then
+	echo "Installing "$1" to /etc/sudoers.d/"
+	install --owner=root \
+		--group=root \
+		--mode=440 "$1" /etc/sudoers.d/
+else
+	echo "Badly formatted sudoers file!"
+	exit 1
+fi
