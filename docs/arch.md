@@ -2,9 +2,9 @@
 
 This step-by-step guide has some slight changes compared to the online
 [Installation guide][guide] and an easy to follow structure. The bootloader
-configuration is done beforesystem configuration so if anything would go wrong,
-it's not much progress tolose. This way the hardware specific steps are
-grouped together at the beginning up to step 12.
+configuration is done before system configurations so if anything would go
+wrong, it's not much progress to lose. This way the hardware specific steps are
+grouped together at the beginning, up to step 12.
 
 ## Step by step Installation
 
