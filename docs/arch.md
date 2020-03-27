@@ -141,18 +141,25 @@ guide.
 
 9. Install the system
 
-   1. Install at least the `base`, `linux`, `linux-firmware`, `sudo` and
-      `networkmanager` packages using `pacstrap`, and also install every other
-      necessary packages like `git`, `vim`, `zsh`, `dash`, `man`. Or install
-      them from the installed system. None of them are necessary right now
-      except `networkmanager`
+   1. Install at least the `base`, `base-devel`, `linux`, `linux-firmware`,
+      `vi`, `sudo`, `git` and `networkmanager` packages using `pacstrap`.
+      Among these only `base`, `linux`, `linux-firmware` and `networkmanager`
+      packages are the most important to install because after that you`ll have
+      pacman and network access to install anything else from the installed
+      system. But having these others install too can make things easier.
 
+      > `dot` users only have to install `git` manually on top of the
+      > mandatory ones.
+      >
       > [`base`](https://www.archlinux.org/packages/core/any/base/) only
       > has a handful of utilities, like `bash`, `coreutils`, `sed`
       > and `pacman`
+      >
+      > `base-devel` is needed to install AUR packages \
+      > `vi` to use `visudo` (or just symlink `vi` to `vim`)
 
       ```sh
-      pacstrap /mnt base linux linux-firmware networkmanager sudo
+      pacstrap /mnt base base-devel linux linux-firmware networkmanager vi sudo
       ```
 
    2. If you want to edit the bootloader from the installed system, install it.
