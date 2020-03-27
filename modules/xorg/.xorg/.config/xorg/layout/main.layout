@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# ? this is here mostly for reference because on this setup I use
-# ? root configuration
+# ? this is here mostly for reference because this setup uses a configuration
 
 # layout for my main setup, to refresh or generate a new, use 'arandr'
 xrandr --output DP-0.8 --mode 1920x1080 --pos 0x540 --rotate normal \

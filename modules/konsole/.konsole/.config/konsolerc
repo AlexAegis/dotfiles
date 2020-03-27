@@ -9,12 +9,12 @@ ShowMenuBarByDefault=false
 
 [MainWindow]
 Height 1080=535
-Height 2160=720
+Height 2160=2146
 Height 540=255
 MenuBar=Disabled
 ToolBarsMovable=Disabled
 Width 1920=1913
-Width 3840=1280
+Width 3840=3826
 Width 960=475
 
 [Notification Messages]

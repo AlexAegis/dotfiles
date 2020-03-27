@@ -1,11 +1,6 @@
-# x
+# [X](https://wiki.archlinux.org/index.php/Xorg)
 
-TODO: This whole mouse config does not work, right now I'm using imwheel.
-might be a better option as it can be user specific.
-
-## systemd and user services
-
-<https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg>
+TODO: Implement config reload on display change using xrandr
 
 ## [Monitor Layout](https://wiki.gentoo.org/wiki/Xorg/Multiple_monitors)
 
@@ -37,7 +32,17 @@ This will set the layout after logging in, causing some delay after logging in.
 
 To generate an `xrandr` layout with a gui, use `arandr`
 
+## Notes
+
+### [Writing user services that depends on x](https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg)
+
+This module provides an `xsession.target` to bind services to.
+This target is then triggered by the `~/.xsession` file
+
 ## Mouse config
+
+TODO: This whole mouse config does not work, right now I'm using imwheel.
+might be a better option as it can be user specific.
 
 Using `lsusb` check the id of your pointer device.
 
@@ -78,6 +83,3 @@ So for example:
 sudo udevadm hwdb --update
 sudo udevadm trigger /dev/input/event4
 ```
-
-TODO:
-<https://medium.com/njiuko/using-fzf-instead-of-dmenu-2780d184753f>
