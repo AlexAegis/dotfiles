@@ -1,32 +1,41 @@
 # x
 
-TODO: This whole mouse config does not work, right now I'm using imwheel. might be a better option as it can be user specific.
+TODO: This whole mouse config does not work, right now I'm using imwheel.
+might be a better option as it can be user specific.
 
 ## systemd and user services
 
 <https://superuser.com/questions/759759/writing-a-service-that-depends-on-xorg>
 
-## Monitor Layout
+## [Monitor Layout](https://wiki.gentoo.org/wiki/Xorg/Multiple_monitors)
 
-### Config
+### Config based
 
 To use a different layout than the default create it a file for it:
-To use a `.conf` file create a `35-layout-<layout-name>.conf` file
+To use a `.conf` file create a `50-layout-<layout-name>.conf` file
 in the `~/.config/xorg/layout/` folder or here in this module in the same
 place.
 
 > To use this set the `LAYOUT_USE_CONF` variable to `1` (default)
 
-> After using this method the module has to be
+#### Config Generation
 
-Or a layout script in the same place named `<layout-name>.layout`.
+To generate an `xorg.conf` file, when using nvidia drivers you can use
+`nvidia-settings` to generate a config file
+
+### Script based
+
+If you don't have the rights to change the config you can fall back to a
+script based layout change using `xrandr`. You have to make a layout script
+in the same place as the installable conf files in the previous section, but
+named `<layout-name>.layout`.
+This will set the layout after logging in, causing some delay after logging in.
 
 > To use this set the `LAYOUT_USE_CONF` variable to `0`
 
-### Without root access
+#### Script Generation
 
-To define the monitor layout use `arandr` and save the configuration file
-to the `.config/xorg/layout` folder
+To generate an `xrandr` layout with a gui, use `arandr`
 
 ## Mouse config
 
