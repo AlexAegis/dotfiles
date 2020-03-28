@@ -1,4 +1,4 @@
 +arch ? [ $arch ]
 +void ? [ $void ]
-ly
 bspwm
+rofi
