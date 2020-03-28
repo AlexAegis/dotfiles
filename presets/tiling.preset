@@ -1,4 +1,4 @@
 +arch ? [ $arch ]
-+wsl-ubuntu ? [ $ubuntu ]
++void ? [ $void ]
 ly
 bspwm

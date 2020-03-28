@@ -1,3 +1,3 @@
 # Ubuntu
 
-Ubuntu system specific stuff
+Ubuntu specific system setup

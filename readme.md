@@ -20,3 +20,6 @@ dot zsh vim # or just call ./dot.sh if you didn't `make`
 cd ~/.dotfiles/dot
 sudo make clean # removes the symlink of ./dot.sh
 ```
+
+TODO: Write about the concept of a junction module
+check sys-\* modules for example
