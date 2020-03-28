@@ -15,6 +15,13 @@ if [ "$(id -u)" = 0 ]; then
 	exit 1
 fi
 
+# force fix .gnupg permissions
+# for example if it was backed up on an ntfs partition
+if [ -d "$HOME/.gnupg" ]; then
+	echo 'Fixing ~/.gnupg permissions'
+	chmod -R 700 "$HOME/.gnupg"
+fi
+
 if ! [ "$ORIGIN" ]; then
 	# No origin file, do local setup
 	echo "Origin file is missing, creating a local store instead of cloning one"
