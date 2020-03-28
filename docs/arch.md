@@ -210,6 +210,10 @@ guide.
    6. If you want to have extra kernels, install them too.
 
       > The zen linux is optimized for everyday usage and performance
+      >
+      > ! But some things might break under different kernels
+      > Always switch back to the original kernel if some hardware related
+      > thing failes
 
       ```sh
       pacstrap /mnt linux-zen
