@@ -1,8 +1,7 @@
 #!/bin/sh
 
 mkdir -p  \
-	"$HOME/.alias.d" \
-	"$HOME/.env.d" \
-	"$HOME/.rc.d" \
-	"$HOME/bin" \
-	"$HOME/scripts"
+	"$HOME/.config/alias.d" \
+	"$HOME/.config/env.d" \
+	"$HOME/.config/rc.d" \
+	"$HOME/.local/bin"
