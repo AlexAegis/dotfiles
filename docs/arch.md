@@ -386,15 +386,20 @@ guide.
 
     2. Give sudo access to yourself
 
-       > `visudo` is not needed here, it only does a check
+       > `visudo` is not needed here, it only does a syntax check \
        > If you are confident enough, leave it out. \
        > Make sure `vi` is installed if you want to do the check
 
        ```sh
-       echo 'alex ALL=(ALL:ALL) ALL' > /etc/sudoers.d/99-alex
-       chmod 440 /etc/sudoers.d/99-alex
-       visudo -cf /etc/sudoers.d/99-alex
+       echo 'alex ALL=(ALL:ALL) ALL' > /etc/sudoers.d/05-alex
+       chmod 440 /etc/sudoers.d/05-alex
+       visudo -cf /etc/sudoers.d/05-alex
        ```
+
+       > It starts with `05` so that most of the later installed sudoer files
+       > can overwrite it. For example, a `10-wheel` sudoer file that will give
+       > even more permissions (NOPASSWD: ALL) will only have an effect on this
+       > user if it's loaded after this, less permissive one.
 
     3. Optionally create a guest user
 
@@ -408,4 +413,6 @@ guide.
 
     > Keep the Live installation for emergency recoveries
 
-20. Install your dotfiles
+20. Install your dotfiles.
+
+    > If you don't have one, make one. Saves a lot of time.
