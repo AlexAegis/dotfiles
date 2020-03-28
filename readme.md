@@ -23,3 +23,7 @@ sudo make clean # removes the symlink of ./dot.sh
 
 TODO: Write about the concept of a junction module
 check sys-\* modules for example
+
+TODO: try to indroduce `~/.local/share/*` folders where locally installed
+by using XDG_DATA_HOME
+programs should be, not their config, those stay in .config

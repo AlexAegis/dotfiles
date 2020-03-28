@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Only delete if present
+# It doesn't have a default, not even in the spec
+[ $XDG_RUNTIME_DIR ] && rm -rf $XDG_RUNTIME_DIR

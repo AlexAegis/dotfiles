@@ -1,0 +1,9 @@
+[Unit]
+Description=Entr watch autorestarter
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/cleanruntime
+
+[Install]
+WantedBy=default.target

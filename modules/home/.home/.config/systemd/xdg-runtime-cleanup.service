@@ -1,0 +1,11 @@
+[Unit]
+Description=Cleanup XDG runtime before logout
+DefaultDependencies=no
+After=final.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/cleanruntime
+
+[Install]
+WantedBy=final.target

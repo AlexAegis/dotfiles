@@ -11,3 +11,5 @@ set -a
 set +a
 
 export PATH="$HOME/.cargo/bin:$PATH"
+
+[ -s "/home/egyosan/.jabba/jabba.sh" ] && source "/home/egyosan/.jabba/jabba.sh"
