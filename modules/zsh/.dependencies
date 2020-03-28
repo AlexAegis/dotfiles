@@ -1,4 +1,5 @@
 # Needed to download oh-my-zsh
 home
 curl
+fzf
 neofetch

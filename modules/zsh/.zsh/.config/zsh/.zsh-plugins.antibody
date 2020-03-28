@@ -13,7 +13,6 @@ robbyrussell/oh-my-zsh
 robbyrussell/oh-my-zsh path:plugins/archlinux
 robbyrussell/oh-my-zsh path:plugins/bgnotify
 robbyrussell/oh-my-zsh path:plugins/cargo
-robbyrussell/oh-my-zsh path:plugins/chucknorris
 robbyrussell/oh-my-zsh path:plugins/command-not-found
 robbyrussell/oh-my-zsh path:plugins/docker
 robbyrussell/oh-my-zsh path:plugins/docker-compose

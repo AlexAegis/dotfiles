@@ -2,6 +2,7 @@
 sys-arch
 home
 :shelltool
+bash
 zsh
 vim
 +dev
