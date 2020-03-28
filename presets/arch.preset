@@ -5,6 +5,7 @@ home
 bash
 zsh
 vim
+rofi
 +utilities
 +dev
 +systools
