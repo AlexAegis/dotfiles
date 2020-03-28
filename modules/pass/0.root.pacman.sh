@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pacman -Syu --needed --noconfirm pass
+pacman -Syu --needed --noconfirm pass qtpass

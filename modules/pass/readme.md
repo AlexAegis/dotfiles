@@ -1,11 +1,14 @@
 # [pass](https://wiki.archlinux.org/index.php/Pass)
 
+> https://www.passwordstore.org/
+
 I sync my passwords to a private GitHub repository.
 The only thing I have to handle manually is the gpg keys.
 
 > If this dotmodule is installed then these utilities are already on path
 
 TODO: sudo exclude pass from NOPASSWD
+TODO: setup browserpass
 
 ## Creating keys
 
