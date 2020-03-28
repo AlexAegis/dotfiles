@@ -3,8 +3,10 @@
 # gpg --recv-keys ID
 
 # Import from $1 or from the default place
-gpg --import "${1-$HOME/pass-private-key.asc}"
-# Theb
+
+gpg --import "${1-$HOME}/pass-private-key.asc"
+
+# Then initialize pass with the last added key
 pass init "$(gpg --list-secret-keys |
 	grep "^      " |
 	tail -1 |

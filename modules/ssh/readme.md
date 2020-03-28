@@ -11,3 +11,7 @@ Try out your keys with [github](https://github.com/settings/keys)
 ```sh
 ssh -T git@github.com
 ```
+
+## Backup
+
+When backing up `~/.ssh`, remove the files that are part of this module
