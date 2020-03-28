@@ -8,6 +8,15 @@ My dotmodules™, and a live example of [dot](https://github.com/alexaegis/dot)
 
 ```sh
 git clone http://www.github.com/AlexAegis/dotfiles ~/.dotfiles
-cd ~/.dotfiles
+cd ~/.dotfiles/dot
 git submodule update --init --recursive
+sudo make # creates a symlink of ./dot.sh to /usr/local/bin
+dot zsh vim # or just call ./dot.sh if you didn't `make`
+```
+
+## Uninstall
+
+```sh
+cd ~/.dotfiles/dot
+sudo make clean # removes the symlink of ./dot.sh
 ```

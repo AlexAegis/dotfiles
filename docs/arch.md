@@ -142,7 +142,7 @@ guide.
 9. Install the system
 
    1. Install at least the `base`, `base-devel`, `linux`, `linux-firmware`,
-      `vi`, `sudo`, `git` and `networkmanager` packages using `pacstrap`.
+      `sudo`, `git` and `networkmanager` packages using `pacstrap`.
       Among these only `base`, `linux`, `linux-firmware` and `networkmanager`
       packages are the most important to install because after that you`ll have
       pacman and network access to install anything else from the installed
@@ -155,11 +155,10 @@ guide.
       > has a handful of utilities, like `bash`, `coreutils`, `sed`
       > and `pacman`
       >
-      > `base-devel` is needed to install AUR packages \
-      > `vi` to use `visudo` (or just symlink `vi` to `vim`)
+      > `base-devel` is needed to install AUR packages, can be installed later
 
       ```sh
-      pacstrap /mnt base base-devel linux linux-firmware networkmanager vi sudo
+      pacstrap /mnt base base-devel linux linux-firmware networkmanager sudo
       ```
 
    2. If you want to edit the bootloader from the installed system, install it.
@@ -312,7 +311,7 @@ guide.
     1. Open up the `locale.gen` file for edit
 
        ```sh
-       vim /etc/locale.gen
+       vi /etc/locale.gen
        ```
 
     2. Uncomment the locales you need. Also `en_US.UTF-8 UTF-8`. It should
@@ -385,7 +384,19 @@ guide.
        useradd -m -U -G wheel,root -s /bin/zsh alex
        ```
 
-    2. Optionally create a guest user
+    2. Give sudo access to yourself
+
+       > `visudo` is not needed here, it only does a check
+       > If you are confident enough, leave it out. \
+       > Make sure `vi` is installed if you want to do the check
+
+       ```sh
+       echo 'alex ALL=(ALL:ALL) ALL' > /etc/sudoers.d/99-alex
+       chmod 440 /etc/sudoers.d/99-alex
+       visudo -cf /etc/sudoers.d/99-alex
+       ```
+
+    3. Optionally create a guest user
 
        > Good for experimenting how things work in an unpriviliged environment
 

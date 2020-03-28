@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# pacman is not necessarily needed but its useless without it
+# If it was left out on install
+pacman -Syu --needed --noconfirm base-devel
+
 mkdir -p "$HOME/.yay"
 git clone https://aur.archlinux.org/yay.git "$HOME/.yay"
 cd "$HOME/.yay" || exit 1
