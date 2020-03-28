@@ -1,2 +1,6 @@
+# for fallback setup `bash` is needed
 bash
+# for fallback setup `curl` is needed
 curl
+# for fallback setup `unzip` is needed
+zip

@@ -6,7 +6,7 @@
 	user = AlexAegis
 
 [core]
-	askpass = /usr/bin/ksshaskpass
+#	askpass =
 
 [credential]
 	helper = /usr/bin/pass-git-helper

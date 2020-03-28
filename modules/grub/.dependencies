@@ -1,1 +1,3 @@
 home
+# because the resolution detection is done trhough X
+xorg
