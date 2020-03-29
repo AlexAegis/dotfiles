@@ -1,2 +1,3 @@
-systemd ? [ $systemctl ]
+xdg
+systemd ? [ $systemd ]
 xorg

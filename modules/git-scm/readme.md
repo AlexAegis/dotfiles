@@ -1,6 +1,10 @@
-# git
+# [git](https://git-scm.com/)
 
-This folder is called git-scm to avoid having a `.git` folder to stow
+> [Arch Wiki](https://wiki.archlinux.org/index.php/git)
+
+Version control system
+
+> This folder is called git-scm to avoid having a `.git` folder to stow
 
 On WSL share with Host keyring
 

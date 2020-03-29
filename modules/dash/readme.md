@@ -1,4 +1,6 @@
-# [Dash](https://wiki.archlinux.org/index.php/Dash)
+# [dash](https://en.wikipedia.org/wiki/Almquist_shell#dash:_Ubuntu,_Debian_and_POSIX_compliance_of_Linux_distributions)
+
+> [Arch Wiki](https://wiki.archlinux.org/index.php/Dash)
 
 Fast POSIX shell
 

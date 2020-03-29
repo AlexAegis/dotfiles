@@ -1,5 +1,14 @@
 #!/bin/sh
-
-. "$(dirname "$(readlink -f "$0")")/env.d/xdg.env"
-
-XDG_VIDEOS_DIR="$HOME/videoss"
+# Extended XDG spec
+# Each variable has to be present
+# Otherwise xdg-user-dirs-update will just delete the symlink
+# ! If you want to disable a folder, set it to "$HOME"
+# shellcheck disable=SC2034
+XDG_DESKTOP_DIR="$HOME"
+XDG_DOCUMENTS_DIR="$HOME/documents"
+XDG_DOWNLOAD_DIR="$HOME/downloads"
+XDG_MUSIC_DIR="$HOME/music"
+XDG_PICTURES_DIR="$HOME/pictures"
+XDG_PUBLICSHARE_DIR="$HOME"
+XDG_TEMPLATES_DIR="$HOME"
+XDG_VIDEOS_DIR="$HOME"

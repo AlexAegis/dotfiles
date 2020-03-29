@@ -1,6 +1,6 @@
-# powerline
+# [powerline](https://github.com/powerline/fonts)
 
-Fonts
+> [Arch Wiki](https://wiki.archlinux.org/index.php/Powerline)
 
 The git submodule only needed when there is no easily accessable package
 like the one in AUR

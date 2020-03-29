@@ -1,8 +1,0 @@
-QWidget {
-	margin: 6;
-	background-color: #252525;
-}
-
-QScrollBar:vertical {
-	width: 0px;
-}

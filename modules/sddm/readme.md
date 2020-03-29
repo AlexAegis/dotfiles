@@ -1,6 +1,8 @@
-# sddm
+# [SDDM](https://github.com/sddm/sddm)
 
-Display Manager
+> [Arch Wiki](https://wiki.archlinux.org/index.php/SDDM)
+
+Login Manager
 
 ## Test with theme
 

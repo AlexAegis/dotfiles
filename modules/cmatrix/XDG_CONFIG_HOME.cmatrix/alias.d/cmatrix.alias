@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# TODO: More variants
+alias matrix="cmatrix -lba"

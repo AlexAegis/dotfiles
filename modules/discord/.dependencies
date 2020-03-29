@@ -1,2 +1,3 @@
+xdg
 yay ? [ $pacman ]
 snap ? [ ! $pacman ]

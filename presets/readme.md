@@ -2,5 +2,21 @@
 
 Presets define a set of modules to be installed using `dot`
 
-Each non commented line defines a module to be installed
-Each line that starts with a `:` will be installed as a tag
+The presets folder will be recursively searched through for `*.preset` files
+
+## Usage
+
+Presets can be used with the `+` prefix
+
+### Example
+
+```sh
++dev
+```
+
+will use everything in the `dev.preset` file
+
+## Preset file format
+
+Preset files shares the same file format as dependencies. They can even use
+other presets.

@@ -16,7 +16,7 @@ setval "/etc/default/grub" "GRUB_GFXMODE" "$primary_res"
 setval "/etc/default/grub" "GRUB_HIDDEN_TIMEOUT" "0.0"
 setval "/etc/default/grub" "GRUB_TIMEOUT" "0.0"
 
-install -Dm 755 "31_hold_shift" "/etc/grub.d/31_hold_shift"
+install -Dm 755 "./resources/31_hold_shift" "/etc/grub.d/31_hold_shift"
 
 # update bootloader
 grub-mkconfig -o /boot/grub/grub.cfg

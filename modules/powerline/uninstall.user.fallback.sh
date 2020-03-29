@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # shellcheck source=/dev/null
-. "$HOME/.config/powerline/fonts/uninstall.sh"
+. "$XDG_CONFIG_HOME/powerline/fonts/uninstall.sh"

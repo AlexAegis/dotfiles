@@ -16,6 +16,8 @@
 		"rogalmic.bash-debug",
 		"visualstudioexptteam.vscodeintellicode",
 		"timonwong.shellcheck",
-		"bmalehorn.vscode-fish"
+		"bmalehorn.vscode-fish",
+		"coolbear.systemd-unit-file",
+		"aaron-bond.better-comments"
 	]
 }

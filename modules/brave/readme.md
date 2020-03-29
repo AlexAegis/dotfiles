@@ -1,1 +1,1 @@
-# brave
+# [Brave](https://brave.com/)

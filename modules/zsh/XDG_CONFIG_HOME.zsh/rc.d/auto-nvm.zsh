@@ -1,9 +1,11 @@
 #!/bin/zsh
+# ! nvm is deprecated in favour of fnm
+
 # https://github.com/nvm-sh/nvm#automatically-call-nvm-use
 
 # place this after nvm initialization!
 
-# TODO: Extremely slow on notebook, replace it with something, or nvm altogether
+# Extremely slow
 # autoload -U add-zsh-hook
 # load-nvmrc() {
 #   local node_version="$(nvm version)"

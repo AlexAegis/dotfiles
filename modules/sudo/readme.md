@@ -1,4 +1,6 @@
-# sudo
+# [sudo](https://www.sudo.ws/)
+
+> [Arch Wiki](https://wiki.archlinux.org/index.php/sudo)
 
 This module installs custom sudoers config in `/etc/sudoers.d/`.
 

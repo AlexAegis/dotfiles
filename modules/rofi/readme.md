@@ -1,3 +1,5 @@
-# rofi
+# [rofi](https://github.com/davatorium/rofi)
 
-I use it only as an application launcher
+> [Arch Wiki](https://wiki.archlinux.org/index.php/Rofi)
+
+## Application Launcher

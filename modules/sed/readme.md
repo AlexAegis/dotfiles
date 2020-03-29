@@ -1,3 +1,5 @@
-# sed
+# [sed](https://www.gnu.org/software/sed/manual/sed.html)
 
-Stream editor. Should be preinstalled everywhere, this is just making sure.
+> [Arch Wiki](https://wiki.archlinux.org/index.php/Core_utilities#Essentials)
+
+Stream editor

@@ -1,4 +1,6 @@
-# [plymouth](https://wiki.archlinux.org/index.php/plymouth)
+# [plymouth](https://github.com/freedesktop/plymouth)
+
+> [Arch Wiki](https://wiki.archlinux.org/index.php/plymouth)
 
 Startup splash screen
 

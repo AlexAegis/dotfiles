@@ -1,4 +1,5 @@
 # Needed to download oh-my-zsh
+xdg
 home
 curl
 fzf

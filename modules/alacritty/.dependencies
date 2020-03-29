@@ -1,2 +1,2 @@
-rust ? [ ! $pacman ]
 xdg
+rust ? [ ! $pacman ]

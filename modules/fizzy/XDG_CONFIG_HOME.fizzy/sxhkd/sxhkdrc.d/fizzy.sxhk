@@ -1,5 +1,0 @@
-super + space
-	~/bin/fizzy
-
-super + n
-	notify-send "fizzy is loaded!"

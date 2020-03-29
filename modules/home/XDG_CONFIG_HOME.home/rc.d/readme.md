@@ -1,4 +1,4 @@
-# rc
+# rc.d
 
 This hard folder will be populated by rc scripts of other modules.
 

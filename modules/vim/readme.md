@@ -1,6 +1,8 @@
-# Vim
+# [vim](https://www.vim.org/)
 
-Autoload .vimrc securely
+> [Arch Wiki](https://wiki.archlinux.org/index.php/Vim)
+
+## Autoload .vimrc securely
 
 ```vim
 set secure

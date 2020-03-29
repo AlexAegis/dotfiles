@@ -1,6 +1,8 @@
-# bash
+# [Bash](https://www.gnu.org/software/bash/)
 
-<https://unix.stackexchange.com/questions/218270/which-are-bash-shell-special-parameters>
+> [Arch Wiki](https://wiki.archlinux.org/index.php/bash)
+
+## Special Parameters
 
 ```bash
 man bash | awk '/Special Parameters$/','/Shell Variables$/'

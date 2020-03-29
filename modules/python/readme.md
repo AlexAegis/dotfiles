@@ -1,3 +1,6 @@
-# [python](https://wiki.archlinux.org/index.php/Python)
+# [python](https://www.python.org/)
 
-Install locally using pyenv, and a global installation for everything else
+> [Arch Wiki](https://wiki.archlinux.org/index.php/Python)
+
+Install locally using [pyenv](https://github.com/pyenv/pyenv), and a global
+installation for everything else

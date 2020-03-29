@@ -1,7 +1,0 @@
-xorg
-fzf
-# its fast
-konsole
-# to launch it with super + space
-sxhkd
-bash

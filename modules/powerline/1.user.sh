@@ -1,5 +1,5 @@
 #!/bin/sh
 
-cp "$HOME"/.config/powerline/fonts/fontconfig/* \
-	"$HOME"/.config/fontconfig/conf.d
+cp "$XDG_CONFIG_HOME"/powerline/fonts/fontconfig/* \
+	"$XDG_CONFIG_HOME"/fontconfig/conf.d
 fc-cache -vf

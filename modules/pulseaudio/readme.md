@@ -1,4 +1,6 @@
-# PulseAudio
+# [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/)
+
+> [Arch Wiki](https://wiki.archlinux.org/index.php/PulseAudio)
 
 For audio drivers
 

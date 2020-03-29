@@ -10,7 +10,7 @@ set -a
 # shellcheck source=/dev/null
 DIR="$XDG_CONFIG_HOME" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 # shellcheck source=/dev/null
-DIR="$XDG_CONFIG_HOME/env.d" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
+DIR="$XDG_CONFIG_HOME/environment.d" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 
 [ ! "$QUIET" ] && echo "Loading Aliases"
 # shellcheck source=/dev/null

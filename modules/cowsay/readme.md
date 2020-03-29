@@ -1,6 +1,8 @@
 # [cowsay](https://en.wikipedia.org/wiki/Cowsay)
 
-most importantest command
+The most important command
+
+## Variations
 
 To see an example of every cow. (Example uses `fortune`)
 

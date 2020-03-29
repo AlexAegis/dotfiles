@@ -1,3 +1,4 @@
 #!/bin/sh
 
-mkdir -p "$HOME/.config/sddm/themes"
+# shared folder
+mkdir -p "$XDG_CONFIG_HOME/sddm/themes"
