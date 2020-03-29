@@ -6,10 +6,9 @@
 #
 # Load environmental variables and aliases
 set -a
+# preload xdg env so loadenv can load the rest according to that
 # shellcheck disable=SC1090
-[ -e "$HOME/bin/loadenv" ] && . "$HOME/bin/loadenv"
+. "$HOME/.config/environment.d/xdg.env"
+# shellcheck disable=SC1090
+[ -e "$XDG_BIN_HOME/loadenv" ] && . "$XDG_BIN_HOME/loadenv"
 set +a
-
-export PATH="$HOME/.cargo/bin:$PATH"
-
-[ -s "/home/egyosan/.jabba/jabba.sh" ] && source "/home/egyosan/.jabba/jabba.sh"
