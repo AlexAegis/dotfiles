@@ -1,23 +1,20 @@
 [submodule "dot"]
 	path = dot
 	url = https://github.com/AlexAegis/dot
-[submodule "modules/doom/.doom/.config/gzdoom/iwad"]
-	path = modules/doom/.doom/.config/gzdoom/iwad
+[submodule "modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad"]
+	path = modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad
 	url = https://github.com/dgeng/iwad.git
 	ignore = dirty
-[submodule "modules/powerline/.powerline/.config/powerline/fonts"]
-	path = modules/powerline/.powerline/.config/powerline/fonts
+[submodule "modules/powerline/XDG_CONFIG_HOME.powerline/powerline/fonts"]
+	path = modules/powerline/XDG_CONFIG_HOME.powerline/powerline/fonts
 	url = https://github.com/powerline/fonts
 	ignore = dirty
-[submodule "modules/tmux/oh-my-tmux"]
-	path = modules/tmux/oh-my-tmux
+[submodule "modules/tmux/XDG_CONFIG_HOME.tmux/tmux/oh-my-tmux"]
+	path = modules/tmux/XDG_CONFIG_HOME.tmux/tmux/oh-my-tmux
 	url = https://github.com/gpakosz/.tmux
-[submodule "modules/tmux/.tmux/.config/tmux/oh-my-tmux"]
-	path = modules/tmux/.tmux/.config/tmux/oh-my-tmux
-	url = https://github.com/gpakosz/.tmux
-[submodule "modules/sddm/.sddm/.config/sddm/themes/sddm-slice"]
-	path = modules/sddm/.sddm/.config/sddm/themes/sddm-slice
+[submodule "modules/sddm/XDG_CONFIG_HOME.sddm/sddm/themes/sddm-slice"]
+	path = modules/sddm/XDG_CONFIG_HOME.sddm/sddm/themes/sddm-slice
 	url = https://github.com/RadRussianRus/sddm-slice.git
-[submodule "modules/rofi/.rofi/.config/rofi/rofi-themes"]
-	path = modules/rofi/.rofi/.config/rofi/rofi-themes
+[submodule "modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes"]
+	path = modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes
 	url = https://github.com/davatorium/rofi-themes

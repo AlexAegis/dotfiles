@@ -1,3 +1,3 @@
 #!/bin/sh
 
-./.sudo/bin/install-sudoer ./resources/10-wheel
+$XDG_BIN_HOME/install-sudoer ./resources/10-wheel

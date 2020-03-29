@@ -1,4 +1,0 @@
-#!/bin/sh
-
-alias dotdup="dot -a -u -d"
-alias dotup="dot -a -u"
