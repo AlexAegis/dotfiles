@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# TODO: TEST this
+chmod -R -077 "$HOME"
+chmod 744 "$HOME"
