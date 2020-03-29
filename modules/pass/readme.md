@@ -1,6 +1,6 @@
 # [pass](https://wiki.archlinux.org/index.php/Pass)
 
-> https://www.passwordstore.org/
+> <https://www.passwordstore.org/>
 
 I sync my passwords to a private GitHub repository.
 The only thing I have to handle manually is the gpg keys.
@@ -59,3 +59,5 @@ To import just run [`pass-import-key`](./.pass/bin/pass-import-key)
 ```sh
 pass-import-key
 ```
+
+TODO: SET PASSWORD_STORE_DIR in env
