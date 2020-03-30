@@ -1,4 +1,4 @@
 #!/bin/sh
 
-mkdir -p "$HOME/.config/systemd/user" \
-	"$HOME/.config/xorg/layout"
+# shared folder
+mkdir -p "$HOME/.config/xorg/layout"
