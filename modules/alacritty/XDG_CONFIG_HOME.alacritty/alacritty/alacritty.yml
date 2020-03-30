@@ -1,0 +1,28 @@
+# Font configuration (changes require restart)
+background_opacity: 0.3
+font:
+    # The normal (roman) font face to use.
+    size: 16
+    offset:
+        y: 16
+        x: 0
+    glyph_offset:
+        x: 0
+        y: 10
+    line_height: 21
+    normal:
+        family: Inconsolata Nerd Font
+        # Style can be specified to pick a specific face.
+        style: Regular
+
+    # The bold font face
+    bold:
+        family: Inconsolata Nerd Font
+        # Style can be specified to pick a specific face.
+        # style: Bold
+
+    # The italic font face
+    italic:
+        family: Inconsolata Nerd Font
+        # Style can be specified to pick a specific face.
+        # style: Italic
