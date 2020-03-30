@@ -9,8 +9,8 @@
 #	askpass = /usr/lib/ssh/ssh-askpass
 
 [credential]
-#	helper = /usr/bin/pass-git-helper
-#	useHttpPath = true
+	helper = /usr/bin/pass-git-helper
+	useHttpPath = true
 
 [push]
 	default = upstream
