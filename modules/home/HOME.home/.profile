@@ -8,7 +8,8 @@
 set -a
 # preload xdg env so loadenv can load the rest according to that
 # shellcheck disable=SC1090
-. "$HOME/.config/environment.d/xdg.env"
+echo ".propfile xch: $XDG_CONFIG_HOME"
+# . "$HOME/.config/environment.d/10-xdg.conf"
 # shellcheck disable=SC1090
 [ -e "$XDG_BIN_HOME/loadenv" ] && . "$XDG_BIN_HOME/loadenv"
 set +a
