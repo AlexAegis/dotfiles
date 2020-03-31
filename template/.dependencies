@@ -1,7 +1,0 @@
-# Dependency list
-# Comments are supported
-# Each line has to match another module
-sh
-# dependencies can be conditional. Everything after the `?` will be `eval`-d
-# ? For the list of supported variables check the readme.md
-rust ? [ $debian ] || [ $ubuntu ]
