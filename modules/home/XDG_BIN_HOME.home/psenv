@@ -17,7 +17,7 @@ done
 
 if [ ! "$1" ]; then
 	row=$(pstree -p "$root_pid" | fzf | \
-		grep -o -E '\{?[a-zA-Z]+[-]*[a-zA-Z]+\}?\([0-9]+\)')
+		grep -o -E '\{?\(?[a-zA-Z]+[-]*[a-zA-Z]+\)?\}?\([0-9]+\)')
 	if [ "$(echo "$row" | wc -l)" = 1 ]; then
 		pid=$(echo "$row" | grep -o -E '[0-9]+' )
 	else
