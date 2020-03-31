@@ -4,25 +4,45 @@ font:
     # The normal (roman) font face to use.
     size: 16
     offset:
-        y: 16
+        y: 0
         x: 0
     glyph_offset:
         x: 0
-        y: 10
+        y: 0
     line_height: 21
+    # Inconsolata Nerd Font glyphs appear too tall
     normal:
-        family: Inconsolata Nerd Font
+        family: FuraCode Nerd Font
         # Style can be specified to pick a specific face.
         style: Regular
 
     # The bold font face
     bold:
-        family: Inconsolata Nerd Font
+        family: FuraCode Nerd Font
         # Style can be specified to pick a specific face.
         # style: Bold
 
     # The italic font face
     italic:
-        family: Inconsolata Nerd Font
+        family: FuraCode Nerd Font
         # Style can be specified to pick a specific face.
         # style: Italic
+
+key_bindings:
+    - { key: Paste, action: Paste }
+    - { key: Copy, action: Copy }
+    - { key: L, mods: Control, action: ClearLogNotice }
+    - { key: PageUp, mods: Shift, mode: ~Alt, action: ScrollPageUp }
+    - { key: PageDown, mods: Shift, mode: ~Alt, action: ScrollPageDown }
+    - { key: Home, mods: Shift, mode: ~Alt, action: ScrollToTop }
+    - { key: End, mods: Shift, mode: ~Alt, action: ScrollToBottom }
+
+    # (Windows, Linux, and BSD only)
+    - { key: V, mods: Control|Shift, action: Paste }
+    - { key: C, mods: Control|Shift, action: Copy }
+    - { key: Insert, mods: Shift, action: PasteSelection }
+    - { key: Key0, mods: Control, action: ResetFontSize }
+    - { key: Equals, mods: Control, action: IncreaseFontSize }
+    - { key: Add, mods: Control, action: IncreaseFontSize }
+    - { key: Subtract, mods: Control, action: DecreaseFontSize }
+    - { key: Minus, mods: Control, action: DecreaseFontSize }

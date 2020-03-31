@@ -5,3 +5,9 @@
 ## Reference settings
 
 <https://github.com/alacritty/alacritty/blob/master/alacritty.yml>
+
+## Bindings
+
+### Mouse support
+
+[Can't bind to wheel](https://github.com/alacritty/alacritty/issues/2512)

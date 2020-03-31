@@ -1,3 +1,3 @@
 #!/bin/sh
 
-systemctl enable --user --now picom
+# systemctl enable --user --now picom
