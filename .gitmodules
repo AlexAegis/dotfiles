@@ -9,9 +9,6 @@
 	path = modules/powerline/XDG_CONFIG_HOME.powerline/powerline/fonts
 	url = https://github.com/powerline/fonts
 	ignore = dirty
-[submodule "modules/tmux/XDG_CONFIG_HOME.tmux/tmux/oh-my-tmux"]
-	path = modules/tmux/XDG_CONFIG_HOME.tmux/tmux/oh-my-tmux
-	url = https://github.com/gpakosz/.tmux
 [submodule "modules/sddm/XDG_CONFIG_HOME.sddm/sddm/themes/sddm-slice"]
 	path = modules/sddm/XDG_CONFIG_HOME.sddm/sddm/themes/sddm-slice
 	url = https://github.com/RadRussianRus/sddm-slice.git
