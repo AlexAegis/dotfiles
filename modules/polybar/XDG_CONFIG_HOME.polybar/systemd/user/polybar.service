@@ -2,6 +2,7 @@
 Description=Polybar
 Documentation=man:polybar(1)
 PartOf=graphical-session.target
+PartOf=polybar-config.path
 
 [Service]
 ExecStart=%h/.config/polybar/polybar.sh

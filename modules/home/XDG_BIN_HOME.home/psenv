@@ -1,0 +1,32 @@
+#!/bin/sh
+
+root_pid=1
+
+while :; do
+	case $1 in
+	-sdu | -\? | --systemd-user)
+		root_pid=$(pidof systemd)
+		;;
+	*)
+		break
+		;;
+	esac
+
+	shift
+done
+
+if [ ! "$1" ]; then
+	row=$(pstree -p "$root_pid" | fzf | \
+		grep -o -E '\{?[a-zA-Z]+[-]*[a-zA-Z]+\}?\([0-9]+\)')
+	if [ "$(echo "$row" | wc -l)" = 1 ]; then
+		pid=$(echo "$row" | grep -o -E '[0-9]+' )
+	else
+		pid=$(echo "$row" | fzf | grep -o -E '[0-9]+' )
+	fi
+elif [ "$(expr "$1" : '[0-9]*$')" != 0 ]; then
+	pid="$1"
+else
+	pid=$(pidof "$1")
+fi
+
+tr '\0' '\n' < "/proc/$pid/environ"

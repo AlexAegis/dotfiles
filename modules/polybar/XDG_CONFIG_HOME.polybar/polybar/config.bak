@@ -56,7 +56,7 @@ font-1 = "Inconsolata Nerd Font":fontformat=truetype:size=8:antialias=false;0
 font-2 = "Inconsolata Nerd Font":pixelsize=10;1
 
 modules-left = bspwm i3
-modules-center = mpd
+;modules-center = mpd
 modules-right = filesystem xbacklight alsa pulseaudio xkeyboard memory cpu wlan eth battery temperature date powermenu
 
 tray-position = right
