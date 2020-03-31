@@ -1,0 +1,6 @@
+[Path]
+Unit=daemon-reload.service
+PathChanged=%h/.config/environment.d/wallpaper.conf
+
+[Install]
+WantedBy=multi-user.target

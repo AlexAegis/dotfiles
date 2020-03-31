@@ -1,2 +1,3 @@
 #!/bin/sh
-feh --no-fehbg --bg-scale '/home/alex/Pictures/wallpapers/fjord.jpg'
+echo "feh: setting wallpaper to: $WALLPAPER"  | systemd-cat -p info
+feh --no-fehbg --bg-scale "$WALLPAPER"

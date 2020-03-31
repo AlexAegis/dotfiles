@@ -1,18 +1,13 @@
 [Unit]
 Description=Feh Wallpaper
 Documentation=man:feh(1)
+After=daemon-reload.service
+PartOf=feh-wallpaper.path
 
 [Service]
 ExecStart=%h/.config/feh/.fehbg
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
-# Try to restart no matter how the process ended
-Restart=always
-# Restart in 5 second intervals
-RestartSec=5
-# Try to restart up to 3 times
-StartLimitBurst=3
-# Don't try to restart after 60 seconds
-StartLimitIntervalSec=60
 
 [Install]
 WantedBy=xsession.target
+WantedBy=daemon-reload.service

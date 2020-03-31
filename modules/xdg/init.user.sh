@@ -2,8 +2,8 @@
 
 # Load the XDG config defined by the module itself to be used when installing
 # shellcheck disable=SC1091
-. "./XDG_CONFIG_HOME.xdg/environment.d/xdg.env"
-. "./XDG_CONFIG_HOME.xdg/user-dirs.dirs"
+. "./XDG_CONFIG_HOME.xdg/environment.d/10-xdg.conf"
+. "./XDG_CONFIG_HOME.xdg/environment.d/11-xdg-user-dirs.conf"
 
 # making sure it's the syslink if `xdg-user-dirs-update` overwrites it
 [ -e "$XDG_CONFIG_HOME/user-dirs.dirs" ] \

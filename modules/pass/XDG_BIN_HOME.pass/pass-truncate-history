@@ -6,7 +6,7 @@ cd "$HOME/.password-store/" || exit 1
 
 git checkout --orphan temp_branch
 git add -A
-git commit -am "Reset point"
+git commit -am "reset point"
 git branch -D master
 git branch -m master
 
