@@ -9,5 +9,5 @@ configuration {
  sort: true;
  show-icons: true;
  icon-theme: "candy-icons";
+ theme: "rofi-themes/User Themes/oxide.rasi";
 }
-

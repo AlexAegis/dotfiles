@@ -1,6 +1,9 @@
 [submodule "dot"]
 	path = dot
 	url = https://github.com/AlexAegis/dot
+[submodule "modules/wallpapers"]
+	path = modules/wallpapers
+	url = https://github.com/AlexAegis/wallpapers
 [submodule "modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad"]
 	path = modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad
 	url = https://github.com/dgeng/iwad.git
@@ -15,9 +18,6 @@
 [submodule "modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes"]
 	path = modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes
 	url = https://github.com/davatorium/rofi-themes
-[submodule "modules/wallpapers"]
-	path = modules/wallpapers
-	url = https://github.com/AlexAegis/wallpapers
 [submodule "modules/picom/resources/compton"]
 	path = modules/picom/resources/compton
 	url = https://github.com/tryone144/compton
