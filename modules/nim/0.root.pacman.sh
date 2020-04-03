@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm nim
+pacman -Syu --needed --noconfirm nim nimble
