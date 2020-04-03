@@ -1,0 +1,3 @@
+#!/bin/sh
+# This enables sudo to expand aliases of your user
+alias sudo='sudo '
