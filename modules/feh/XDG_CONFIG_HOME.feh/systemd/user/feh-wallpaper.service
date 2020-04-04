@@ -5,7 +5,7 @@ After=daemon-reload.service
 PartOf=feh-wallpaper.path
 
 [Service]
-ExecStart=%h/.config/feh/.fehbg
+ExecStart=%E/feh/.fehbg
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 
 [Install]

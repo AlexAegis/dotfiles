@@ -1,6 +1,6 @@
 [Path]
 Unit=daemon-reload.service
-PathChanged=%h/.config/feh/.fehbg
+PathChanged=%E/feh/.fehbg
 
 [Install]
 WantedBy=multi-user.target

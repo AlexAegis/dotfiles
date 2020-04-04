@@ -8,7 +8,7 @@ Wants=notify-restart@%N.service
 # killmode service needed because this service is used to
 # spawn other processes that should live independently
 [Service]
-ExecStart=%s -c '/usr/bin/sxhkd $XDG_CONFIG_HOME/sxhkd/sxhkdrc.d/*'
+ExecStart=/bin/sh -c '/usr/bin/sxhkd $XDG_CONFIG_HOME/sxhkd/sxhkdrc.d/*'
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 KillMode=service
 Restart=always
