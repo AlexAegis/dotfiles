@@ -1,0 +1,7 @@
+[Path]
+Unit=sxhkd.service
+PathModified=%E/sxhkd/sxhkdrc
+PathModified=%E/sxhkd/sxhkdrc.d
+
+[Install]
+WantedBy=default.target

@@ -1,11 +1,16 @@
 [Unit]
 Description=Simple X Hotkey Daemon
 Documentation=man:sxhkd(1)
-PartOf=graphical-session.target
+PartOf=sxhkd.path
+OnFailure=notify-failure@%N.service
+Wants=notify-restart@%N.service
 
+# killmode service needed because this service is used to
+# spawn other processes that should live independently
 [Service]
-ExecStart=/bin/sh -c '/usr/bin/sxhkd $HOME/.config/sxhkd/sxhkdrc.d/*'
+ExecStart=%s -c '/usr/bin/sxhkd $XDG_CONFIG_HOME/sxhkd/sxhkdrc.d/*'
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+KillMode=service
 Restart=always
 
 [Install]

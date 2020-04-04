@@ -26,3 +26,7 @@ git lc
 ```
 
 > **l**ist **c**onfig
+
+## Notes
+
+TODO: <https://github.com/github/hub>

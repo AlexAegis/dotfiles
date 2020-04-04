@@ -1,0 +1,9 @@
+[Unit]
+Description=Notify about events
+
+[Service]
+Type=oneshot
+ExecStart=notify-send --urgency=normal '%i'
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=Notify about restarts
+
+[Service]
+Type=oneshot
+ExecStart=notify-send --urgency=normal '%i restarted'
+
+[Install]
+WantedBy=default.target

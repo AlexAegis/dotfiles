@@ -1,0 +1,9 @@
+[Unit]
+Description=Notify about critical errors
+
+[Service]
+Type=oneshot
+ExecStart=notify-send --urgency=critical 'Critical: %i'
+
+[Install]
+WantedBy=default.target

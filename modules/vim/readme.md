@@ -11,6 +11,10 @@ if filereadable(expand(printf('%s/%s', getcwd(), '.vimrc')))
 endif
 ```
 
+## Notes
+
+TODO: <https://sevensidedmarble.com/folds-for-better-vim-configs/>
+
 TODO:
 
 ```vim

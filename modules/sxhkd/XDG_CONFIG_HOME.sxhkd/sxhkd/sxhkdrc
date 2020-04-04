@@ -1,4 +1,11 @@
+# This file is good for quick experimentations as systemd will reload sxhkd
+# when it changed. Symlink entries in sxhkdrc.d will only make it reload when
+# the symlink is removed/added (Restowed)
+
 # ? This is obsolete when the kill_sxhkd_on_change watcher is running
 # make sxhkd reload its configuration files:
 super + Escape
 	pkill -USR1 -x sxhkd
+
+alt + m
+	notify-send "main sxhkdrc file available"
