@@ -7,6 +7,18 @@ This module contains the XDG variable definitions
 The rest of the modules should follow this, and set this module as their
 dependency if they wish to utilize it.
 
+## Scructural Dependencies
+
+In the `home` module, the `.profile` file depends on the internal settings
+of this module because it has to reference the main XDG variables in order
+to load them.
+
+```sh
+. "$HOME/.config/environment.d/10-xdg.conf"
+```
+
+If this module is changed in this aspect, you have to manually change that.
+
 ## Notes
 
 The `user-dirs.dirs` file was made available to the general environment
