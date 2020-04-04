@@ -1,6 +1,7 @@
 [Unit]
 Description=Daemon Reload
 Documentation=man:systemd(1)
+PartOf=user-services.path
 
 [Service]
 Type=oneshot

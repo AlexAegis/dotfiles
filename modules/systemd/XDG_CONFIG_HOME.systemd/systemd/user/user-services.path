@@ -1,0 +1,6 @@
+[Path]
+Unit=daemon-reload.service
+PathChanged=%h/.config/systemd/user
+
+[Install]
+WantedBy=default.target
