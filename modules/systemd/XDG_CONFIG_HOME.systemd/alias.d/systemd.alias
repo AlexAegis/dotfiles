@@ -1,2 +1,2 @@
-alias sys="systemctl"
+alias sys="sudo systemctl"
 alias sysu="systemctl --user"

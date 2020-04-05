@@ -3,5 +3,5 @@
 # -r, --region               Capture a rectangular region of the screen
 # -b, --background           Take a screenshot and exit without showing the GUI
 # -c, --clipboard            In background mode, copy screenshot to clipboard
-super + {_,shift + }{_,ctrl + }v
+super + {_,shift + }{_,ctrl + }s
 	spectacle -b {_,-r} {-c,_}
