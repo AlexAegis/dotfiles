@@ -1,12 +1,12 @@
 [Unit]
 Description=Entr watch autorestarter
+OnFailure=notify-failure@%N.service
+Wants=notify-restart@%N.service
 
 [Service]
 Type=oneshot
-ExecStart=notify-send 'Reload Entr' && /usr/bin/systemctl restart --user entr-watch.service
-# Restart at most 5 times...
+ExecStart=/usr/bin/systemctl restart --user entr-watch.service
 StartLimitBurst=5
-# ...in a 10 second interval
 StartLimitIntervalSec=10
 
 [Install]

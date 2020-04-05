@@ -1,8 +1,11 @@
 [Unit]
 Description=Entr Watch Environment
 Documentation=man:entr(1)
+OnFailure=notify-failure@%N.service
+Wants=notify-restart@%N.service
 
 [Service]
+Type=forking
 ExecStart=%E/entr/bin/entr-start-watchers.sh
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 
