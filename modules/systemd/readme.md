@@ -46,11 +46,11 @@ to regenerate them (it always force-stows)
 ### Spawners
 
 Services that are used to spawn other processes that are not strictly related
-to the service (Like `sxhkd`) should have `KillMode` set to `service`
+to the service (Like `sxhkd`) should have `KillMode` set to `process`
 
 ```ini
 [Service]
-KillMode=service
+KillMode=process
 ```
 
 This way only the main process will be killed and the spawned processes will

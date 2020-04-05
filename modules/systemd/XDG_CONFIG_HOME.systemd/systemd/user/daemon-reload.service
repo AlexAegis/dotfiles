@@ -2,10 +2,10 @@
 Description=Daemon Reload
 Documentation=man:systemd(1)
 PartOf=user-services.path
+Wants=notify-restart@%N.service
 
 [Service]
 Type=oneshot
-ExecStart=notify-send 'daemon reloaded'
 ExecStart=/usr/bin/systemctl --user daemon-reload
 
 [Install]

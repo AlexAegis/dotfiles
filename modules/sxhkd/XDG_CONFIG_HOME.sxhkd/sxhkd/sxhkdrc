@@ -9,3 +9,6 @@ super + Escape
 
 alt + m
 	notify-send "main sxhkdrc file available"
+
+alt + n
+	switchkbmap.sh
