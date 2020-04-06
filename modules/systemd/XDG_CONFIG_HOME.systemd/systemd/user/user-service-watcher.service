@@ -4,9 +4,7 @@ Documentation=man:systemd(1)
 Wants=notify-restart@%N.service
 
 [Service]
-EnvironmentFile=%E/environment.d/10-xdg.conf
-# ExecStart=/bin/sh -c '~/.local/bin/restart_on_change -d "/home/alex/.config/systemd/user" -s "daemon-reload"'
-ExecStart=%h/.local/bin/restart_on_change -d "/home/alex/.config/systemd/user" -s "daemon-reload"
+ExecStart=%E/systemd/restart_on_change -d "%E/systemd/user" -s "daemon-reload"
 
 [Install]
 WantedBy=default.target

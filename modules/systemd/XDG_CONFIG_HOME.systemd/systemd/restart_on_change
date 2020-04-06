@@ -54,6 +54,8 @@ for arg in $(parse_args "$@"); do
 	esac
 done
 
+echo "XDG_BIN_HOME: $XDG_BIN_HOME"
+
 eval "$XDG_BIN_HOME/watch_exec $TARGET $SERVICE"
 
 echo "Restart on change terminated"
