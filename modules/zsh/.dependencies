@@ -6,3 +6,4 @@ fzf
 neofetch
 nerdfonts
 powerline
+systemd ? [ $systemd ]

@@ -5,6 +5,9 @@
 
 [ ! "$QUIET" ] && echo "Loading Environment"
 set -a
+
+# TODO: LOAD SYSTEMD .conf files too
+# PUT EVERYTINH BEHIND FLAGS
 # ? We actually can rely on the absolute path of `sourcein` here because
 # ? it is added by this module
 # shellcheck source=/dev/null

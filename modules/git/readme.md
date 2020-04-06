@@ -4,8 +4,6 @@
 
 Version control system
 
-> This folder is called git-scm to avoid having a `.git` folder to stow
-
 On WSL share with Host keyring
 
 ```bash

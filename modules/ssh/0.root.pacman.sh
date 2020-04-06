@@ -1,3 +1,3 @@
 #!/bin/sh
-
-pacman -Syu --needed --noconfirm x11-ssh-askpass
+# TODO: Maybe for a backup, using rofi instead
+# pacman -Syu --needed --noconfirm x11-ssh-askpass

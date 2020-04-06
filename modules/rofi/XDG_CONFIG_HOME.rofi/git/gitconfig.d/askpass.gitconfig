@@ -1,0 +1,2 @@
+[core]
+	askpass = $XDG_BIN_HOME/rofi-askpass.sh

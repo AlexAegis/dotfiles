@@ -1,2 +1,4 @@
-git-scm
+git
 ssh
+xdg
+systemd ? [ $systemd ]

@@ -1,0 +1,1 @@
+../../../XDG_BIN_HOME.rofi/rofi-askpass.sh
