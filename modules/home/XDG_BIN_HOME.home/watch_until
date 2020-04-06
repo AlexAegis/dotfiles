@@ -1,0 +1,26 @@
+#!/bin/sh
+
+echo "Watch $*"
+
+TARGETS=${*:-.}
+
+#shellcheck disable=SC2086
+TARGETS=$(/usr/bin/find $TARGETS -maxdepth 3 -exec /usr/bin/readlink -f {} \;)
+
+wait_notification() {
+	/usr/bin/inotifywait -q \
+	-e delete \
+	-e delete_self \
+	-e move \
+	-e moved_to \
+	-e moved_from \
+	-e modify \
+	-e attrib \
+	"$@"
+}
+
+echo "Watch targets: $TARGETS"
+#shellcheck disable=SC2086
+wait_notification $TARGETS
+
+echo 'Watch until terminated'

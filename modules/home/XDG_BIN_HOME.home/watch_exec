@@ -1,0 +1,86 @@
+#!/bin/sh
+
+# watches directories provided by -d parameters and everytime a notification
+# happens, it executes every -e parameter with eval
+# It also resolves symlinks!
+
+# for argument parsing
+IFS=' '
+
+parse_args() {
+	/usr/bin/getopt -o "de" -l "directory,exec" -- "$@" || exit 1
+}
+
+TARGET=
+EXEC=
+
+for arg in $(parse_args "$@"); do
+	case $arg in
+		-d | --directory)
+			if [ -d "$2" ]; then
+				if [ $TARGET ]; then
+					TARGET="$TARGET
+$2"
+				else
+					TARGET="$2"
+				fi
+			else
+				echo "${C_RED} Invalid target: $2${C_RESET}"
+				exit 1
+			fi
+			shift 2
+			;;
+		-e | --exec)
+			if [ "$2" ]; then
+				if [ $EXEC ]; then
+					EXEC="$EXEC
+$2"
+				else
+					EXEC="$2"
+				fi
+			else
+				echo "${C_RED} Invalid exec: $2${C_RESET}"
+				exit 1
+			fi
+			shift 2
+			;;
+		--)	;;
+		-?*)
+			printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+			;;
+		*) # Installs modules specified after it
+			break
+			;;
+	esac
+done
+
+
+wait_notification() {
+	/usr/bin/inotifywait -q \
+	-e delete \
+	-e delete_self \
+	-e move \
+	-e moved_to \
+	-e moved_from \
+	-e modify \
+	-e attrib \
+	"$@"
+}
+
+
+#shellcheck disable=SC2086
+TARGET=$(/usr/bin/find $TARGET -maxdepth 3 -exec /usr/bin/readlink -f {} \;)
+
+# for lists with elements with spaces
+IFS='
+'
+#shellcheck disable=SC2086
+while wait_notification $TARGET; do
+	echo "Notification! Execute all: $EXEC"
+	for exe in $EXEC; do
+		echo "exe $exe"
+		eval "$exe"
+	done
+done
+
+echo 'Watch exec terminated'

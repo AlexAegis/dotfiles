@@ -1,3 +1,4 @@
+# deprecated
 [Unit]
 Description=Entr watch autorestarter
 OnFailure=notify-failure@%N.service
