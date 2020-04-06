@@ -1,5 +1,5 @@
 [Unit]
-Description=Daemon Reload
+Description=User services watcher (Daemon Reloader)
 Documentation=man:systemd(1)
 Wants=notify-restart@%N.service
 

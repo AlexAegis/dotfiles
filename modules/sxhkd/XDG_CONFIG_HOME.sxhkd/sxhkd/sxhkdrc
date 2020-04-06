@@ -10,5 +10,5 @@ super + Escape
 alt + m
 	notify-send "main sxhkdrc file available"
 
-alt + n
-	switchkbmap.sh
+alt + space
+	$XDG_BIN_HOME/switchkbmap.sh

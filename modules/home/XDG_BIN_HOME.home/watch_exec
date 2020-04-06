@@ -67,15 +67,18 @@ wait_notification() {
 	"$@"
 }
 
-
+# symlink is added
 #shellcheck disable=SC2086
-TARGET=$(/usr/bin/find $TARGET -maxdepth 3 -exec /usr/bin/readlink -f {} \;)
+
 
 # for lists with elements with spaces
 IFS='
 '
 #shellcheck disable=SC2086
-while wait_notification $TARGET; do
+while :; do
+	# freshly calculating the target so newly added symlinks are resolved too
+	TARGET=$(/usr/bin/find $TARGET -maxdepth 3 -exec /usr/bin/readlink -f {} \;)
+	wait_notification $TARGET
 	echo "Notification! Execute all: $EXEC"
 	for exe in $EXEC; do
 		echo "exe $exe"
