@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # shared folder
-mkdir -p "$HOME/.config/xorg/layout"
+mkdir -p "$XDG_CONFIG_HOME/xorg/layout"

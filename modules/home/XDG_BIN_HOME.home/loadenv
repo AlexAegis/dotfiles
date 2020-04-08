@@ -16,8 +16,8 @@ DIR="$XDG_CONFIG_HOME" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 DIR="$XDG_CONFIG_HOME/environment.d" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 
 # shellcheck source=/dev/null
-# these are loaded by systemd, only load it if it's not present
-if [ ! "$(command -v systemctl 2>/dev/null)" ]; then
+# Load if no already loaded
+if [ ! "$CONF_LOADED" ]; then
 	echo "Manually loading *.conf files!"
 	DIR="$XDG_CONFIG_HOME/environment.d" REGEX=".*\.conf" . \
 		"$XDG_BIN_HOME/sourcein"

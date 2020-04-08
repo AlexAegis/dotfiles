@@ -3,16 +3,19 @@
 # Always clean up
 rm -f /etc/X11/xorg.conf.d/??-layout*
 
+# This has to be run as root, but we also need the environment of the
+# target user
 # loadenv is in the original users home folder
 # shellcheck disable=SC1090,SC2016
 ORIGINAL_ENVIRONMENT="$(${SUDO_USER:+sudo -Hiu $SUDO_USER} \
-/bin/sh -c '. ~/.profile && env')"
+	/bin/sh -c '. ~/.profile && env')"
+
 ORIGINAL_XDG_CONFIG_HOME=$(echo "$ORIGINAL_ENVIRONMENT" | \
-grep XDG_CONFIG_HOME= | sed 's/.*=//')
+	grep XDG_CONFIG_HOME= | sed 's/.*=//')
 LAYOUT=$(echo "$ORIGINAL_ENVIRONMENT" | \
-grep LAYOUT= | sed 's/.*=//')
+	grep LAYOUT= | sed 's/.*=//')
 LAYOUT_USE_CONF=$(echo "$ORIGINAL_ENVIRONMENT" | \
-grep LAYOUT_USE_CONF= | sed 's/.*=//')
+	grep LAYOUT_USE_CONF= | sed 's/.*=//')
 
 echo "Using $ORIGINAL_XDG_CONFIG_HOME as XDG_CONFIG_HOME."
 echo "Installing layout: $LAYOUT. Use conf? $LAYOUT_USE_CONF."
