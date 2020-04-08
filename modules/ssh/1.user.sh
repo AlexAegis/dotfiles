@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -e "$HOME/.gnupg" ]; then
+if [ ! -e "$GNUPGHOME" ]; then
 	echo "Missing GPG keys. Generating."
 	# shellcheck disable=SC1091
 	. gengpg

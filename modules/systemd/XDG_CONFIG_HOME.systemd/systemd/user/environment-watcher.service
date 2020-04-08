@@ -1,0 +1,11 @@
+[Unit]
+Description=User environment watcher (Daemon Reloader)
+Documentation=man:systemd(1)
+Wants=notify-restart@%N.service
+
+[Service]
+ExecStart=%E/systemd/restart_on_change \
+	-d "%E/environment.d" -s "daemon-reload"
+
+[Install]
+WantedBy=default.target
