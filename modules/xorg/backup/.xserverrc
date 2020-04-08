@@ -1,4 +1,6 @@
 #!/bin/sh
 
+# https://wiki.archlinux.org/index.php/Xinit#xserverrc
+# but sddm doesnt use it
 # start X on the same tty where the login happened
 exec /usr/bin/X -nolisten tcp "$@" vt"$XDG_VTNR"

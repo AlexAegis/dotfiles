@@ -3,5 +3,3 @@
 # echo 'allowed_users=anybody
 # needs_root_rights=yes' \
 # 	>"/etc/X11/Xwrapper.config"
-
-systemctl enable --user --now xbindkeys.service

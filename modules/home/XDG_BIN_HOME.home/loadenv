@@ -15,6 +15,14 @@ DIR="$XDG_CONFIG_HOME" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 # shellcheck source=/dev/null
 DIR="$XDG_CONFIG_HOME/environment.d" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 
+# shellcheck source=/dev/null
+# these are loaded by systemd, only load it if it's not present
+if [ ! "$(command -v systemctl 2>/dev/null)" ]; then
+	echo "Manually loading *.conf files!"
+	DIR="$XDG_CONFIG_HOME/environment.d" REGEX=".*\.conf" . \
+		"$XDG_BIN_HOME/sourcein"
+fi
+
 [ ! "$QUIET" ] && echo "Loading Aliases"
 # shellcheck source=/dev/null
 DIR="$XDG_CONFIG_HOME" REGEX=".*\.alias" . "$XDG_BIN_HOME/sourcein"
