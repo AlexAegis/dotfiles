@@ -2,7 +2,7 @@
 
 # loading environment before proceeding
 # shellcheck disable=1091
-. loadenv
+LOAD_CONF=1 . loadenv
 
 rustup install nightly
 rustup install stable
