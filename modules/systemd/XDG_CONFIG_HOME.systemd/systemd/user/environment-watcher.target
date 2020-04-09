@@ -1,6 +1,0 @@
-[Unit]
-Description=Listen environment changes
-Wants=notify-restart@%n.service
-
-[Install]
-WantedBy=environment-watcher.service
