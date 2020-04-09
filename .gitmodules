@@ -21,3 +21,6 @@
 [submodule "modules/picom/resources/compton"]
 	path = modules/picom/resources/compton
 	url = https://github.com/tryone144/compton
+[submodule "modules/yay/resources/yay"]
+	path = modules/yay/resources/yay
+	url = https://aur.archlinux.org/yay.git
