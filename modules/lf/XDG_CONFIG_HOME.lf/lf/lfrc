@@ -20,16 +20,13 @@ cmd Link %{{
 }}
 
 
-
 # define a custom 'open' command
 # This command is called when current file is not a directory. You may want to
 # use either file extensions and/or mime types here. Below uses an editor for
 # text files and a file opener for the rest.
 cmd open ${{
-	exit 2
     case $(file --mime-type $f -b) in
         text/*) $EDITOR $fx ;;
-		inode/directory) exit 2 ;;
         *) for f in $fx; do setsid $OPENER $f > /dev/null 2> /dev/null & done;;
     esac
 }}
