@@ -9,3 +9,7 @@ Login Manager
 ```sh
 sddm-greeter --test-mode --theme /usr/share/sddm/themes/$THEME_NAME
 ```
+
+## Default config
+
+> `/usr/lib/sddm/sddm.conf.d/default.conf`

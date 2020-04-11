@@ -22,3 +22,7 @@ Based on current hardware
 ```sh
 nvidia-xconfig
 ```
+
+## OpenGL Environment
+
+<http://us.download.nvidia.com/XFree86/FreeBSD-x86/319.32/README/openglenvvariables.html>

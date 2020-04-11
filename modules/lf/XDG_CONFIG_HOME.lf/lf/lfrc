@@ -1,3 +1,56 @@
+cmd Link %{{
+	lf -remote 'load' | while read file; do
+		if [ ! -n "${mode+1}" ]; then
+			mode="$file"
+			continue
+		fi
+		files+=("$file")
+	done
+	if [ "${#files[@]}" -le 1 ]; then
+		lf -remote "send $id echo no files to link"
+		exit 0
+	fi
+	# symbolicly copy mode is indicating a soft link
+	if [[ "$mode" == copy ]]; then
+		ln -sr $files -t .
+	# while a move mode is indicating a hard link
+	elif [[ "$mode" == move ]]; then
+		ln $files -t .
+	fi
+}}
+
+
+
+# define a custom 'open' command
+# This command is called when current file is not a directory. You may want to
+# use either file extensions and/or mime types here. Below uses an editor for
+# text files and a file opener for the rest.
+cmd open ${{
+	exit 2
+    case $(file --mime-type $f -b) in
+        text/*) $EDITOR $fx ;;
+		inode/directory) exit 2 ;;
+        *) for f in $fx; do setsid $OPENER $f > /dev/null 2> /dev/null & done;;
+    esac
+}}
+
+# move current file or selected files to trash folder
+# (also see 'man mv' for backup/overwrite options)
+cmd trash %set -f; mv $fx ~/.trash
+
+# define a custom 'delete' command
+cmd delete ${{
+    set -f
+    printf "$fx\n"
+    printf "delete?[y/n]"
+    read ans
+    [ $ans = "y" ] && rm -rf $fx
+}}
+
+# use '<delete>' key for either 'trash' or 'delete' command
+# map <delete> trash
+map <delete> delete
+
 ## settings
 
 set hidden
@@ -20,3 +73,14 @@ set filesep "\n"  # default already
 ## bindings
 map <c-r> reload
 # map <enter> shell
+map <enter> open
+map <esc> quit
+# send to background
+map <c-z> $ kill -STOP $PPID
+
+map <c-c> copy
+map <c-x> cut
+map <c-v> paste
+map <c-o> cd
+
+map L :Link
