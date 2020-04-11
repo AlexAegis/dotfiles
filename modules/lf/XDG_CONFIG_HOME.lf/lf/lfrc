@@ -25,11 +25,20 @@ cmd Link %{{
 # use either file extensions and/or mime types here. Below uses an editor for
 # text files and a file opener for the rest.
 cmd open ${{
-    case $(file --mime-type $f -b) in
-        text/*) $EDITOR $fx ;;
-        *) for f in $fx; do setsid $OPENER $f > /dev/null 2> /dev/null & done;;
-    esac
+	open() {
+		case $(file --mime-type $1 -b) in
+			inode/symlink) open $(readlink $1) ;;
+			inode/x-empty) $EDITOR $1 ;;
+			text/*) $EDITOR $1 ;;
+			*) for f in $1; do setsid $OPENER $f \
+				> /dev/null 2> /dev/null & done;;
+		esac
+	}
+	open $fx
 }}
+
+# alias quit to q to :q for exit
+cmd q :quit
 
 # move current file or selected files to trash folder
 # (also see 'man mv' for backup/overwrite options)
@@ -37,11 +46,11 @@ cmd trash %set -f; mv $fx ~/.trash
 
 # define a custom 'delete' command
 cmd delete ${{
-    set -f
-    printf "$fx\n"
-    printf "delete?[y/n]"
-    read ans
-    [ $ans = "y" ] && rm -rf $fx
+	set -f
+	printf "$fx\n"
+	printf "delete?[y/n]"
+	read ans
+	[ $ans = "y" ] && rm -rf $fx
 }}
 
 # use '<delete>' key for either 'trash' or 'delete' command
