@@ -1,8 +1,8 @@
 [General]
 # background=capitan-mountain.jpg
 # type=image
-font=TerminessTTF Nerd Font Mono
-# font=VictorMono Nerd Font
+font=Iosevka
+
 # background color. Defaults to #222222.
 color_bg=#141414
 # main color. Defaults to #dddddd.

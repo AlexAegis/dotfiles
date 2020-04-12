@@ -1,6 +1,7 @@
 [Unit]
 Description=Polybar
 Documentation=man:polybar(1)
+Wants=notify-restart@%N.service
 PartOf=graphical-session.target
 PartOf=polybar-config.path
 
