@@ -1,0 +1,10 @@
+[Unit]
+Description=Deadd config watcher
+Documentation=man:deadd-notification-center(1)
+Wants=notify-restart@%N.service
+
+[Service]
+ExecStart=%E/systemd/restart_on_change -t "%E/deadd" -s "deadd-notification-center"
+
+[Install]
+WantedBy=default.target
