@@ -1,6 +1,0 @@
-[Path]
-Unit=polybar.service
-PathChanged=%E/polybar/polybar.sh
-
-[Install]
-WantedBy=default.target

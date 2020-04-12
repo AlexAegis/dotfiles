@@ -1,0 +1,10 @@
+[Unit]
+Description=polybar config watcher
+Documentation=man:polybar(1)
+Wants=notify-restart@%N.service
+
+[Service]
+ExecStart=%E/systemd/restart_on_change -t "%E/polybar" -s "polybar"
+
+[Install]
+WantedBy=default.target
