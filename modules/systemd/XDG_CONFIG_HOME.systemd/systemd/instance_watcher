@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Only accepts a single argument, designed to recieve a single instance
+# name from systemd which containes 2 variables separated by ;
+# then pass the parsed arguments to restart_on_change
+
+# TODO: If they are valid characters in the first place*
+# TODO: Implement, then use it as a Wants as watch@%E,/other/folder:%n,otherservice;
+echo "Instance watcher terminated"

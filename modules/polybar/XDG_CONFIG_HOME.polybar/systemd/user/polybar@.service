@@ -6,7 +6,7 @@ PartOf=graphical-session.target
 PartOf=polybar-config.path
 
 [Service]
-ExecStart=%E/polybar/polybar.sh
+ExecStart=%E/polybar/polybar.sh %i
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 Restart=always
 

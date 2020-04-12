@@ -4,7 +4,7 @@ Documentation=man:polybar(1)
 Wants=notify-restart@%N.service
 
 [Service]
-ExecStart=%E/systemd/restart_on_change -t "%E/polybar" -s "polybar"
+ExecStart=%E/systemd/restart_on_change -t "%E/polybar" -s "polybar@%i"
 
 [Install]
 WantedBy=default.target
