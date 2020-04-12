@@ -1,5 +1,9 @@
 label.deadd-noti-center.notification.body,
 label.deadd-noti-center.notification.title,
 .deadd-noti-center {
-	font-family: Iosevka;
+  font-family: Iosevka;
+}
+
+* {
+  background-color: rgba(72, 119, 160, 0.349) !important;
 }

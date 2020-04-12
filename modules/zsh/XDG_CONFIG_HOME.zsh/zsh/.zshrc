@@ -1,7 +1,9 @@
 #!/bin/zsh
 # zsh startup file
 # start profiling
-[ "$BENCH" ] && zmodload zsh/zprof
+if [ "$BENCH" ]; then
+	zmodload zsh/zprof
+fi
 
 # Custom Compdef
 fpath=(~/.config/zsh/compdef $fpath)
@@ -59,4 +61,6 @@ if [ command -v direnv > /dev/null 2>&1 ]; then
 fi
 
 # end profiling
-[ "$BENCH" ] && zprof
+if [ "$BENCH" ]; then
+	zprof
+fi
