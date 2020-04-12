@@ -8,15 +8,16 @@
 IFS=' '
 
 parse_args() {
-	/usr/bin/getopt -o "de" -l "directory,exec" -- "$@" || exit 1
+	/usr/bin/getopt -o "ted" -l "target,exec,delay" -- "$@" || exit 1
 }
 
 TARGET=
 EXEC=
+DELAY=
 
 for arg in $(parse_args "$@"); do
 	case $arg in
-		-d | --directory)
+		-t | --target)
 			if [ -d "$2" ]; then
 				if [ $TARGET ]; then
 					TARGET="$TARGET
@@ -40,6 +41,15 @@ $2"
 				fi
 			else
 				echo "${C_RED} Invalid exec: $2${C_RESET}"
+				exit 1
+			fi
+			shift 2
+			;;
+		-d | --delay)
+			if [ "$2" ]; then
+				DELAY="$2"
+			else
+				echo "${C_RED} Invalid delay${C_RESET}"
 				exit 1
 			fi
 			shift 2
@@ -79,6 +89,8 @@ while :; do
 	# freshly calculating the target so newly added symlinks are resolved too
 	TARGET=$(/usr/bin/find $TARGET -maxdepth 3 -exec /usr/bin/readlink -f {} \;)
 	wait_notification $TARGET
+
+	[ $DELAY ] && sleep $DELAY
 	echo "Notification! Execute all: $EXEC"
 	for exe in $EXEC; do
 		echo "exe $exe"

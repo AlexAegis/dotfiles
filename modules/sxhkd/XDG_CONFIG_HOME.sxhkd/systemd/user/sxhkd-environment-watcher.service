@@ -1,11 +1,11 @@
 [Unit]
-Description=User environment watcher (Daemon Reloader)
-Documentation=man:systemd(1)
+Description=sxhkd environment watcher
+Documentation=man:sxhkd(1)
 Wants=notify-restart@%N.service
 
 [Service]
 ExecStart=%E/systemd/restart_on_change \
-	-t "%E/environment.d" -s "daemon-reload"
+	-t "%E/environment.d" -s "sxhkd" -d 0.5
 
 [Install]
 WantedBy=default.target

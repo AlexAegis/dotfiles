@@ -10,4 +10,16 @@ TODO move ~/.config/pulse under a system specific folder here
 
 ## Config
 
-Try `alsamixer`
+> Try `alsamixer`
+
+### List sinks
+
+```sh
+pactl list short sinks
+```
+
+### Set default sink
+
+```sh
+pacmd set-default-sink <ID>
+```

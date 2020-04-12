@@ -12,3 +12,13 @@ alt + m
 
 alt + space
 	$XDG_BIN_HOME/switchkbmap.sh
+
+# Not TERM, that is set automatically.
+super + Return
+	$TERMINAL
+
+super + w
+	$BROWSER
+
+super + e
+	$FILEMANAGER

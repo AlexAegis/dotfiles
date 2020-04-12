@@ -9,5 +9,7 @@ for f in $(find ${1-$DIR} -mindepth 1 -maxdepth 1 -regex "${2-$REGEX}"); do
 	[ ! "$QUIET" ] && echo "Sourcing $f"
 	# shellcheck disable=SC1090
 	[ -e "$f" ] && . "$f"
+	ret="$?"
+	[ "$ret" != 0 ] && echo "Return value of $f is $ret"
 done
 set +af

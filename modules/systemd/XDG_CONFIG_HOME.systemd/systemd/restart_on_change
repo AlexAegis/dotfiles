@@ -7,13 +7,14 @@
 IFS=' '
 
 parse_args() {
-	/usr/bin/getopt -o "sdur" -l "service,directory,user,root" -- "$@" || exit 1
+	/usr/bin/getopt -o "sturd" -l "service,target,user,root,delay" -- "$@" || exit 1
 }
 
 TARGET=
 SERVICE=
 USER='--user'
 COMMAND='restart'
+DELAY=
 
 for arg in $(parse_args "$@"); do
 	case $arg in
@@ -28,9 +29,18 @@ for arg in $(parse_args "$@"); do
 			fi
 			shift 2
 			;;
-		-d | --directory)
+		-t | --target)
 			if [ -d "$2" ]; then
-				TARGET="$TARGET -d $2"
+				TARGET="$TARGET -t $2"
+			else
+				echo "${C_RED} Invalid target: $2${C_RESET}"
+				exit 1
+			fi
+			shift 2
+			;;
+		-d | --delay)
+			if [ "$2" ]; then
+				DELAY="-d $2"
 			else
 				echo "${C_RED} Invalid target: $2${C_RESET}"
 				exit 1
@@ -54,6 +64,6 @@ for arg in $(parse_args "$@"); do
 	esac
 done
 
-eval "$XDG_BIN_HOME/watch_exec $TARGET $SERVICE"
+eval "$XDG_BIN_HOME/watch_exec $TARGET $SERVICE $DELAY"
 
 echo "Restart on change terminated"

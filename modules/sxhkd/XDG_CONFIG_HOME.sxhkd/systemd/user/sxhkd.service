@@ -15,6 +15,3 @@ Restart=always
 [Install]
 # Automatically launch when the xsession starts
 WantedBy=xsession.target
-# And restart when the daemon is reloaded, so subsequently spawned programs
-# have a fresh environment
-WantedBy=daemon-reload.service

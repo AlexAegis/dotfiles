@@ -4,7 +4,7 @@ Documentation=man:sxhkd(1)
 Wants=notify-restart@%N.service
 
 [Service]
-ExecStart=%E/systemd/restart_on_change -d "%E/sxhkd" -s "sxhkd"
+ExecStart=%E/systemd/restart_on_change -t "%E/sxhkd" -s "sxhkd"
 
 [Install]
 WantedBy=default.target
