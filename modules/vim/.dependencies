@@ -2,3 +2,5 @@ xdg
 curl
 # Node is needed for some plugins (prettier)
 fnm
+# For fzf.vim
+fzf

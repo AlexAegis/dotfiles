@@ -37,6 +37,11 @@ set smarttab             " smart tabulation and backspace
 set autoindent
 set bs=indent,eol,start  " allow backspacing over everything
 
+syntax on
+set termguicolors
+let &t_8f = "\e[38;2;%lu;%lu;%lum"
+let &t_8b = "\e[48;2;%lu;%lu;%lum"
+
 " Hungry Delete. [source](https://www.reddit.com/r/vim/comments/7gqowu)
 inoremap <s-bs> <bs>			" shift + backspace to do regular backspace
 inoremap <silent><expr><bs>
