@@ -26,3 +26,19 @@ nvidia-xconfig
 ## OpenGL Environment
 
 <http://us.download.nvidia.com/XFree86/FreeBSD-x86/319.32/README/openglenvvariables.html>
+
+## Early KMS
+
+TODO: Automatize this part
+
+```sh
+sudo vim /etc/mkinitcpio.conf
+```
+
+Add `nvidia` to the `MODULES` array
+
+then regenerate the `initramfs`
+
+```sh
+sudo mkinitcpio -p linux
+```

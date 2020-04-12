@@ -26,4 +26,4 @@
 	url = https://aur.archlinux.org/yay.git
 [submodule "modules/sddm/resources/sddm-chili"]
 	path = modules/sddm/resources/sddm-chili
-	url = https://github.com/MarianArlt/sddm-chili
+	url = https://github.com/Crystalix007/sddm-chili
