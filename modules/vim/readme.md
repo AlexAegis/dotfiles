@@ -2,6 +2,14 @@
 
 > [Arch Wiki](https://wiki.archlinux.org/index.php/Vim)
 
+## Plugins
+
+Install plugins
+
+### [vim-plug](https://github.com/junegunn/vim-plug)
+
+### Fugitive
+
 ## Autoload .vimrc securely
 
 ```vim

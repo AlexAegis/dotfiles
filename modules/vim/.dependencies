@@ -1,2 +1,4 @@
 xdg
 curl
+# Node is needed for some plugins (prettier)
+fnm

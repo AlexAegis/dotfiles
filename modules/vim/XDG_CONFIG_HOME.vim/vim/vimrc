@@ -1,15 +1,41 @@
+"         _
+"  _   __(_)___ ___    __________
+" | | / / / __ `__ \  / ___/ ___/
+" | |/ / / / / / / / / /  / /__
+" |___/_/_/ /_/ /_(_)_/   \___/
+"
+" 2020 Győri Sándor (AlexAegis) <alexaegis@gmail.com>
+
+" Environment
+set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after
+set directory=$XDG_CACHE_HOME/vim/swap//,.,~/tmp,/var/tmp,/tmp
+set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
+set backupdir=$XDG_CONFIG_HOME/vim/backup//,.,~/tmp,~/
+set undodir=$XDG_CONFIG_HOME/vim/undo//,.
+let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
 " Plugins
 
 let mapleader=' '
 
-call plug#begin('~/.vim/bundle')
+call plug#begin('$XDG_CONFIG_HOME/vim/bundle')
 Plug 'junegunn/vim-plug'
 Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'camspiers/animate.vim'
 Plug 'camspiers/lens.vim'
 Plug 'terryma/vim-multiple-cursors'
+" For JavaScript and TypeScript
+Plug 'prettier/vim-prettier', {
+  \ 'do': 'npm install',
+  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss',
+		\ 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
 call plug#end()
+
+" Plugin Configuration
+"" prettier
+" Format on write
+autocmd BufWritePost *.js,*.jsx,*.json,*.ts,*.tsx,*.css,*.less,
+	\*.scss,*.json,*.graphql,*.md,*.yaml,*.html :Prettier:w
 
 " Main settings
 set number relativenumber
@@ -21,12 +47,13 @@ set splitbelow splitright
 " TODO Autoupdate on launch?
 " TODO Autoexit after successful update
 
-" How Tab behaves
+" Tab
 set tabstop=4            " number of spaces used as tab for file
 set softtabstop=4        " number of spaces used as tab for editing
 set shiftwidth=4         " number of spaces used to autoindent
-set expandtab            " expand tabs into spaces
+" set expandtab            " expand tabs into spaces
 set smarttab             " smart tabulation and backspace
+set autoindent
 set bs=indent,eol,start  " allow backspacing over everything
 
 " Hungry Delete. [source](https://www.reddit.com/r/vim/comments/7gqowu)
@@ -37,10 +64,14 @@ inoremap <silent><expr><bs>
   \ !search('\S','nbW',line('.')) ? (col('.') != 1 ? "\<C-U>" : "") .
   \ "\<bs>" . (getline(line('.')-1) =~ '\S' ? "" : "\<C-F>") : "\<bs>"
 
+nnoremap <C>q :call Reload()<CR>
+
 " TODO: Make non printable characters show in only visual mode (always)
 " How non-printable things are shown
-set list                              " show non-print characters,...
 set listchars=trail:⋅,nbsp:⋅,tab:▷⋅   " for tabs and trailing spaces
+" set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+set listchars=eol:$,tab:▰▱,trail:~,extends:>,precedes:<
+set list                              " show non-print characters,...
 set number                            " show line number for current line,...
 set relativenumber                    " and relative line numbers for others
 set cursorline                        " highlight the line with the cursor
@@ -60,7 +91,7 @@ set mouse=a                           " enable mouse in all modes
 
 
 " Tweak how Gvim looks
-set guifont=Inconsolata-g\ Medium\ 11 " set font in gvim
+set guifont=Iosevka\ 11 " set font in gvim
 set guioptions-=T                     " no toolbar in gvim
 set guioptions-=m                     " no menubar in gvim
 set guioptions-=r                     " no right scrollbar in gvim
