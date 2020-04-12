@@ -1,0 +1,10 @@
+[Unit]
+Description=dunst config watcher
+Documentation=man:dunst(1)
+Wants=notify-restart@%N.service
+
+[Service]
+ExecStart=%E/systemd/restart_on_change -t "%E/dunst" -s "dunst"
+
+[Install]
+WantedBy=default.target
