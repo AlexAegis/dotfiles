@@ -1,5 +1,8 @@
-# 100% - 96 multiples of 96
-# 125% - 120
-# 150% - 144
-# 200% - 192
+! Use `xrdb ~/.Xresources` to reload
+! 100% - 96 multiples of 96
+! 125% - 120
+! 150% - 144
+! 200% - 192
 Xft.dpi: 120
+Xcursor.theme: breeze
+Xcursor.size: 32
