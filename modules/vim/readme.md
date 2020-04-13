@@ -21,6 +21,9 @@ endif
 
 ## Notes
 
+- If syntax highlighting is not working it's likely because runtimepath was
+  not set correctly
+
 TODO: <https://sevensidedmarble.com/folds-for-better-vim-configs/>
 
 TODO:
