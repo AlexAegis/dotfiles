@@ -10,6 +10,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'camspiers/animate.vim'
 Plug 'camspiers/lens.vim'
@@ -33,19 +34,30 @@ autocmd BufWritePost *.js,*.jsx,*.json,*.ts,*.tsx,*.css,*.less,
 	\*.scss,*.json,*.graphql,*.md,*.yaml,*.html :Prettier:w
 
 set undofile
+
+let g:gitgutter_sign_added = '█'
+let g:gitgutter_sign_modified = '█'
+let g:gitgutter_sign_removed = '█'
+let g:gitgutter_sign_removed_first_line = '█'
+let g:gitgutter_sign_modified_removed = '█'
+let g:gitgutter_highlight_linenrs = 1
+
 " fzf
 
-function! s:fzf_statusline()
-  " Override statusline as you like
-  highlight fzf1 ctermfg=161 ctermbg=251
-  highlight fzf2 ctermfg=23 ctermbg=251
-  highlight fzf3 ctermfg=237 ctermbg=251
-  setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
-endfunction
+" function! s:fzf_statusline()
+"   " Override statusline as you like
+"   highlight fzf1 ctermfg=161 ctermbg=251
+"   highlight fzf2 ctermfg=23 ctermbg=251
+"   highlight fzf3 ctermfg=237 ctermbg=251
+"   setlocal statusline=%#fzf1#\ >\ %#fzf2#fz%#fzf3#f
+" endfunction
+"
+" autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
-autocmd! User FzfStatusLine call <SID>fzf_statusline()
+filetype off
+filetype plugin indent on
 
-
+set updatetime=100		" default is 4000, this makes gitgutter more responsive
 syntax on
 
 let mapleader=' '
@@ -80,12 +92,12 @@ nnoremap <leader>v :call Reload()<CR>
 " hi SpecialKey ctermbg=NONE ctermfg=NONE guibg=#8fafd744 guifg=NONE cterm=NONE gui=NONE
 colorscheme apprentice
 
- hi Normal ctermbg=none guibg=NONE
+hi Normal ctermbg=none guibg=NONE
 
 set encoding=utf-8
 " TODO: Make non printable characters show in only visual mode (always)
 " How non-printable things are shown
-set listchars=eol:$,tab:▰▱,nbsp:⋅,trail:~,extends:>,precedes:<
+" set listchars=eol:$,tab:▰▱,nbsp:⋅,trail:~,extends:>,precedes:<
 " set list                              " show non-print characters,...
 set number                            " show line number for current line,...
 set relativenumber                    " and relative line numbers for others
@@ -102,9 +114,9 @@ set shiftwidth=4         " number of spaces used to autoindent
 set smarttab             " smart tabulation and backspace
 set bs=indent,eol,start  " allow backspacing over everything
 
-set termguicolors
-let &t_8f = "\e[38;2;%lu;%lu;%lum"
-let &t_8b = "\e[48;2;%lu;%lu;%lum"
+"set termguicolors
+"let &t_8f = "\e[38;2;%lu;%lu;%lum"
+"let &t_8b = "\e[48;2;%lu;%lu;%lum"
 
 " Move a line of text using TODO: Respect indentation
 nmap <silent><M-j> mz:m+<cr>`z
