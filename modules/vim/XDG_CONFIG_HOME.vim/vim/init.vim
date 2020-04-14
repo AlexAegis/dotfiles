@@ -1,7 +1,20 @@
-" Common vim config
-
-" Plug plugins and their configs
-
+"        _
+" __   _(_)_ __ ___  _ __ ___
+" \ \ / / | '_ ` _ \| '__/ __|
+"  \ V /| | | | | | | | | (__
+" (_)_/ |_|_| |_| |_|_|  \___|
+"
+" Author: Győri Sándor (AlexAegis) <alexaegis@gmail.com>
+""""""""""
+"  Plug  "
+""""""""""
+"" Autoload if missing
+if empty(glob('$XDG_CONFIG_HOME/vim/autoload/plug.vim'))
+  silent !curl -fLo $XDG_CONFIG_HOME/vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+"" Load plugins
 call plug#begin('$XDG_CONFIG_HOME/vim/bundle')
 Plug 'junegunn/vim-plug'
 Plug 'sheerun/vim-polyglot'
@@ -12,6 +25,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'camspiers/animate.vim'
 Plug 'camspiers/lens.vim'
 Plug 'terryma/vim-multiple-cursors'
@@ -19,29 +33,272 @@ Plug 'flazz/vim-colorschemes'
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'rainglow/vim'
 Plug 'mkarmona/colorsbox'
+Plug 'jiangmiao/auto-pairs'
+Plug 'alvan/vim-closetag'
+Plug 'mattn/emmet-vim', {
+  \ 'for': ['javascript', 'typescript', 'html', 'xhtml', 'xml'] }
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" For JavaScript and TypeScript
 Plug 'prettier/vim-prettier', {
   \ 'do': 'npm install',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss',
 		\ 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
 call plug#end()
 
-" Plugin Configuration
-"" prettier
+"" Plugin Configuration
+""" scrooloose/nerdtree
+let g:NERDTreeHijackNetrw = 1	" On by default, just to be sure
+autocmd VimEnter * NERDTree		" Autotart NERDTree
+autocmd VimEnter * wincmd p		" Go to previous (last accessed) window.
+" Exit NERDTree if it's the last buffer
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") &&
+	\ b:NERDTree.isTabTree()) | q | endif
+""" Xuyuanp/nerdtree-git-plugin
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ 'Ignored'   : '☒',
+    \ "Unknown"   : "?"
+    \ }
+""" prettier/vim-prettier
 " Format on write
 autocmd BufWritePost *.js,*.jsx,*.json,*.ts,*.tsx,*.css,*.less,
 	\*.scss,*.json,*.graphql,*.md,*.yaml,*.html :Prettier:w
-
-set undofile
-
+""" airblade/vim-gitgutter
 let g:gitgutter_sign_added = '█'
 let g:gitgutter_sign_modified = '█'
 let g:gitgutter_sign_removed = '█'
 let g:gitgutter_sign_removed_first_line = '█'
 let g:gitgutter_sign_modified_removed = '█'
 let g:gitgutter_highlight_linenrs = 1
+""" neoclide/coc.nvim
+" TextEdit might fail if hidden is not set.
+set hidden
 
+" Some servers have issues with backup files, see #649.
+set nobackup
+set nowritebackup
+
+" Give more space for displaying messages.
+set cmdheight=2
+
+" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+" delays and poor user experience.
+set updatetime=300
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+set signcolumn=yes
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
+if exists('*complete_info')
+  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+else
+  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+endif
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying codeAction to the current line.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Introduce function text object
+" NOTE: Requires 'textDocument.documentSymbol' support from the language server.
+xmap if <Plug>(coc-funcobj-i)
+xmap af <Plug>(coc-funcobj-a)
+omap if <Plug>(coc-funcobj-i)
+omap af <Plug>(coc-funcobj-a)
+
+" Use <TAB> for selections ranges.
+" NOTE: Requires 'textDocument/selectionRange' support from the language server.
+" coc-tsserver, coc-python are the examples of servers that support it.
+nmap <silent> <TAB> <Plug>(coc-range-select)
+xmap <silent> <TAB> <Plug>(coc-range-select)
+
+" Add `:Format` command to format current buffer.
+command! -nargs=0 Format :call CocAction('format')
+
+" Add `:Fold` command to fold current buffer.
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+"" coc extensions
+"""
+" TODO: let g:coc_global_extensions^='coc-emmet'
+"""""""""""""
+"  Folding  "
+"""""""""""""
+"" Common
+" set foldmethod=syntax
+" set foldlevelstart=99
+"set nofoldenable	" No fold on launch
+"" Vim
+" Autofolding .vimrc
+" see http://vimcasts.org/episodes/writing-a-custom-fold-expression/
+""" Foldlevel definition
+function! VimFolds(lnum)
+  let s:thisline = getline(a:lnum)
+  if match(s:thisline, '^"" ') >= 0
+    return '>2'
+  endif
+  if match(s:thisline, '^""" ') >= 0
+    return '>3'
+  endif
+  let s:two_following_lines = 0
+  if line(a:lnum) + 2 <= line('$')
+    let s:line_1_after = getline(a:lnum+1)
+    let s:line_2_after = getline(a:lnum+2)
+    let s:two_following_lines = 1
+  endif
+  if !s:two_following_lines
+      return '='
+    endif
+  else
+    if (match(s:thisline, '^"""""') >= 0) &&
+       \ (match(s:line_1_after, '^"  ') >= 0) &&
+       \ (match(s:line_2_after, '^""""') >= 0)
+      return '>1'
+    else
+      return '='
+    endif
+  endif
+endfunction
+""" Foldtext definition
+function! VimFoldText()
+  " handle special case of normal comment first
+  let s:info = '('.string(v:foldend-v:foldstart).' l)'
+  if v:foldlevel == 1
+    let s:line = ' ◇ '.getline(v:foldstart+1)[3:-2]
+  elseif v:foldlevel == 2
+    let s:line = '   ●  '.getline(v:foldstart)[3:]
+  elseif v:foldlevel == 3
+    let s:line = '     ▪ '.getline(v:foldstart)[4:]
+  endif
+  if strwidth(s:line) > 80 - len(s:info) - 3
+    return s:line[:79-len(s:info)-3+len(s:line)-strwidth(s:line)].'...'.s:info
+  else
+    return s:line.repeat(' ', 80 - strwidth(s:line) - len(s:info)).s:info
+  endif
+endfunction
+" set foldsettings automatically for vim files
+augroup fold_vimrc
+  autocmd!
+  autocmd FileType vim
+                   \ setlocal foldmethod=expr |
+                   \ setlocal foldexpr=VimFolds(v:lnum) |
+                   \ setlocal foldtext=VimFoldText() |
+                   \ set foldcolumn=2 foldminlines=2
+augroup END
+"" Markdown
+let g:markdown_folding = 1
+
+"" Keybindings
+" Using leader space (double space)
+vnoremap <leader><space> zf
+nnoremap <silent> <leader><space> @=(foldlevel('.')?'za':"  ")<CR>
+" Using double click
+noremap <2-LeftMouse> za
+""""""""""""
+"  Common  "
+""""""""""""
+"" General
+let mapleader=' '
+set undofile
+set updatetime=100				" Default is 4000
+set number relativenumber		" Gutter numbers
+set splitbelow splitright		" Order of window splitting
+"" Filetypes & highlighting
+filetype plugin indent on
+syntax on
+"""""""""""""""""
+"  Keybindings  "
+"""""""""""""""""
+"" Hungry Delete.
+" [source](https://www.reddit.com/r/vim/comments/7gqowu)
+inoremap <s-bs> <bs>			" shift + backspace to do regular backspace
+inoremap <silent><expr><bs>
+  \ (&indentexpr isnot '' ? &indentkeys : &cinkeys) =~? '!\^F' &&
+  \ &backspace =~? '.*eol\&.*start\&.*indent\&' &&
+  \ !search('\S','nbW',line('.')) ? (col('.') != 1 ? "\<C-U>" : "") .
+  \ "\<bs>" . (getline(line('.')-1) =~ '\S' ? "" : "\<C-F>") : "\<bs>"
+"" Terminal
+:tnoremap <Esc> <C-\><C-n>
 " fzf
 
 " function! s:fzf_statusline()
@@ -54,22 +311,17 @@ let g:gitgutter_highlight_linenrs = 1
 "
 " autocmd! User FzfStatusLine call <SID>fzf_statusline()
 
-filetype off
-filetype plugin indent on
 
-set updatetime=100		" default is 4000, this makes gitgutter more responsive
-syntax on
 
-let mapleader=' '
+
+
 
 " " Command autocomplete
 " set wildmenu
 " set wildmode=longest:full
 
 " Main settings
-set number relativenumber
 
-set splitbelow splitright
 
 " PlugInstall
 " PlugUpdate
@@ -77,13 +329,6 @@ set splitbelow splitright
 " TODO Autoexit after successful update
 
 
-" Hungry Delete. [source](https://www.reddit.com/r/vim/comments/7gqowu)
-inoremap <s-bs> <bs>			" shift + backspace to do regular backspace
-inoremap <silent><expr><bs>
-  \ (&indentexpr isnot '' ? &indentkeys : &cinkeys) =~? '!\^F' &&
-  \ &backspace =~? '.*eol\&.*start\&.*indent\&' &&
-  \ !search('\S','nbW',line('.')) ? (col('.') != 1 ? "\<C-U>" : "") .
-  \ "\<bs>" . (getline(line('.')-1) =~ '\S' ? "" : "\<C-F>") : "\<bs>"
 
 nnoremap <leader>v :call Reload()<CR>
 

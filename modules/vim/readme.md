@@ -34,6 +34,18 @@ set timeoutlen=1000 ttimeoutlen=0
 
 TODO: VIM IntelliSense / LSP
 <https://github.com/neoclide/coc.nvim>
+<https://github.com/neoclide/coc.nvim/wiki/Using-coc-extensions>
+Setup html js ts extensions, check your vscode extensions
+
+- automatically rename tags without deleting the arguments
+
+TODO: Ctrl + ` to enter end exit terminal mode. and also open and close
+its buffer. For a dedicated buffer at the bottom
+<https://github.com/neoclide/coc-prettier>
+
+TODO: <https://github.com/camspiers/animate.vim> config, easing etc
+
+TODO: Config airline
 
 TODO:
 Explore if pasting would apply autoindenting and autoquoting
@@ -47,3 +59,5 @@ TODO: Try hard mode <https://github.com/wikitopian/hardmode>
 
 TODO: Remap caps lock to esc
 TODO: Remap semicolon to colon in normal mode
+
+TODO: Properly separate viminfo of vim and nvim
