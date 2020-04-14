@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# TODO: FIX
 rofi -dmenu \
 	-password \
 	-i \
