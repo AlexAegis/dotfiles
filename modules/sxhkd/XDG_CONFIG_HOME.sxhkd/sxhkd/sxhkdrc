@@ -14,7 +14,8 @@ alt + space
 	$XDG_BIN_HOME/switchkbmap.sh
 
 # Not TERM, that is set automatically.
-super + Return
+# Both ` and 0 to support other layouts
+super + {grave,0}
 	$TERMINAL
 
 super + w
