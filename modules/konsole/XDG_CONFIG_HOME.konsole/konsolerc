@@ -4,18 +4,17 @@ DefaultProfile=iosevka.profile
 [Favorite Profiles]
 Favorites=iosevka.profile
 
+[FileLocation]
+scrollbackUseCacheLocation=true
+scrollbackUseSystemLocation=false
+
 [KonsoleWindow]
+SaveGeometryOnExit=false
 ShowMenuBarByDefault=false
 
 [MainWindow]
-Height 1080=972
-Height 2160=2040
-Height 540=255
 MenuBar=Disabled
 ToolBarsMovable=Disabled
-Width 1920=461
-Width 3840=1822
-Width 960=475
 
 [Notification Messages]
 ShowPasteUnprintableWarning=false
