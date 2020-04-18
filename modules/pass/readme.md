@@ -1,6 +1,6 @@
-# [pass](https://wiki.archlinux.org/index.php/Pass)
+# [pass](https://www.passwordstore.org/)
 
-> <https://www.passwordstore.org/>
+> [Arch Wiki](https://wiki.archlinux.org/index.php/Pass)
 
 I sync my passwords to a private GitHub repository.
 The only thing I have to handle manually is the gpg keys.
