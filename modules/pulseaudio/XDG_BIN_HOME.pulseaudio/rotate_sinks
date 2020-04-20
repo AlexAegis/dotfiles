@@ -1,0 +1,79 @@
+#!/bin/sh
+
+names_and_ids=$(pactl list sinks | sed -e '/Sink #[0-9]*/,/Name:/!d' | \
+	awk '{ printf "%s", $0; if (NR % 3 == 0) print ""; else printf " " }')
+sink_count=$(echo "$names_and_ids" | wc -l)
+
+# Current default sink
+default_sink_name=$(pactl info | grep 'Default Sink: ' | cut -c 15-)
+
+id_from_name() {
+	echo "$names_and_ids" | grep -n "$1" | grep -o '#[0-9]*' | cut -c 2-
+}
+
+name_from_index() {
+	echo "$names_and_ids" | nl -s : | grep "${1}:" \
+		| rev | cut -d ' ' -f 1 | rev
+}
+
+index_from_id() {
+	echo "$names_and_ids" | nl -s : | grep "#${1}" \
+		| cut -d ':' -f 1 | grep -o '[0-9]*'
+}
+
+id_from_index() {
+	id_from_name "$(name_from_index "$1")"
+}
+
+index_from_name() {
+	index_from_id "$(id_from_name "$1")"
+}
+
+name_from_id() {
+	name_from_index "$(index_from_id "$1")"
+}
+
+target_sink_id=$(id_from_name" $default_sink_name")
+# Current default sinks index
+default_sink_index=$(index_from_name "$default_sink_name")
+
+advance_target_sink() {
+	# Indexing change from 'from 1' to 'from 0'
+	# so no need to increment, only do the modulo
+	next_sink_index=$((default_sink_index % sink_count))
+	next_sink_index=$((next_sink_index + 1))
+	target_sink_id=$(id_from_index $next_sink_index)
+}
+
+# 3 3 4
+# Descrtiptions
+sink_descriptions=$(pactl list sinks | grep 'Description' | cut -c 15-)
+
+# Set new default sink
+
+try=0
+while [ $try -lt "$sink_count" ]; do
+	advance_target_sink
+	notify-send --urgency=critical "try sink $target_sink_id"
+	if [ "$(pactl set-default-sink "$target_sink_id" 2>/dev/null && echo 0)" ] ; then
+
+		# Currently running sink inputs
+		sink_inputs=$(pactl list sink-inputs | grep 'Sink Input #' | cut -c 13-)
+		# Move all current sink inputs to the new sink
+		for sink_input in $sink_inputs; do
+			pactl move-sink-input "$sink_input" "$target_sink_id"
+			notify-send " try move $sink_input $target_sink_id"
+		done
+
+		# Target sinks description
+		next_sink_description=$(echo "$sink_descriptions" | sed -n ${next_sink_index}p)
+		notify-send "Audio on $next_sink_description"
+		try=41
+		break;
+	else
+		notify-send "Audio failed to be set on $next_sink_description"
+	fi
+
+	try=$((try + 1))
+done
+
