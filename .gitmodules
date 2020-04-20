@@ -1,6 +1,9 @@
 [submodule "modules/dot"]
 	path = modules/dot
 	url = https://github.com/AlexAegis/dot
+[submodule ".vscode"]
+	path = .vscode
+	url = https://github.com/AlexAegis/.vscode
 [submodule "modules/wallpapers"]
 	path = modules/wallpapers
 	url = https://github.com/AlexAegis/wallpapers
