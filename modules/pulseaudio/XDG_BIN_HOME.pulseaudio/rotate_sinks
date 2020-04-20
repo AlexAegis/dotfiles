@@ -53,27 +53,27 @@ sink_descriptions=$(pactl list sinks | grep 'Description' | cut -c 15-)
 
 try=0
 while [ $try -lt "$sink_count" ]; do
+	try=$((try + 1))
 	advance_target_sink
-	notify-send --urgency=critical "try sink $target_sink_id"
-	if [ "$(pactl set-default-sink "$target_sink_id" 2>/dev/null && echo 0)" ] ; then
+	if [ "$(pactl set-default-sink "$target_sink_id" \
+		2>/dev/null && echo 0)" ]; then
 
 		# Currently running sink inputs
-		sink_inputs=$(pactl list sink-inputs | grep 'Sink Input #' | cut -c 13-)
+		sink_inputs=$(pactl list sink-inputs | grep 'Sink Input #' | \
+			cut -c 13-)
 		# Move all current sink inputs to the new sink
 		for sink_input in $sink_inputs; do
 			pactl move-sink-input "$sink_input" "$target_sink_id"
-			notify-send " try move $sink_input $target_sink_id"
 		done
 
 		# Target sinks description
-		next_sink_description=$(echo "$sink_descriptions" | sed -n ${next_sink_index}p)
+		next_sink_description=$(echo "$sink_descriptions" | \
+			sed -n ${next_sink_index}p)
 		notify-send "Audio on $next_sink_description"
-		try=41
-		break;
+		break
 	else
-		notify-send "Audio failed to be set on $next_sink_description"
+		notify-send "Audio failed to be set on $next_sink_description" \
+			"trying next sink"
 	fi
-
-	try=$((try + 1))
 done
 
