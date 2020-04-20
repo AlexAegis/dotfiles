@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd "$HOME/.password-store/" || exit 1
+cd "$PASSWORD_STORE_DIR" || exit 1
 
 # Based on http://stackoverflow.com/questions/13716658
 

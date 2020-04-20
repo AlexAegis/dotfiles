@@ -1,12 +1,11 @@
 #!/bin/sh
 
-# TODO: After the XDG refactor change this to PASS_FOLDER or something
 # Copy the resulting file after export to a more secure place
 
 mkdir -p "${1-$HOME}"
 
-gpg --armor --export-secret-keys "$(cat "$HOME/.password-store/.gpg-id")" \
+gpg --armor --export-secret-keys "$(cat "$PASSWORD_STORE_DIR/.gpg-id")" \
 	>"${1-$HOME}/pass-private-key.asc"
 
-gpg --armor --export "$(cat "$HOME/.password-store/.gpg-id")" \
+gpg --armor --export "$(cat "$PASSWORD_STORE_DIR/.gpg-id")" \
 	>"${1-$HOME}/pass-public-key.asc"

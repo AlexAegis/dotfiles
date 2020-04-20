@@ -17,9 +17,10 @@ fi
 
 # force fix .gnupg permissions
 # for example if it was backed up on an ntfs partition
-if [ -d "$HOME/.gnupg" ]; then
-	echo 'Fixing ~/.gnupg permissions'
-	chmod -R 700 "$HOME/.gnupg"
+
+if [ -d "$GNUPGHOME" ]; then
+	echo "Fixing $GNUPGHOME permissions"
+	chmod -R 700 "$GNUPGHOME"
 fi
 
 if ! [ "$ORIGIN" ]; then
@@ -27,7 +28,7 @@ if ! [ "$ORIGIN" ]; then
 	echo "Origin file is missing, creating a local store instead of cloning one"
 	echo "If you want to clone instead, revert this script by removing the\
 ~/.password-store folder"
-	mkdir -p "$HOME/.password-store"
+	mkdir -p "$PASSWORD_STORE_DIR"
 
 	echo "Creating a fresh gpg key "
 
@@ -51,10 +52,10 @@ else
 	else
 		# Origin file has content, clone it
 
-		if [ -e "$HOME/.password-store" ]; then
+		if [ -e "$PASSWORD_STORE_DIR" ]; then
 			echo "password-store folder already present"
 			existing_origin="$(
-				cd "$HOME/.password-store" || exit
+				cd "$PASSWORD_STORE_DIR" || exit
 				git config remote.origin.url
 			)"
 
@@ -69,10 +70,10 @@ or fix the origin file"
 			fi
 		else
 			echo 'Cloning origin password-store...'
-			git clone "$ORIGIN" "$HOME/.password-store"
+			git clone "$ORIGIN" "$PASSWORD_STORE_DIR"
 		fi
 
-		if ! [ -e "$HOME"/.password-store/.gpg-id ]; then
+		if ! [ -e "$PASSWORD_STORE_DIR"/.gpg-id ]; then
 			echo "Repo cloned but had no gpg-id, generating new one.."
 			gengpg "Pass"
 
@@ -92,7 +93,7 @@ or fix the origin file"
 		# place it in `~/pass-private-key.asc` or pass it to this script
 		for i in "1 2"; do
 			if [ "$(gpg --list-keys \
-				"$(cat "$HOME"/.password-store/.gpg-id)" 2>/dev/null)" ]; then
+				"$(cat "$PASSWORD_STORE_DIR"/.gpg-id)" 2>/dev/null)" ]; then
 				echo "Password stores gpg key is present"
 
 				# If doing a full reset (see user-reset.sh)
@@ -115,7 +116,7 @@ or fix the origin file"
 from ~/pass-private-key.asc"
 
 				if [ -e "$HOME/pass-private-key.asc" ]; then
-					if [ "$(./.pass/bin/pass-import-key)" ]; then
+					if [ "$(pass-import-key)" ]; then
 						echo "Password import successful.. checking again"
 					else
 						echo "Password import failed for the ${i}th time"
@@ -125,7 +126,7 @@ from ~/pass-private-key.asc"
 					echo "The ~/pass-private-key.asc file does not exist.
 
 If you are trying to reset this repo, delete the
-~/.password-store/.gpg-id file. This module then will prompt you to generate
+PASSWORD_STORE_DIR/.gpg-id file. This module then will prompt you to generate
 a new key."
 
 					exit 1
