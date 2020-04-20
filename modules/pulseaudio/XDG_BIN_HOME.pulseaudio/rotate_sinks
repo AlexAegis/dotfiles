@@ -7,11 +7,6 @@ sink_count=$(echo "$names_and_ids" | wc -l)
 # Current default sink
 default_sink_name=$(pactl info | grep 'Default Sink: ' | cut -c 15-)
 
-target_sink_id=$(id_from_name" $default_sink_name")
-default_sink_index=$(index_from_name "$default_sink_name")
-
-sink_descriptions=$(pactl list sinks | grep 'Description' | cut -c 15-)
-
 id_from_name() {
 	echo "$names_and_ids" | grep -n "$1" | grep -o '#[0-9]*' | cut -c 2-
 }
@@ -38,6 +33,10 @@ name_from_id() {
 	name_from_index "$(index_from_id "$1")"
 }
 
+target_sink_id=$(id_from_name" $default_sink_name")
+# Current default sinks index
+default_sink_index=$(index_from_name "$default_sink_name")
+
 advance_target_sink() {
 	# Indexing change from 'from 1' to 'from 0'
 	# so no need to increment, only do the modulo
@@ -45,6 +44,8 @@ advance_target_sink() {
 	next_sink_index=$((next_sink_index + 1))
 	target_sink_id=$(id_from_index $next_sink_index)
 }
+
+sink_descriptions=$(pactl list sinks | grep 'Description' | cut -c 15-)
 
 try=0
 while [ $try -lt "$sink_count" ]; do
@@ -71,3 +72,4 @@ while [ $try -lt "$sink_count" ]; do
 			"trying next sink"
 	fi
 done
+
