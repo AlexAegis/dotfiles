@@ -31,9 +31,10 @@ Plug 'camspiers/lens.vim'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'flazz/vim-colorschemes'
 Plug 'rafi/awesome-vim-colorschemes'
+Plug 'sainnhe/gruvbox-material'
 Plug 'rainglow/vim'
 Plug 'mkarmona/colorsbox'
-Plug 'jiangmiao/auto-pairs'
+" Plug 'jiangmiao/auto-pairs' " Causes problems with coc enter accept
 Plug 'alvan/vim-closetag'
 Plug 'mattn/emmet-vim', {
   \ 'for': ['javascript', 'typescript', 'html', 'xhtml', 'xml'] }
@@ -49,6 +50,11 @@ call plug#end()
 let g:NERDTreeHijackNetrw = 1	" On by default, just to be sure
 autocmd VimEnter * NERDTree		" Autotart NERDTree
 autocmd VimEnter * wincmd p		" Go to previous (last accessed) window.
+" Store the bookmarks file
+let NERDTreeBookmarksFile=expand("$XDG_CONFIG_HOME/vim/nerd_tree_bookmarks")
+" Show the bookmarks table on startup
+let NERDTreeShowBookmarks=1
+
 " Exit NERDTree if it's the last buffer
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") &&
 	\ b:NERDTree.isTabTree()) | q | endif
@@ -69,6 +75,28 @@ let g:NERDTreeIndicatorMapCustom = {
 " Format on write
 autocmd BufWritePost *.js,*.jsx,*.json,*.ts,*.tsx,*.css,*.less,
 	\*.scss,*.json,*.graphql,*.md,*.yaml,*.html :Prettier:w
+""" sainnhe/gruvbox-material
+
+" important!!
+set termguicolors
+
+" for dark version
+set background=dark
+
+" for light version
+" set background=light
+
+" set contrast
+" this configuration option should be placed before `colorscheme gruvbox-material`
+" available values: 'hard', 'medium'(default), 'soft'
+let g:gruvbox_material_background = 'hard'
+let g:gruvbox_material_transparent_background = 1
+
+" For airline
+let g:airline_theme = 'gruvbox_material'
+
+colorscheme gruvbox-material
+
 """ airblade/vim-gitgutter
 let g:gitgutter_sign_added = '█'
 let g:gitgutter_sign_modified = '█'
@@ -102,26 +130,22 @@ set signcolumn=yes
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
+	\ pumvisible() ? "\<C-n>" :
+	\ <SID>check_back_space() ? "\<TAB>" :
+	\ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
+	let col = col('.') - 1
+	return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+
+" Accept completion with Enter.
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() :
+	\"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " Use <c-space> to trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
-" position. Coc only does snippet and additional edit on confirm.
-if exists('*complete_info')
-  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
-else
-  imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-endif
 
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
@@ -335,7 +359,7 @@ nnoremap <leader>v :call Reload()<CR>
 " hi Normal ctermbg=235 ctermfg=250 guibg=#262626 guifg=#bcbcbc cterm=NONE gui=NONE
 " hi Visual ctermbg=110 ctermfg=235 guibg=#8fafd7 guifg=#262626 cterm=NONE gui=NONE
 " hi SpecialKey ctermbg=NONE ctermfg=NONE guibg=#8fafd744 guifg=NONE cterm=NONE gui=NONE
-colorscheme apprentice
+" colorscheme apprentice
 
 hi Normal ctermbg=none guibg=NONE
 
@@ -358,8 +382,8 @@ set shiftwidth=4         " number of spaces used to autoindent
 " set expandtab            " expand tabs into spaces
 set smarttab             " smart tabulation and backspace
 set bs=indent,eol,start  " allow backspacing over everything
+set termguicolors
 
-"set termguicolors
 "let &t_8f = "\e[38;2;%lu;%lu;%lum"
 "let &t_8b = "\e[48;2;%lu;%lu;%lum"
 
