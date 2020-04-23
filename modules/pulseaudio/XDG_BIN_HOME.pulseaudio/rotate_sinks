@@ -1,75 +1,61 @@
 #!/bin/sh
+set -f  # Disable globbing
+oifs=$IFS
+nl='
+'
 
-names_and_ids=$(pactl list sinks | sed -e '/Sink #[0-9]*/,/Name:/!d' | \
-	awk '{ printf "%s", $0; if (NR % 3 == 0) print ""; else printf " " }')
-sink_count=$(echo "$names_and_ids" | wc -l)
-
-# Current default sink
-default_sink_name=$(pactl info | grep 'Default Sink: ' | cut -c 15-)
-
-id_from_name() {
-	echo "$names_and_ids" | grep -n "$1" | grep -o '#[0-9]*' | cut -c 2-
+get_data() {
+	# shellcheck disable=SC1004
+	{ pactl info; pactl list sinks; } | awk '
+		/^Default Sink: /		{ default_sink=$3 }
+		/^Sink #[0-9]+$/		{ id=substr($2, 2) }
+		$1 == "Name:"			{
+									sinks[++i]=id " " $2
+									if ($2 == default_sink) print i
+								}
+		$1 == "Description:"	{
+									sinks[i]=sinks[i] ":::"\
+									substr($0, match($0, ": ") + 2)
+								}
+		END						{ for (j=1; j<=i; j++) print sinks[j] }'
 }
 
-name_from_index() {
-	echo "$names_and_ids" | nl -s : | grep "${1}:" \
-		| rev | cut -d ' ' -f 1 | rev
+list_inputs() {
+	pactl list sink-inputs | awk '
+		/^Sink Input #[0-9]+$/	{ print substr($3, 2) }'
 }
-
-index_from_id() {
-	echo "$names_and_ids" | nl -s : | grep "#${1}" \
-		| cut -d ':' -f 1 | grep -o '[0-9]*'
-}
-
-id_from_index() {
-	id_from_name "$(name_from_index "$1")"
-}
-
-index_from_name() {
-	index_from_id "$(id_from_name "$1")"
-}
-
-name_from_id() {
-	name_from_index "$(index_from_id "$1")"
-}
-
-target_sink_id=$(id_from_name" $default_sink_name")
-# Current default sinks index
-default_sink_index=$(index_from_name "$default_sink_name")
 
 advance_target_sink() {
-	# Indexing change from 'from 1' to 'from 0'
-	# so no need to increment, only do the modulo
-	next_sink_index=$((default_sink_index % sink_count))
-	next_sink_index=$((next_sink_index + 1))
-	target_sink_id=$(id_from_index $next_sink_index)
+    advance=$((default_sink_index % $#))
+    shift $advance
+    next_sink=$1
+    default_sink_index=$((advance + 1))
 }
 
-sink_descriptions=$(pactl list sinks | grep 'Description' | cut -c 15-)
+IFS=$nl
+# shellcheck disable=SC2046
+set -- $(get_data)
+IFS=$oifs
+default_sink_index=$1
+shift
+sink_count=$#
 
 try=0
 while [ $try -lt "$sink_count" ]; do
 	try=$((try + 1))
-	advance_target_sink
-	if [ "$(pactl set-default-sink "$target_sink_id" \
-		2>/dev/null && echo 0)" ]; then
-
-		# Currently running sink inputs
-		sink_inputs=$(pactl list sink-inputs | grep 'Sink Input #' | \
-			cut -c 13-)
-		# Move all current sink inputs to the new sink
-		for sink_input in $sink_inputs; do
-			pactl move-sink-input "$sink_input" "$target_sink_id"
+	advance_target_sink "$@"
+	next_sink_id=${next_sink%% *}
+	if pactl set-default-sink "$next_sink_id" 2>/dev/null; then
+		for sink_input in $(list_inputs); do
+			pactl move-sink-input "$sink_input" "$next_sink_id"
 		done
-
-		# Target sinks description
-		next_sink_description=$(echo "$sink_descriptions" | \
-			sed -n ${next_sink_index}p)
-		notify-send "Audio on $next_sink_description"
-		break
+		notify-send "Audio on ${next_sink#*:::}"
+		exit 0
 	else
-		notify-send "Audio failed to be set on $next_sink_description" \
+		notify-send "Audio failed to be set on ${next_sink#*:::}" \
 			"trying next sink"
 	fi
 done
 
+notify-send "No available Audio sinks"
+exit 1
