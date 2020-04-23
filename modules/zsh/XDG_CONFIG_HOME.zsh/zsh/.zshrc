@@ -34,6 +34,8 @@ export KEYTIMEOUT=1 # esc has a default timeout of 0.4 sec which is annoying in 
 [ -f "$ZDOTDIR/.p10k.zsh" ] && . "$ZDOTDIR/.p10k.zsh"
 
 ## Base config
+# Enable vi mode
+bindkey -v
 
 # TODO: https://raw.githubusercontent.com/romkatv/zsh4humans/master/.zshrc
 
