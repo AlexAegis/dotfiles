@@ -4,6 +4,10 @@ oifs=$IFS
 nl='
 '
 
+# To ignore certain sinks, set IGNORED_SINKS to a list of string that matches
+# the ignored sinks in the result of `get_data` here
+# Example: IGNORED_SINKS='hdmi'
+
 get_data() {
 	# shellcheck disable=SC1004
 	{ pactl info; pactl list sinks; } | awk '
@@ -45,6 +49,11 @@ while [ $try -lt "$sink_count" ]; do
 	try=$((try + 1))
 	advance_target_sink "$@"
 	next_sink_id=${next_sink%% *}
+
+	for ignore in $IGNORED_SINKS; do
+		[ ! "${next_sink##*$ignore}" = "$next_sink" ] && continue 2
+	done
+
 	if pactl set-default-sink "$next_sink_id" 2>/dev/null; then
 		for sink_input in $(list_inputs); do
 			pactl move-sink-input "$sink_input" "$next_sink_id"
