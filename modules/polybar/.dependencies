@@ -2,3 +2,4 @@ xdg
 systemd ? [ $systemd ]
 xorg
 rofi
+pulseaudio
