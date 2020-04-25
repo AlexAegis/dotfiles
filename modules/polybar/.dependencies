@@ -3,3 +3,4 @@ systemd ? [ $systemd ]
 xorg
 rofi
 pulseaudio
+redshift
