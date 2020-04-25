@@ -33,9 +33,22 @@ export KEYTIMEOUT=1 # esc has a default timeout of 0.4 sec which is annoying in 
 
 # TODO: history plugin https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/history.zsh
 
-# To customize prompt, run `p10k configure` or edit ~/.config/zsh/.p10k.zsh.
+DEFAULT_USER=asd
+POWERLEVEL9K_ALWAYS_SHOW_USER=true
+
 [ -f "$ZDOTDIR/.p10k.zsh" ] && . "$ZDOTDIR/.p10k.zsh"
 
+# CUSTOM_CONTEXT_RUNE='VVX'
+POWERLEVEL9K_CONTEXT_TEMPLATE="`if command -v runic &>/dev/null; then
+	runic ${CUSTOM_CONTEXT_RUNE:-$USER}
+else echo ${CUSTOM_CONTEXT_RUNE:-$USER}; fi
+`"
+
+typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+  context dir vcs
+)
+
+unset POWERLEVEL9K_CONTEXT_DEFAULT_CONTENT_EXPANSION
 ## Base config
 # Enable vi mode
 bindkey -v

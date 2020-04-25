@@ -8,3 +8,4 @@ nerdfonts
 powerline
 systemd ? [ $systemd ]
 # tmux
+runic
