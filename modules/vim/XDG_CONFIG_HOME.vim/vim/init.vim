@@ -31,18 +31,27 @@ Plug 'camspiers/lens.vim'
 Plug 'mg979/vim-visual-multi', { 'branch': 'master' }
 Plug 'flazz/vim-colorschemes'
 Plug 'rafi/awesome-vim-colorschemes'
+Plug 'chuling/vim-equinusocio-material'
 Plug 'sainnhe/gruvbox-material'
 Plug 'rainglow/vim'
 Plug 'mkarmona/colorsbox'
 " Plug 'jiangmiao/auto-pairs' " Causes problems with coc enter accept
-Plug 'alvan/vim-closetag'
+" Plug 'alvan/vim-closetag'
+Plug 'doums/coBra'
+" Dev
+" Plug 'vim-scripts/Conque-GDB'
+Plug 'majutsushi/tagbar'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"" HTML
 Plug 'mattn/emmet-vim', {
   \ 'for': ['javascript', 'typescript', 'html', 'xhtml', 'xml'] }
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"" Typescript
 Plug 'prettier/vim-prettier', {
-  \ 'do': 'npm install',
+  \ 'do': 'npm install -g prettier',
   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss',
 		\ 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
+"" Rust
+Plug 'rust-lang/rust.vim'
 call plug#end()
 
 "" Plugin Configuration
@@ -72,9 +81,15 @@ let g:NERDTreeIndicatorMapCustom = {
     \ "Unknown"   : "?"
     \ }
 """ prettier/vim-prettier
+let g:prettier#exec_cmd_path = "prettier"
+let g:prettier#autoformat = 1
+""" rust-lang/rust.vim
+let g:rustfmt_autosave = 1
+:nnoremap <F6> :RustRun<CR>
 " Format on write
+" *.md, markdown format seems bad, removes entire buffer on format
 autocmd BufWritePost *.js,*.jsx,*.json,*.ts,*.tsx,*.css,*.less,
-	\*.scss,*.json,*.graphql,*.md,*.yaml,*.html :Prettier:w
+	\*.scss,*.json,*.graphql,*.yaml,*.html :Prettier:w
 """ vim-airline/vim-airline
 " Disable the default mode show
 set noshowmode
@@ -109,6 +124,13 @@ let g:gitgutter_sign_removed_first_line = '█'
 let g:gitgutter_sign_modified_removed = '█'
 let g:gitgutter_highlight_linenrs = 1
 """ neoclide/coc.nvim
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+nmap <F2> <Plug>(coc-rename)
+
+" CocInstall coc-rust-analyzer
+" CocInstall coc-emmet
+
 " TextEdit might fail if hidden is not set.
 set hidden
 
@@ -291,7 +313,7 @@ augroup fold_vimrc
                    \ set foldcolumn=2 foldminlines=2
 augroup END
 "" Markdown
-let g:markdown_folding = 1
+let g:markdown_folding = 0
 
 "" Keybindings
 " Using leader space (double space)

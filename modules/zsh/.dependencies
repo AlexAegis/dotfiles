@@ -7,3 +7,4 @@ neofetch
 nerdfonts
 powerline
 systemd ? [ $systemd ]
+# tmux

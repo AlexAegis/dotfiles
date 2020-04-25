@@ -5,6 +5,9 @@ if [ "$BENCH" ]; then
 	zmodload zsh/zprof
 fi
 
+# ZSH_TMUX_AUTOSTART=true
+# ZSH_TMUX_FIXTERM=true
+
 # Custom Compdef
 fpath=(~/.config/zsh/compdef $fpath)
 unsetopt PROMPT_SP
@@ -66,3 +69,21 @@ fi
 if [ "$BENCH" ]; then
 	zprof
 fi
+
+# tmux
+#if [[ -n ${TMUX} && -n ${commands[tmux]} ]];then
+#	case $(tmux showenv TERM 2>/dev/null) in
+#		*256color) ;&
+#			TERM=fbterm)
+#			TERM=screen-256color ;;
+#		*)
+#			TERM=screen
+#		esac
+#fi
+
+#if command -v tmux &> /dev/null && [ -n "$PS1" ] \
+#	&& [[ ! "$TERM" =~ screen ]] \
+#	&& [[ ! "$TERM" =~ tmux ]] \
+#	&& [ -z "$TMUX" ]; then
+#	tmux a -t default || exec tmux new -s default && exit;
+#fi
