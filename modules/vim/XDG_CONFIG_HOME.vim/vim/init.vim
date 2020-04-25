@@ -23,7 +23,6 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'camspiers/animate.vim'
@@ -35,28 +34,23 @@ Plug 'chuling/vim-equinusocio-material'
 Plug 'sainnhe/gruvbox-material'
 Plug 'rainglow/vim'
 Plug 'mkarmona/colorsbox'
-" Plug 'jiangmiao/auto-pairs' " Causes problems with coc enter accept
-" Plug 'alvan/vim-closetag'
-Plug 'doums/coBra'
-" Dev
-" Plug 'vim-scripts/Conque-GDB'
+Plug 'neoclide/jsonc.vim'
 Plug 'majutsushi/tagbar'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-"" HTML
-Plug 'mattn/emmet-vim', {
-  \ 'for': ['javascript', 'typescript', 'html', 'xhtml', 'xml'] }
-"" Typescript
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'npm install -g prettier',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss',
-		\ 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
-"" Rust
 Plug 'rust-lang/rust.vim'
+Plug 'airblade/vim-gitgutter' " Faster than coc-git
+Plug 'puremourning/vimspector'
+Plug 'doums/coBra' "
 call plug#end()
+
+"" Deprecated plugins
+" Plug 'jiangmiao/auto-pairs' " Causes problems with coc enter accept
+" Plug 'alvan/vim-closetag' " In favor of doums/coBra
 
 "" Plugin Configuration
 """ scrooloose/nerdtree
 let g:NERDTreeHijackNetrw = 1	" On by default, just to be sure
+let NERDTreeShowHidden=1
 autocmd VimEnter * NERDTree		" Autotart NERDTree
 autocmd VimEnter * wincmd p		" Go to previous (last accessed) window.
 " Store the bookmarks file
@@ -86,10 +80,6 @@ let g:prettier#autoformat = 1
 """ rust-lang/rust.vim
 let g:rustfmt_autosave = 1
 :nnoremap <F6> :RustRun<CR>
-" Format on write
-" *.md, markdown format seems bad, removes entire buffer on format
-autocmd BufWritePost *.js,*.jsx,*.json,*.ts,*.tsx,*.css,*.less,
-	\*.scss,*.json,*.graphql,*.yaml,*.html :Prettier:w
 """ vim-airline/vim-airline
 " Disable the default mode show
 set noshowmode
@@ -128,8 +118,7 @@ let g:gitgutter_highlight_linenrs = 1
 nmap <leader>rn <Plug>(coc-rename)
 nmap <F2> <Plug>(coc-rename)
 
-" CocInstall coc-rust-analyzer
-" CocInstall coc-emmet
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
 
 " TextEdit might fail if hidden is not set.
 set hidden

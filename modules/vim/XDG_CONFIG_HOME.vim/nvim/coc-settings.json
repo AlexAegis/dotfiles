@@ -1,0 +1,22 @@
+{
+	"suggest.autoTrigger": "trigger",
+	"coc.preferences.formatOnSaveFiletypes": [
+		"css",
+		"markdown",
+		"javascript",
+		"typescript",
+		"json",
+		"html"
+	],
+	"git.enableGutters": false,
+	"git.addedSign.hlGroup": "GitGutterAdd",
+	"git.changedSign.hlGroup": "GitGutterChange",
+	"git.removedSign.hlGroup": "GitGutterDelete",
+	"git.topRemovedSign.hlGroup": "GitGutterDelete",
+	"git.changeRemovedSign.hlGroup": "GitGutterChangeDelete",
+	"git.changedSign.text": "█",
+	"git.addedSign.text": "█",
+	"git.removedSign.text": "█",
+	"git.topRemovedSign.text": "▀",
+	"git.changeRemovedSign.text": "█"
+}
