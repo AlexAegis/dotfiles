@@ -1,12 +1,5 @@
 #!/bin/sh
 
-# Presourcing the environment file for the installation
-# dot links every file to $HOME before this script
-set -a
-# shellcheck disable=SC1090
-. "$HOME/.zshenv"
-set +a
-
 # Addons
 
 # Antibody https://getantibody.github.io/
