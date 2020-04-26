@@ -31,7 +31,8 @@ set undofile
 set updatetime=100				" Default is 4000
 set number relativenumber		" Gutter numbers
 set splitbelow splitright		" Order of window splitting
-
+set colorcolumn=80				" ruler
+set nocompatible
 "" Filetypes & highlighting
 filetype plugin indent on
 syntax on
@@ -71,6 +72,7 @@ Plug 'rust-lang/rust.vim'
 Plug 'airblade/vim-gitgutter' " Faster than coc-git
 Plug 'puremourning/vimspector'
 Plug 'doums/coBra' "
+Plug 'preservim/nerdcommenter'
 call plug#end()
 
 "" Deprecated plugins
@@ -83,14 +85,25 @@ let g:NERDTreeHijackNetrw = 1	" On by default, just to be sure
 let NERDTreeShowHidden=1
 autocmd VimEnter * NERDTree		" Autotart NERDTree
 autocmd VimEnter * wincmd p		" Go to previous (last accessed) window.
+map <silent> <C-e> :NERDTreeFocus<CR>
 " Store the bookmarks file
 let NERDTreeBookmarksFile=expand("$XDG_CONFIG_HOME/vim/nerd_tree_bookmarks")
 " Show the bookmarks table on startup
 let NERDTreeShowBookmarks=1
-
 " Exit NERDTree if it's the last buffer
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") &&
 	\ b:NERDTree.isTabTree()) | q | endif
+""" scrooloose/nerdcommenter
+" Add spaces after comment delimiters by default
+let g:NERDSpaceDelims = 1
+" Use compact syntax for prettified multi-line comments
+let g:NERDCompactSexyComs = 1
+" Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDDefaultAlign = 'left'
+" Allow commenting and inverting empty lines (useful when commenting a region)
+let g:NERDCommentEmptyLines = 1
+" Enable trimming of trailing whitespace when uncommenting
+let g:NERDTrimTrailingWhitespace = 1
 """ Xuyuanp/nerdtree-git-plugin
 let g:NERDTreeIndicatorMapCustom = {
     \ "Modified"  : "✹",
@@ -344,6 +357,7 @@ noremap <2-LeftMouse> za
 "  Keybindings  "
 """""""""""""""""
 "" Edit vimrc
+nnoremap <leader>ec :echo 'Hello World!'<cr>
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 "" Hungry Delete.
