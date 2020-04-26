@@ -33,6 +33,7 @@ set number relativenumber		" Gutter numbers
 set splitbelow splitright		" Order of window splitting
 set colorcolumn=80				" ruler
 set nocompatible
+set fillchars+=vert:▍
 "" Filetypes & highlighting
 filetype plugin indent on
 syntax on
@@ -73,6 +74,7 @@ Plug 'airblade/vim-gitgutter' " Faster than coc-git
 Plug 'puremourning/vimspector'
 Plug 'doums/coBra' "
 Plug 'preservim/nerdcommenter'
+Plug 'ryanoasis/vim-devicons'
 call plug#end()
 
 "" Deprecated plugins
@@ -125,8 +127,14 @@ let g:rustfmt_autosave = 1
 :nnoremap <F6> :RustRun<CR>
 """ vim-airline/vim-airline
 " Disable the default mode show
-set noshowmode
-" bottom cmd height can be set with cmdheight=1
+set noshowmode " bottom cmd height can be set with cmdheight=1
+let g:airline_theme='base16_gruvbox_dark_hard'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
+let g:airline_left_sep = ''
+let g:airline_left_alt_sep = ''
+let g:airline_right_sep = ''
+let g:airline_right_alt_sep = ''
 """ sainnhe/gruvbox-material
 
 " important!!
@@ -348,14 +356,14 @@ augroup END
 let g:markdown_folding = 0
 
 "" Keybindings
-" Using leader space (double space)
-vnoremap <leader><space> zf
+vnoremap <leader><space> zf " Using leader space (double space)
 nnoremap <silent> <leader><space> @=(foldlevel('.')?'za':"  ")<CR>
-" Using double click
-noremap <2-LeftMouse> za
+noremap <2-LeftMouse> za " Using double click
 """""""""""""""""
 "  Keybindings  "
 """""""""""""""""
+"" General
+nnoremap <C-q> :q<CR> " Quit
 "" Edit vimrc
 nnoremap <leader>ec :echo 'Hello World!'<cr>
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
