@@ -28,6 +28,12 @@ mkdir -p "$XDG_DESKTOP_DIR" \
 		"$XDG_PUBLICSHARE_DIR" \
 		"$XDG_TEMPLATES_DIR" \
 		"$XDG_VIDEOS_DIR"
+
+# Other common folders
+mkdir -p "$XDG_CONFIG_HOME/alias.d" \
+		"$XDG_CONFIG_HOME/environment.d" \
+		"$XDG_CONFIG_HOME/rc.d"
+
 # rm -r ~/Videos ~/Desktop ~/Music ~/Pictures ~/Public ~/Templates ~/Videos
 # rm -r "$XDG_DOCUMENTS_DIR" \
 # 		"$XDG_DOWNLOAD_DIR" \
