@@ -27,6 +27,7 @@ endif
 """"""""""""
 "" General
 let mapleader=' '
+let maplocalleader=' '
 set undofile
 set updatetime=100				" Default is 4000
 set number relativenumber		" Gutter numbers
@@ -34,6 +35,60 @@ set splitbelow splitright		" Order of window splitting
 set colorcolumn=80				" ruler
 set nocompatible
 set fillchars+=vert:▍
+" set cryptmethod=blowfish2
+set mouse=a
+
+" hi Normal ctermbg=235 ctermfg=250 guibg=#262626 guifg=#bcbcbc cterm=NONE gui=NONE
+" hi Visual ctermbg=110 ctermfg=235 guibg=#8fafd7 guifg=#262626 cterm=NONE gui=NONE
+" hi SpecialKey ctermbg=NONE ctermfg=NONE guibg=#8fafd744 guifg=NONE cterm=NONE gui=NONE
+" colorscheme apprentice
+
+hi Normal ctermbg=none guibg=NONE
+hi NonText ctermbg=none guibg=NONE
+hi SignColumn guibg=NONE ctermbg=NONE
+
+" autocmd VimEnter GitGutterLineNrHighlightsDisable
+
+set encoding=utf-8
+" TODO: Make non printable characters show in only visual mode (always)
+" How non-printable things are shown
+" set listchars=eol:$,tab:▰▱,nbsp:⋅,trail:~,extends:>,precedes:<
+" set list                              " show non-print characters,...
+set number                            " show line number for current line,...
+set relativenumber                    " and relative line numbers for others
+set cursorline                        " highlight the line with the cursor
+set wildmenu                          " use command-line completion menu,...
+set wildmode=longest:full             " with wildmode
+set wildchar=<Tab>
+" Tab
+set autoindent                        " enable auto-indentation
+set tabstop=4            " number of spaces used as tab for file
+set softtabstop=4        " number of spaces used as tab for editing
+set shiftwidth=4         " number of spaces used to autoindent
+" set expandtab            " expand tabs into spaces
+set smarttab             " smart tabulation and backspace
+set bs=indent,eol,start  " allow backspacing over everything
+set termguicolors
+
+"let &t_8f = "\e[38;2;%lu;%lu;%lum"
+"let &t_8b = "\e[48;2;%lu;%lu;%lum"
+
+" Move a line of text using TODO: Respect indentation
+
+
+"set ignorecase						" assume patterns are case insensitive,...
+set smartcase						" ...when lowercase-only is used
+set incsearch						" start searching as you type
+
+set ttyfast							" assume the terminal is fast
+set mouse=a							" enable mouse in all modes
+
+set guifont=Iosevka\ 11				" set font in gvim
+set guioptions-=T					" no toolbar in gvim
+set guioptions-=m					" no menubar in gvim
+set guioptions-=r					" no right scrollbar in gvim
+set guioptions-=L					" no left scrollbar when v.split in gvim
+
 "" Filetypes & highlighting
 filetype plugin indent on
 syntax on
@@ -55,7 +110,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree' ", { 'on':  'NERDTreeToggle' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'camspiers/animate.vim'
 Plug 'camspiers/lens.vim'
@@ -70,24 +125,42 @@ Plug 'neoclide/jsonc.vim'
 Plug 'majutsushi/tagbar'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'rust-lang/rust.vim'
-Plug 'airblade/vim-gitgutter' " Faster than coc-git
 Plug 'puremourning/vimspector'
 Plug 'doums/coBra' "
 Plug 'preservim/nerdcommenter'
 Plug 'ryanoasis/vim-devicons'
+Plug 'jistr/vim-nerdtree-tabs'
+Plug 'tpope/vim-eunuch'
+Plug 'will133/vim-dirdiff'
+Plug 'AndrewRadev/linediff.vim'
 call plug#end()
 
 "" Deprecated plugins
+" Plug 'airblade/vim-gitgutter' " Faster than coc-git for display,
+								" but tab switching is really slow
 " Plug 'jiangmiao/auto-pairs' " Causes problems with coc enter accept
 " Plug 'alvan/vim-closetag' " In favor of doums/coBra
 
 "" Plugin Configuration
+
+""" camspiers/animate.vim
+" TODO: turn back on
+let g:animate#distribute_space = 0
+
 """ scrooloose/nerdtree
 let g:NERDTreeHijackNetrw = 1	" On by default, just to be sure
 let NERDTreeShowHidden=1
-autocmd VimEnter * NERDTree		" Autotart NERDTree
-autocmd VimEnter * wincmd p		" Go to previous (last accessed) window.
+"autocmd VimEnter * NERDTree					" Autotart NERDTree
+"autocmd VimEnter * wincmd p		" Go to previous (last accessed) window.
+autocmd TabNew * call feedkeys(":NERDTreeMirrorOpen\<CR>")
+" autocmd BufWinEnter * NERDTreeMirror | 40wincmd | | wincmd p
+
+let g:nerdtree_tabs_open_on_console_startup=1
+
 map <silent> <C-e> :NERDTreeFocus<CR>
+map <silent> <leader><e> :NERDTreeFocus<CR>
+let g:NERDTreeWinSize=30
+let g:gitgutter_eager=0
 " Store the bookmarks file
 let NERDTreeBookmarksFile=expand("$XDG_CONFIG_HOME/vim/nerd_tree_bookmarks")
 " Show the bookmarks table on startup
@@ -108,17 +181,17 @@ let g:NERDCommentEmptyLines = 1
 let g:NERDTrimTrailingWhitespace = 1
 """ Xuyuanp/nerdtree-git-plugin
 let g:NERDTreeIndicatorMapCustom = {
-    \ "Modified"  : "✹",
-    \ "Staged"    : "✚",
-    \ "Untracked" : "✭",
-    \ "Renamed"   : "➜",
-    \ "Unmerged"  : "═",
-    \ "Deleted"   : "✖",
-    \ "Dirty"     : "✗",
-    \ "Clean"     : "✔︎",
-    \ 'Ignored'   : '☒',
-    \ "Unknown"   : "?"
-    \ }
+		\ "Modified"  : "✹",
+		\ "Staged"    : "✚",
+		\ "Untracked" : "✭",
+		\ "Renamed"   : "➜",
+		\ "Unmerged"  : "═",
+		\ "Deleted"   : "✖",
+		\ "Dirty"     : "✗",
+		\ "Clean"     : "✔︎",
+		\ 'Ignored'   : '☒',
+		\ "Unknown"   : "?"
+		\ }
 """ prettier/vim-prettier
 let g:prettier#exec_cmd_path = "prettier"
 let g:prettier#autoformat = 1
@@ -156,6 +229,7 @@ let g:gruvbox_material_transparent_background = 1
 let g:airline_theme = 'gruvbox_material'
 
 colorscheme gruvbox-material
+" colorscheme laravel
 
 """ airblade/vim-gitgutter
 let g:gitgutter_sign_added = '█'
@@ -224,11 +298,11 @@ nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
+	if (index(['vim','help'], &filetype) >= 0)
+		execute 'h '.expand('<cword>')
+	else
+		call CocAction('doHover')
+	endif
 endfunction
 
 " Highlight the symbol and its references when holding the cursor.
@@ -242,11 +316,11 @@ xmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
 
 augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+	autocmd!
+	" Setup formatexpr specified filetype(s).
+	autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+	" Update signature help on jump placeholder.
+	autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
 " Applying codeAction to the selected region.
@@ -300,57 +374,57 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 " see http://vimcasts.org/episodes/writing-a-custom-fold-expression/
 """ Foldlevel definition
 function! VimFolds(lnum)
-  let s:thisline = getline(a:lnum)
-  if match(s:thisline, '^"" ') >= 0
-    return '>2'
-  endif
-  if match(s:thisline, '^""" ') >= 0
-    return '>3'
-  endif
-  let s:two_following_lines = 0
-  if line(a:lnum) + 2 <= line('$')
-    let s:line_1_after = getline(a:lnum+1)
-    let s:line_2_after = getline(a:lnum+2)
-    let s:two_following_lines = 1
-  endif
-  if !s:two_following_lines
-      return '='
-    endif
-  else
-    if (match(s:thisline, '^"""""') >= 0) &&
-       \ (match(s:line_1_after, '^"  ') >= 0) &&
-       \ (match(s:line_2_after, '^""""') >= 0)
-      return '>1'
-    else
-      return '='
-    endif
-  endif
+	let s:thisline = getline(a:lnum)
+	if match(s:thisline, '^"" ') >= 0
+		return '>2'
+	endif
+	if match(s:thisline, '^""" ') >= 0
+		return '>3'
+	endif
+	let s:two_following_lines = 0
+	if line(a:lnum) + 2 <= line('$')
+		let s:line_1_after = getline(a:lnum+1)
+		let s:line_2_after = getline(a:lnum+2)
+		let s:two_following_lines = 1
+	endif
+	if !s:two_following_lines
+			return '='
+		endif
+	else
+		if (match(s:thisline, '^"""""') >= 0) &&
+			 \ (match(s:line_1_after, '^"  ') >= 0) &&
+			 \ (match(s:line_2_after, '^""""') >= 0)
+			return '>1'
+		else
+			return '='
+		endif
+	endif
 endfunction
 """ Foldtext definition
 function! VimFoldText()
-  " handle special case of normal comment first
-  let s:info = '('.string(v:foldend-v:foldstart).' l)'
-  if v:foldlevel == 1
-    let s:line = ' ◇ '.getline(v:foldstart+1)[3:-2]
-  elseif v:foldlevel == 2
-    let s:line = '   ●  '.getline(v:foldstart)[3:]
-  elseif v:foldlevel == 3
-    let s:line = '     ▪ '.getline(v:foldstart)[4:]
-  endif
-  if strwidth(s:line) > 80 - len(s:info) - 3
-    return s:line[:79-len(s:info)-3+len(s:line)-strwidth(s:line)].'...'.s:info
-  else
-    return s:line.repeat(' ', 80 - strwidth(s:line) - len(s:info)).s:info
-  endif
+	" handle special case of normal comment first
+	let s:info = '('.string(v:foldend-v:foldstart).' l)'
+	if v:foldlevel == 1
+		let s:line = ' ◇ '.getline(v:foldstart+1)[3:-2]
+	elseif v:foldlevel == 2
+		let s:line = '   ●  '.getline(v:foldstart)[3:]
+	elseif v:foldlevel == 3
+		let s:line = '     ▪ '.getline(v:foldstart)[4:]
+	endif
+	if strwidth(s:line) > 80 - len(s:info) - 3
+		return s:line[:79-len(s:info)-3+len(s:line)-strwidth(s:line)].'...'.s:info
+	else
+		return s:line.repeat(' ', 80 - strwidth(s:line) - len(s:info)).s:info
+	endif
 endfunction
 " set foldsettings automatically for vim files
 augroup fold_vimrc
-  autocmd!
-  autocmd FileType vim
-                   \ setlocal foldmethod=expr |
-                   \ setlocal foldexpr=VimFolds(v:lnum) |
-                   \ setlocal foldtext=VimFoldText() |
-                   \ set foldcolumn=2 foldminlines=2
+	autocmd!
+	autocmd FileType vim
+		\ setlocal foldmethod=expr |
+		\ setlocal foldexpr=VimFolds(v:lnum) |
+		\ setlocal foldtext=VimFoldText() |
+		\ set foldcolumn=2 foldminlines=2
 augroup END
 "" Markdown
 let g:markdown_folding = 0
@@ -364,18 +438,79 @@ noremap <2-LeftMouse> za " Using double click
 """""""""""""""""
 "" General
 nnoremap <C-q> :q<CR> " Quit
+nnoremap <C-q><C-q> :qall!<CR> " Quit all
+noremap <silent> <M-l> :bnext<CR>
+noremap <silent> <M-Right> :bnext<CR>
+noremap <silent> <M-Tab> :bnext<CR>
+noremap <silent> <M-h> :bprev<CR>
+noremap <silent> <M-Left> :bprev<CR>
+noremap <silent> <leader>t :tabnew<CR>
+noremap <silent> <leader>h :tabnext<CR>
+noremap <silent> <leader><Right> :tabnext<CR>
+noremap <silent> <leader><Left> :tabprev<CR>
+
+" Go to tab by number
+noremap <leader>1 1gt
+noremap <leader>2 2gt
+noremap <leader>3 3gt
+noremap <leader>4 4gt
+noremap <leader>5 5gt
+noremap <leader>6 6gt
+noremap <leader>7 7gt
+noremap <leader>8 8gt
+noremap <leader>9 9gt
+noremap <leader>0 :tablast<cr>
+noremap <leader><tab> :tabnext<cr>
+
+noremap <S-h> <C-w>h
+noremap <S-j> <C-w>j
+noremap <S-k> <C-w>k
+noremap <S-l> <C-w>l
+noremap <S-Left> <C-w>h
+noremap <S-Down> <C-w>j
+noremap <S-Up> <C-w>k
+noremap <S-Right> <C-w>l
+
+noremap <C-h> :vertical resize +5<cr>
+noremap <C-j> :resize +5<cr>
+noremap <C-k> :resize -5<cr>
+noremap <C-l> :vertical resize -5<cr>
+noremap <C-Left> :vertical resize +5<cr>
+noremap <C-Down> :resize +5<cr>
+noremap <C-Up> :resize -5<cr>
+noremap <C-Rightl> :vertical resize -5<cr>
+
+function! OpenTerminal() abort
+	" TODO: Finish, should be a toggle
+	new term://$SHELL
+	" Send window to bottom and start with small height
+	wincmd J | resize 1
+	" Animate height to 66%
+	call animate#window_percent_height(0.4)
+endfunction
+
+noremap <silent> <M-`> :call OpenTerminal()<cr>i
+
 "" Edit vimrc
 nnoremap <leader>ec :echo 'Hello World!'<cr>
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
+"" Line movements
+nmap <silent><M-j> mz:m+<cr>`z
+nmap <silent><M-k> mz:m-2<cr>`z
+vmap <silent><M-j> :m'>+<cr>`<my`>mzgv`yo`z
+vmap <silent><M-k> :m'<-2<cr>`>my`<mzgv`yo`z
+" Clone a line of text
+nmap <silent><S-M-j> YP<cr>
+nmap <silent><S-M-k> Yp2k<cr>
 "" Hungry Delete.
 " [source](https://www.reddit.com/r/vim/comments/7gqowu)
 inoremap <s-bs> <bs>			" shift + backspace to do regular backspace
 inoremap <silent><expr><bs>
-  \ (&indentexpr isnot '' ? &indentkeys : &cinkeys) =~? '!\^F' &&
-  \ &backspace =~? '.*eol\&.*start\&.*indent\&' &&
-  \ !search('\S','nbW',line('.')) ? (col('.') != 1 ? "\<C-U>" : "") .
-  \ "\<bs>" . (getline(line('.')-1) =~ '\S' ? "" : "\<C-F>") : "\<bs>"
+	\ (&indentexpr isnot '' ? &indentkeys : &cinkeys) =~? '!\^F' &&
+	\ &backspace =~? '.*eol\&.*start\&.*indent\&' &&
+	\ !search('\S','nbW',line('.')) ? (col('.') != 1 ? "\<C-U>" : "") .
+	\ "\<bs>" . (getline(line('.')-1) =~ '\S' ? "" : "\<C-F>") : "\<bs>"
 "" Terminal
 :tnoremap <Esc> <C-\><C-n>
 " fzf
@@ -392,97 +527,18 @@ inoremap <silent><expr><bs>
 
 
 
-
-
-
-" " Command autocomplete
-" set wildmenu
-" set wildmode=longest:full
-
-" Main settings
-
-
-" PlugInstall
-" PlugUpdate
-" TODO Autoupdate on launch?
-" TODO Autoexit after successful update
-
-
-
-nnoremap <leader>v :call Reload()<CR>
-
-" hi Normal ctermbg=235 ctermfg=250 guibg=#262626 guifg=#bcbcbc cterm=NONE gui=NONE
-" hi Visual ctermbg=110 ctermfg=235 guibg=#8fafd7 guifg=#262626 cterm=NONE gui=NONE
-" hi SpecialKey ctermbg=NONE ctermfg=NONE guibg=#8fafd744 guifg=NONE cterm=NONE gui=NONE
-" colorscheme apprentice
-
-hi Normal ctermbg=none guibg=NONE
-
-set encoding=utf-8
-" TODO: Make non printable characters show in only visual mode (always)
-" How non-printable things are shown
-" set listchars=eol:$,tab:▰▱,nbsp:⋅,trail:~,extends:>,precedes:<
-" set list                              " show non-print characters,...
-set number                            " show line number for current line,...
-set relativenumber                    " and relative line numbers for others
-set cursorline                        " highlight the line with the cursor
-set wildmenu                          " use command-line completion menu,...
-set wildmode=longest:full             " with wildmode
-set wildchar=<Tab>
-" Tab
-set autoindent                        " enable auto-indentation
-set tabstop=4            " number of spaces used as tab for file
-set softtabstop=4        " number of spaces used as tab for editing
-set shiftwidth=4         " number of spaces used to autoindent
-" set expandtab            " expand tabs into spaces
-set smarttab             " smart tabulation and backspace
-set bs=indent,eol,start  " allow backspacing over everything
-set termguicolors
-
-"let &t_8f = "\e[38;2;%lu;%lu;%lum"
-"let &t_8b = "\e[48;2;%lu;%lu;%lum"
-
-" Move a line of text using TODO: Respect indentation
-nmap <silent><M-j> mz:m+<cr>`z
-nmap <silent><M-k> mz:m-2<cr>`z
-vmap <silent><M-j> :m'>+<cr>`<my`>mzgv`yo`z
-vmap <silent><M-k> :m'<-2<cr>`>my`<mzgv`yo`z
-" Clone a line of text
-nmap <silent><S-M-j> YP<cr>
-nmap <silent><S-M-k> Yp2k<cr>
-
-" How Search behaves
-"set ignorecase                        " assume patterns are case insensitive,...
-set smartcase                         " ...when lowercase-only is used
-set incsearch                         " start searching as you type
-
-" How IO behave
-set ttyfast                           " assume the terminal is fast
-set mouse=a                           " enable mouse in all modes
-
-
-
-" Tweak how Gvim looks
-set guifont=Iosevka\ 11 " set font in gvim
-set guioptions-=T                     " no toolbar in gvim
-set guioptions-=m                     " no menubar in gvim
-set guioptions-=r                     " no right scrollbar in gvim
-set guioptions-=L                     " no left scrollbar when v.split in gvim
-
-
 " TODO: Check this out: https://dev.to/gaveen/my-vim-story-594d
 
-
 function! InsertTabWrapper()
-  if pumvisible()
-    return "\<c-n>"
-  endif
-  let col = col('.') - 1
-  if !col || getline('.')[col - 1] !~ '\k'
-    return "\<tab>"
-  else
-    return "\<c-x>\<c-o>"
-  endif
+	if pumvisible()
+		return "\<c-n>"
+	endif
+	let col = col('.') - 1
+	if !col || getline('.')[col - 1] !~ '\k'
+		return "\<tab>"
+	else
+		return "\<c-x>\<c-o>"
+	endif
 endfunction
 inoremap <expr><tab> InsertTabWrapper()
 inoremap <expr><s-tab> pumvisible()?"\<c-p>":"\<c-d>"
