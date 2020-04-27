@@ -9,3 +9,5 @@ rustup install stable
 rustup default stable
 
 rustup component add rls
+
+rustup default stable
