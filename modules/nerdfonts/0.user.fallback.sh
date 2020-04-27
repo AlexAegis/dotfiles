@@ -1,12 +1,10 @@
 #!/bin/sh
 
-mkdir -p "$HOME/.nerd-fonts"
+mkdir -p "$XDG_CACHE_HOME/nerd-fonts"
 git clone --depth=1 https://github.com/ryanoasis/nerd-fonts \
-	"$HOME/.nerd-fonts"
+	"$XDG_CACHE_HOME/nerd-fonts"
 
-cd "$HOME/.nerd-fonts" || exit 1
+cd "$XDG_CACHE_HOME/nerd-fonts" || exit 1
 
 # shellcheck disable=SC1091
-. "./install.sh"
-
-rm -rf "$HOME/.nerd-fonts"
+. "$XDG_CACHE_HOME/nerd-fonts/install.sh"
