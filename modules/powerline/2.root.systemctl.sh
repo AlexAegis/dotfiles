@@ -10,4 +10,6 @@ FONT=ter-powerline-v32n.psf.gz
 ' >/etc/vconsole.conf"
 
 # Instant reload
-/usr/lib/systemd/systemd-vconsole-setup
+
+[ -e /usr/lib/systemd/systemd-vconsole-setup ] \
+	&& /usr/lib/systemd/systemd-vconsole-setup

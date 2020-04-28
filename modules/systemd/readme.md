@@ -4,7 +4,9 @@
 
 ## [User](https://wiki.archlinux.org/index.php/Systemd/User)
 
-TODO:
+TODO: verify service permissions, world level write bit should not be set
+check on a fresh git clone. If its set, use this module to unset it in the
+env script so its always fixed
 Test:
 
 ```sh
