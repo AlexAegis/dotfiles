@@ -9,3 +9,4 @@ powerline
 systemd ? [ $systemd ]
 # tmux
 runic
+python # some plugins need it

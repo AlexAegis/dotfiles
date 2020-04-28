@@ -4,11 +4,11 @@
 if [ "$BENCH" ]; then
 	zmodload zsh/zprof
 fi
-
 # ZSH_TMUX_AUTOSTART=true
 # ZSH_TMUX_FIXTERM=true
 
 # Custom Compdef
+# TODO: XDG_CONFIG_HOME
 fpath=(~/.config/zsh/compdef $fpath)
 unsetopt PROMPT_SP
 # Enable Powerlevel10k instant prompt. Should stay close to the top
