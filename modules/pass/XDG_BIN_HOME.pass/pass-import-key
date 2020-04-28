@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# gpg --recv-keys ID
-
 # Import from $1 or from the default place
 
 gpg --import "${1-$HOME}/pass-private-key.asc"
