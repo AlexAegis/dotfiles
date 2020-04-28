@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt install xdg-user-dirs xdg-utils
+apt install -y xdg-user-dirs xdg-utils

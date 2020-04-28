@@ -1,1 +1,2 @@
 xdg
+inotify # Because of the watch_exec script

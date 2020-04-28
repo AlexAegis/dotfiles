@@ -1,4 +1,5 @@
 xdg
-# for env loading
-home
 curl ? [ ! $pacman ]
+# while this module itself does not need it
+# a lot of crates do
+gcc

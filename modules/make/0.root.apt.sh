@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt install make
+apt install -y make
