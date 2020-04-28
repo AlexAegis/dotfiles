@@ -7,6 +7,9 @@ fi
 # ZSH_TMUX_AUTOSTART=true
 # ZSH_TMUX_FIXTERM=true
 
+export LOADENV_RC_EXTS="sh zsh" # used by loadenv
+[ -f "$HOME/.profile" ] && QUIET=1 . "$HOME/.profile"
+
 # Custom Compdef
 # TODO: XDG_CONFIG_HOME
 fpath=(~/.config/zsh/compdef $fpath)
@@ -24,8 +27,7 @@ fi
 
 [ -f "$ZDOTDIR/.zshrc.default" ] && . "$ZDOTDIR/.zshrc.default"
 [ -f "$ZDOTDIR/.zshrc.local" ] && . "$ZDOTDIR/.zshrc.local"
-export LOADENV_RC_EXTS="sh zsh" # used by loadenv
-[ -f "$HOME/.profile" ] && QUIET=1 . "$HOME/.profile"
+
 
 ## zsh config
 

@@ -26,6 +26,3 @@ alias | grep -q ^ls= || alias ls="ls -a"
 # -F, --classify   Append indicator (one of */=>@|) at the end of the file names
 alias | grep -q ^l= || alias l="ls -AlF"
 
-## dot
-
-alias cdot="cd ~/.dotfiles"
