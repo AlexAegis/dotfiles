@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt install -y gcc
+apt install -y gcc llvm libclang-dev

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-# TODO
+cargo install --locked bat
