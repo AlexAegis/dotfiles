@@ -1,3 +1,3 @@
 #!/bin/sh
 
-vim +PlugInstall +PlugUpdate +'CocInstall coc-json' +CocUpdateSync +qall
+vim +PlugInstall +PlugUpdate +CocUpdateSync +qall
