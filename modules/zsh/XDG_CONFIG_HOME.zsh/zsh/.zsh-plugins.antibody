@@ -21,7 +21,7 @@ robbyrussell/oh-my-zsh path:plugins/fzf
 robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
 robbyrussell/oh-my-zsh path:plugins/themes
-robbyrussell/oh-my-zsh path:plugins/tmux
+# robbyrussell/oh-my-zsh path:plugins/tmux
 
 ## completions must be after oh-my-zsh
 zsh-users/zsh-completions
