@@ -1,6 +1,7 @@
 #!/bin/sh
 
-add-apt-repository universe
+# TODO: This is only usable on ubuntu
+[ $ubuntu ] && add-apt-repository universe
 
 apt update -y
 apt upgrade -y
