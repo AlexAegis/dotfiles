@@ -1,6 +1,6 @@
 xdg
 curl
-# Node is needed for some plugins (prettier)
+# Node is needed for coc
 fnm
 # For fzf.vim
 fzf
