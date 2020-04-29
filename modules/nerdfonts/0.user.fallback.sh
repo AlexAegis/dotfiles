@@ -9,5 +9,4 @@ else
 		"$XDG_CACHE_HOME/nerd-fonts"
 fi
 
-# shellcheck disable=SC1091
-. "$XDG_CACHE_HOME/nerd-fonts/install.sh"
+"$XDG_CACHE_HOME/nerd-fonts/install.sh"
