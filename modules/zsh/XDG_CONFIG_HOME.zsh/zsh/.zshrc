@@ -9,7 +9,7 @@ fi
 
 export LOADENV_RC_EXTS="sh zsh" # used by loadenv
 [ -f "$HOME/.profile" ] && QUIET=1 . "$HOME/.profile"
-
+# TODO: The compinit file generates errors on debian buster
 # Custom Compdef
 # TODO: XDG_CONFIG_HOME
 fpath=(~/.config/zsh/compdef $fpath)
