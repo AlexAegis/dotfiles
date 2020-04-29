@@ -2,7 +2,7 @@
 
 mkdir -p "$XDG_CACHE_HOME/nerd-fonts"
 cd "$XDG_CACHE_HOME/nerd-fonts" || exit 1
-if [ -d "$XDG_CACHE_HOME/nerd-fonts/.git"]; then
+if [ -d "$XDG_CACHE_HOME/nerd-fonts/.git" ]; then
 	git pull
 else
 	git clone --depth=1 https://github.com/ryanoasis/nerd-fonts \
