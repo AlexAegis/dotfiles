@@ -1,6 +1,8 @@
 #!/bin/sh
-
+echo 'EXA SET'
+which ls
 alias ls="exa -a"
+which ls
 
 # -a, --all          show hidden and 'dot' files
 # -l, --long         display extended file metadata as a table

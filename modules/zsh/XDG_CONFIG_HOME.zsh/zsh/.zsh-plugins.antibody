@@ -5,7 +5,7 @@ djui/alias-tips
 caarlos0/zsh-mkc
 softmoth/zsh-vim-mode
 Aloxaf/fzf-tab
-junegunn/fzf
+# junegunn/fzf
 
 ## oh-my-zsh
 # collects completions
@@ -17,7 +17,7 @@ robbyrussell/oh-my-zsh path:plugins/command-not-found
 robbyrussell/oh-my-zsh path:plugins/docker
 robbyrussell/oh-my-zsh path:plugins/docker-compose
 robbyrussell/oh-my-zsh path:plugins/docker-machine
-robbyrussell/oh-my-zsh path:plugins/fzf
+# robbyrussell/oh-my-zsh path:plugins/fzf
 robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
 robbyrussell/oh-my-zsh path:plugins/themes

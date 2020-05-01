@@ -17,12 +17,14 @@ alias cd..="echo 'You missed a space again!' && cd .."
 alias popath='export PATH="$(pwd):$PATH"' # temporary path modification
 alias path="echo \$PATH"
 
+echo 'BASE SET'
+which ls
 ## ls
-
-# Only set if not already set
-alias | grep -q ^ls= || alias ls="ls -a"
+alias ls="ls -a"
 # -A, --almost-all Do not list implied . and ..
 # -l, --long       Display extended file metadata as a table
 # -F, --classify   Append indicator (one of */=>@|) at the end of the file names
-alias | grep -q ^l= || alias l="ls -AlF"
+alias l="ls -AlF"
 
+
+which ls

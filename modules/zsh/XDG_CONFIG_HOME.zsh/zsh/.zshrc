@@ -8,7 +8,6 @@ fi
 # ZSH_TMUX_FIXTERM=true
 
 export LOADENV_RC_EXTS="sh zsh" # used by loadenv
-[ -f "$HOME/.profile" ] && QUIET=1 . "$HOME/.profile"
 # TODO: The compinit file generates errors on debian buster
 # Custom Compdef
 # TODO: XDG_CONFIG_HOME
@@ -22,8 +21,14 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   . "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# the fzf plugin needs it, but to overwrite everything else, .profile has
+# to be loaded after the plugins.
+# the fzf plugin is no longer used but this is left here as reference
+# . ~/.config/environment.d/51-fzf.conf
 # Order matters so you can overwrite stuff that the plugins load
 [ -f "$ZDOTDIR/.zsh-plugins.antibody.sh" ] && . "$ZDOTDIR/.zsh-plugins.antibody.sh"
+[ -f "$HOME/.profile" ] && QUIET=1 . "$HOME/.profile"
+
 
 [ -f "$ZDOTDIR/.zshrc.default" ] && . "$ZDOTDIR/.zshrc.default"
 [ -f "$ZDOTDIR/.zshrc.local" ] && . "$ZDOTDIR/.zshrc.local"
@@ -35,7 +40,6 @@ export KEYTIMEOUT=1 # esc has a default timeout of 0.4 sec which is annoying in 
 
 # TODO: history plugin https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/history.zsh
 
-DEFAULT_USER=asd
 POWERLEVEL9K_ALWAYS_SHOW_USER=true
 
 [ -f "$ZDOTDIR/.p10k.zsh" ] && . "$ZDOTDIR/.p10k.zsh"

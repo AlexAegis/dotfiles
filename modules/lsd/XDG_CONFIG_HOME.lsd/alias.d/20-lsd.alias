@@ -1,9 +1,6 @@
 #!/bin/sh
 
-alias ls="lsd"
-# TODO: Enable lsd date this when this resolves:
-# https://github.com/Peltoche/lsd/issues/332
-# alias ls="lsd --date=\"+%F %T\""
+alias ls="lsd --date=\"+%F %T\""
 
 # -A, --almost-all Do not list implied . and ..
 # -l, --long       Display extended file metadata as a table
