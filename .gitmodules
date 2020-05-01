@@ -1,32 +1,41 @@
 [submodule "modules/dot"]
 	path = modules/dot
 	url = https://github.com/AlexAegis/dot
+	branch = master
 [submodule ".vscode"]
 	path = .vscode
 	url = https://github.com/AlexAegis/.vscode
+	branch = shell
 [submodule "modules/wallpapers"]
 	path = modules/wallpapers
 	url = https://github.com/AlexAegis/wallpapers
+	branch = master
 [submodule "modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad"]
 	path = modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad
 	url = https://github.com/dgeng/iwad.git
+	branch = master
 	ignore = dirty
 [submodule "modules/powerline/XDG_CONFIG_HOME.powerline/powerline/fonts"]
 	path = modules/powerline/XDG_CONFIG_HOME.powerline/powerline/fonts
 	url = https://github.com/powerline/fonts
+	branch = master
 	ignore = dirty
 [submodule "modules/sddm/XDG_CONFIG_HOME.sddm/sddm/themes/sddm-slice"]
 	path = modules/sddm/XDG_CONFIG_HOME.sddm/sddm/themes/sddm-slice
 	url = https://github.com/RadRussianRus/sddm-slice.git
+	branch = master
 [submodule "modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes"]
 	path = modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes
 	url = https://github.com/davatorium/rofi-themes
+	branch = master
 [submodule "modules/picom/resources/compton"]
 	path = modules/picom/resources/compton
 	url = https://github.com/tryone144/compton
 [submodule "modules/yay/resources/yay"]
 	path = modules/yay/resources/yay
 	url = https://aur.archlinux.org/yay.git
+	branch = master
 [submodule "modules/sddm/resources/sddm-chili"]
 	path = modules/sddm/resources/sddm-chili
 	url = https://github.com/Crystalix007/sddm-chili
+	branch = master
