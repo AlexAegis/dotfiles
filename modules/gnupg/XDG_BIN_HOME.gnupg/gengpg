@@ -1,6 +1,6 @@
 #!/bin/sh
 # create gpg keys
-# TODO Move this tothe gnupg module and set the default through configs
+# TODO set the default through configs
 default_comment="Generic key"
 
 echo "%echo Generating an OpenPGP key

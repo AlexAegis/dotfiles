@@ -6,7 +6,6 @@
 	user = AlexAegis
 
 [credential]
-	helper = /usr/bin/pass-git-helper
 	useHttpPath = true
 
 [push]

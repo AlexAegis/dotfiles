@@ -3,18 +3,6 @@
 # This script will either clone or create a pass repository for you
 # And will either create or import a gpg key for it
 
-SCRIPT_PATH=$(
-	cd "${0%/*}" || exit
-	pwd
-)
-
-echo "Script path: $SCRIPT_PATH"
-
-if [ "$(id -u)" = 0 ]; then
-	echo "Can't run with root priviliges!"
-	exit 1
-fi
-
 # force fix .gnupg permissions
 # for example if it was backed up on an ntfs partition
 

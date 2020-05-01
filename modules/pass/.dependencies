@@ -1,4 +1,4 @@
+xdg
 git
 ssh
-xdg
 systemd ? [ $systemd ]

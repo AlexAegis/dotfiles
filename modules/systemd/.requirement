@@ -1,0 +1,2 @@
+# Has to be a systemd enabled system
+[ $systemd ]

@@ -5,6 +5,12 @@
 This module sets up the `gpg` environment, but doesn't generate anything
 on it's own.
 
+## Reloading the config
+
+```sh
+gpg-connect-agent reloadagent /bye
+```
+
 ## TTY
 
 You can force gnupg to use a certain tty when asking for a password with an
