@@ -34,6 +34,7 @@ set number relativenumber		" Gutter numbers
 set splitbelow splitright		" Order of window splitting
 set colorcolumn=80				" ruler
 set nocompatible
+set scrolloff=4
 set fillchars+=vert:▍
 " set cryptmethod=blowfish2
 set mouse=a
@@ -107,6 +108,7 @@ Plug 'junegunn/vim-plug'
 Plug 'sheerun/vim-polyglot'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'machakann/vim-highlightedyank'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
@@ -146,7 +148,8 @@ call plug#end()
 """ camspiers/animate.vim
 " TODO: turn back on
 let g:animate#distribute_space = 0
-
+""" junegunn/fzf
+map <silent> <C-p> :Files<CR>
 """ scrooloose/nerdtree
 let g:NERDTreeHijackNetrw = 1	" On by default, just to be sure
 let NERDTreeShowHidden=1
@@ -168,6 +171,7 @@ let NERDTreeShowBookmarks=1
 " Exit NERDTree if it's the last buffer
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") &&
 	\ b:NERDTree.isTabTree()) | q | endif
+
 """ scrooloose/nerdcommenter
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1

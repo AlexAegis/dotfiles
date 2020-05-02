@@ -5,7 +5,8 @@ IFS='
 set -af
 # Can ignore because globbing is disabled with the `f` flag
 # shellcheck disable=SC2044 disable=SC2086
-for f in $(find ${1-$DIR} -mindepth 1 -maxdepth 1 -regex "${2-$REGEX}"); do
+for f in $(find ${1-$DIR} -mindepth 1 -maxdepth 1 -regex "${2-$REGEX}" | sort)
+do
 	[ ! "$QUIET" ] && echo "Sourcing $f"
 	# shellcheck disable=SC1090
 	[ -e "$f" ] && . "$f"
