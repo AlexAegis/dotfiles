@@ -1,3 +1,3 @@
 #!/bin/sh
 
-# TODO: Add docker group
+usermod -a -G docker "$USER"
