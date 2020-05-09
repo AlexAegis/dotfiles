@@ -1,0 +1,43 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: Cache shellcheck
+        id: cache-shellcheck
+        uses: actions/cache@v1
+        with:
+          path: shellcheck-stable
+          key: ${{ runner.os }}-shellcheck
+      - name: Download shellcheck and dependencies
+        if: steps.cache-shellcheck.outputs.cache-hit != 'true'
+        run: |
+          # node:12.6-buster-slim doesn't have sudo
+          SUDO_AVAILABLE=$(if command -v sudo 2> /dev/null; then echo 1; fi)
+          ${SUDO_AVAILABLE:+sudo} apt-get update
+          ${SUDO_AVAILABLE:+sudo} apt-get install -y make wget tar xz-utils
+          wget -qO- "https://github.com/koalaman/shellcheck/releases\
+          /download/stable\
+          /shellcheck-stable.linux.x86_64.tar.xz" | tar -xJv
+          ${SUDO_AVAILABLE:+sudo} \
+            cp "shellcheck-stable/shellcheck" /usr/bin/
+      - name: Install shellcheck
+        run: |
+          SUDO_AVAILABLE=$(if command -v sudo 2> /dev/null; then echo 1; fi)
+          scversion="stable"
+          ${SUDO_AVAILABLE:+sudo} \
+            cp "shellcheck-stable/shellcheck" /usr/bin/
+      - name: Shellcheck version
+        run: shellcheck --version
+      - name: Lint
+        run: make lint

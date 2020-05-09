@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # TODO: This is only usable on ubuntu
-[ $ubuntu ] && add-apt-repository universe
+# shellcheck disable=SC2154
+[ "$ubuntu" ] && add-apt-repository universe
 
 apt update -y
 apt upgrade -y

@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # instead of letting it modify startup scripts to source itself...
+# shellcheck disable=SC1090
 curl -sL https://github.com/shyiko/jabba/raw/master/install.sh | \
 	/bin/bash -s -- --skip-rc && . "$JABBA_HOME/jabba.sh"
 

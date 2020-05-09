@@ -1,18 +1,20 @@
 #!/bin/bash
+#shellcheck disable=SC2001,SC2030,SC2031,SC2034,SC2046,SC2086,SC2231
 
 collect()
 {
-    while read line;do
+    while read -r line;do
         if [ -d "$line" ];then
             (for i in "$line"/*;do echo $i;done)|sort -R|collect
-            echo $line
+            echo "$line"
         elif [[ "$line" == *".h" ]];then
-            echo $line
+            echo "$line"
         fi
     done
 }
 
-sse="$(awk '/flags/{print;exit}' </proc/cpuinfo|grep -o 'sse\S*'|sed 's/^/-m/'|xargs)"
+sse="$(awk '/flags/{print;exit}' </proc/cpuinfo \
+	| grep -o 'sse\S*' | sed 's/^/-m/' | xargs)"
 
 flags=""
 pd="\\"
@@ -20,7 +22,7 @@ pd="\\"
 while true;do
     collect <<< /usr/include|cut -d/ -f4-|
     (
-        while read line;do
+        while read -r line;do
             if [ "$(dirname "$line")" != "$pd" ];then
                 x=$((RANDOM%8-3))
                 if [[ "$x" != "-"* ]];then
@@ -39,7 +41,7 @@ while true;do
                 if [[ "$((RANDOM%3))" == 0 ]];then
                     gnu="-D_GNU_SOURCE=1 -D_REENTRANT -D_POSIX_C_SOURCE=200112L "
                 fi
-                flags="gcc -w $(xargs -n1 <<< "opt pipe gnu ssef arch"|sort -R|(while read line;do eval echo \$$line;done))"
+                flags="gcc -w $(xargs -n1 <<< "opt pipe gnu ssef arch"|sort -R|(while read -r line;do eval echo \$$line;done))"
             fi
             if [ -d "/usr/include/$line" ];then
                 echo $flags -shared $(for i in /usr/include/$line/*.h;do cut -d/ -f4- <<< "$i"|sed 's/h$/o/';done) -o "$line"".so"

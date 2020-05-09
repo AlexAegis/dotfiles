@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # TODO DELETE THIS ONCE THE FALLBACK SCRIPT IS OKAY
-mkdir -p $XDG_DATA_HOME/pyenv
-git clone https://github.com/pyenv/pyenv.git $XDG_DATA_HOME/pyenv
+mkdir -p "$XDG_DATA_HOME/pyenv"
+git clone https://github.com/pyenv/pyenv.git "$XDG_DATA_HOME/pyenv"
 # TODO DELETE THIS ONCE THE FALLBACK SCRIPT IS OKAY
 
 

@@ -10,14 +10,14 @@ echo "Show spinner"
 pid=$! ; i=0
 while ps -a | awk '{print $1}' | grep -q "${pid}"
 do
-    c=`expr ${i} % 4`
+    c=$((i % 4))
     case ${c} in
        0) echo "/\c" ;;
        1) echo "-\c" ;;
        2) echo "\\ \b\c" ;;
        3) echo "|\c" ;;
     esac
-    i=`expr ${i} + 1`
+    i=$((i + 1))
     # change the speed of the spinner by altering the 1 below
     sleep 1
     echo "\b\c"

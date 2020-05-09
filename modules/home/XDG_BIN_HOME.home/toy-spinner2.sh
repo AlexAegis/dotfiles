@@ -8,5 +8,5 @@ echo -n ' '
 while [ -d /proc/$PID ]
 do
         sleep 0.2
-    printf "\b${sp:i++%${#sp}:1}"
+    printf "\b%s" ${sp:i++%${#sp}:1}
 done
