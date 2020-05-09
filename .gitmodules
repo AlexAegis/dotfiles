@@ -39,3 +39,7 @@
 	path = modules/sddm/resources/sddm-chili
 	url = https://github.com/Crystalix007/sddm-chili
 	branch = master
+[submodule "modules/emacs/XDG_CONFIG_HOME.emacs/emacs.d"]
+	path = modules/emacs/XDG_CONFIG_HOME.emacs/emacs.d
+	url = https://github.com/hlissner/doom-emacs
+	branch = master
