@@ -148,7 +148,7 @@ guide.
       pacman and network access to install anything else from the installed
       system. But having these others install too can make things easier.
 
-      > `dot` users only have to install `git` manually on top of the
+      > `pont` users only have to install `git` manually on top of the
       > mandatory ones.
       >
       > [`base`](https://www.archlinux.org/packages/core/any/base/) only

@@ -1,6 +1,6 @@
 # Presets
 
-Presets define a set of modules to be installed using `dot`
+Presets define a set of modules to be installed using `pont`
 
 The presets folder will be recursively searched through for `*.preset` files
 

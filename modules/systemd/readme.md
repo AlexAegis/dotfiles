@@ -37,7 +37,7 @@ systemctl --user daemon-reload
 
 Because when watching a folder the only notification `systemd` gets is when
 direct descendant of the folder changes. Which are just symlinks. If the
-symlink itself changes it's okay, so you have to re-run dot on the module
+symlink itself changes it's okay, so you have to re-run `pont` on the module
 to regenerate them (it always force-stows)
 
 > Entr based watchers are capable of this, see the [entr](../entr/) module

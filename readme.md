@@ -1,21 +1,21 @@
 # dotfiles
 
-My dotmodules™, and a live example of [dot](https://github.com/alexaegis/dot)
+My dotmodules™, and a live example of [pont](https://github.com/alexaegis/pont)
 my dotmodule manager.
 
 [![my_stuff](./docs/images/behold_dotfiles.jpg)](https://imgflip.com/i/40ubdj?herp=1589096423404)
 
 ## Install
 
-This dotfiles repository is set up so `dot` is used as a module itself.
-(Which is not necessary to use `dot`)
+This dotfiles repository is set up so `pont` is used as a module itself.
+(Which is not necessary to use `pont`)
 
 This will set up itself:
 
 ```sh
 git clone --recurse-submodules -j8 \
   http://www.github.com/AlexAegis/dotfiles ~/.config/dotfiles
-~/.config/dotfiles/modules/dot/dot.sh dot
+~/.config/dotfiles/modules/pont/pont.sh pont
 ```
 
 If you use different folders than the default, for example, you want to
@@ -24,14 +24,14 @@ then before installing anything, set the `DOTFILES_HOME` variable beforehand.
 
 ```sh
 export DOTFILES_HOME="$HOME/.dotfiles"
-~/.dotfiles/modules/dot/dot.sh dot
+~/.dotfiles/modules/pont/pont.sh pont
 ```
 
-Make sure dots configs are available when you use them, it can't bootstrap
+Make sure pont's configs are available when you use them, it can't bootstrap
 itself if the !
 
 Then install whatever you'd like. For example, to bootstrap an arch system:
 
 ```sh
-dot +arch
+pont +arch
 ```
