@@ -1,7 +1,3 @@
-[submodule "modules/dot"]
-	path = modules/dot
-	url = https://github.com/AlexAegis/dot
-	branch = master
 [submodule ".vscode"]
 	path = .vscode
 	url = https://github.com/AlexAegis/.vscode
