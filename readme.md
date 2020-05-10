@@ -1,9 +1,9 @@
 # dotfiles
 
-My dotmodules™, and a live example of [pont](https://github.com/alexaegis/pont)
-my dotmodule manager.
+My dotmodules™, and a live example of
+[pont](https://github.com/alexaegis/pont), my dotmodule manager.
 
-[![my_stuff](./docs/images/behold_dotfiles.jpg)](https://imgflip.com/i/40ubdj?herp=1589096423404)
+[![my_stuff](./docs/images/behold_dotfiles.jpg)](./modules)
 
 ## Install
 
