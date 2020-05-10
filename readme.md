@@ -3,6 +3,8 @@
 My dotmodules™, and a live example of [dot](https://github.com/alexaegis/dot)
 my dotmodule manager.
 
+[![my_stuff](./docs/images/behold_dotfiles.jpg)](https://imgflip.com/i/40ubdj?herp=1589096423404)
+
 ## Install
 
 This dotfiles repository is set up so `dot` is used as a module itself.
