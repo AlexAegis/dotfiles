@@ -1,3 +1,7 @@
+[submodule "modules/pont"]
+	path = modules/pont
+	url = http://www.github.com/AlexAegis/pont
+	branch = master
 [submodule ".vscode"]
 	path = .vscode
 	url = https://github.com/AlexAegis/.vscode
