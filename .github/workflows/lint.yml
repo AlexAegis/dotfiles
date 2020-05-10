@@ -15,7 +15,6 @@ jobs:
           fetch-depth: 1
       - name: Environment
         run: |
-          echo ::set-env name=WEEK::$(date +%V)
           echo ::set-env name=SUDO_AVAIL::$(if command -v sudo \
             2> /dev/null; then echo 1; fi)
       - name: Update repositories
@@ -29,7 +28,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: shellcheck-stable
-          key: ${{ runner.os }}-shellcheck-${WEEK}
+          key: ${{ runner.os }}-shellcheck
       - name: Install shellcheck download only dependencies
         if: steps.cache-shellcheck.outputs.cache-hit != 'true'
         run: |
