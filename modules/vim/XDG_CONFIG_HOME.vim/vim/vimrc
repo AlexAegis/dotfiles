@@ -377,7 +377,7 @@ set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 """""""""""""
 "" Common
 " set foldmethod=syntax
-" set foldlevelstart=99
+set foldlevelstart=2
 "set nofoldenable	" No fold on launch
 "" Vim
 " Autofolding .vimrc
