@@ -1,0 +1,4 @@
+yay ? [ $pacman ]
+xdg ? [ $pacman ]
+make ? [ $pacman ]
+git ? [ $pacman ]
