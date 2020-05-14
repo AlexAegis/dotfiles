@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cargo update nightly
-cargo update stable
+rustup update nightly
+rustup update stable
