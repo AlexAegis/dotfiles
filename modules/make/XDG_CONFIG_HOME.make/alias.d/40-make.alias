@@ -1,0 +1,4 @@
+#!/bin/sh
+
+alias m="make"
+alias mi="make install"

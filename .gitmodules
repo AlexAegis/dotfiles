@@ -43,3 +43,6 @@
 	path = modules/emacs/XDG_CONFIG_HOME.emacs/emacs.d
 	url = https://github.com/hlissner/doom-emacs
 	branch = master
+[submodule "modules/st/resources/st"]
+	path = modules/st/resources/st
+	url = https://github.com/AlexAegis/st
