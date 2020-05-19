@@ -28,9 +28,10 @@
 	path = modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes
 	url = https://github.com/davatorium/rofi-themes
 	branch = master
-[submodule "modules/picom/resources/compton"]
-	path = modules/picom/resources/compton
-	url = https://github.com/tryone144/compton
+[submodule "modules/picom/resources/picom"]
+	path = modules/picom/resources/picom
+	url = https://github.com/ibhagwan/picom
+	branch = next
 [submodule "modules/yay/resources/yay"]
 	path = modules/yay/resources/yay
 	url = https://aur.archlinux.org/yay.git
@@ -46,3 +47,4 @@
 [submodule "modules/st/resources/st"]
 	path = modules/st/resources/st
 	url = https://github.com/AlexAegis/st
+

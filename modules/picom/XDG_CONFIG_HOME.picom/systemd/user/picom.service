@@ -1,10 +1,10 @@
 [Unit]
-Description=Picom compositor
+Description=Picom compositor fork
 Documentation=man:picom(1)
 PartOf=graphical-session.target
 
 [Service]
-ExecStart=/usr/bin/picom --experimental-backends
+ExecStart=%h/.local/bin/picom --experimental-backends
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 # Try to restart no matter how the process ended
 Restart=always
