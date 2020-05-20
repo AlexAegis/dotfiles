@@ -10,6 +10,8 @@ meson --buildtype=release . build
 
 ninja -C build
 
+echo "Linking built picom from $(pwd)/build/src/picom"
+
 ln -sf \
-	"$DOTFILES_HOME"/modules/picom/resources/compton/build/src/picom \
-	"$HOME"/.local/bin/picom
+	"$(pwd)/build/src/picom" \
+	"${HOME}/.local/bin/picom"
