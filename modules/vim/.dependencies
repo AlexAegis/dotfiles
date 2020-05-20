@@ -1,6 +1,6 @@
 xdg
 curl
 # Node is needed for coc
-fnm
+node
 # For fzf.vim
 fzf
