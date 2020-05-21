@@ -6,13 +6,8 @@ Image viewer
 
 TODO: zsh completions, read the projects readme on gh
 
-## Temporary wallpaper
+## [fehbg](../fehbg)
 
-Set the WALLPAPER variable in systemd then restart the servive.
-You have to trigger a deamon reload to change it back.
-
-```sh
-systemctl --user set-environment WALLPAPER="$XDG_PICTURES_DIR/wallpaper.jpg"
-systemctl --user unset-environment WALLPAPER
-systemctl --user daemon-reload
-```
+There is a separate module dedicated to `feh`'s background setting capability.
+This is to allow other similar programs to clash with it without having to
+give up `feh` as an image viewer.
