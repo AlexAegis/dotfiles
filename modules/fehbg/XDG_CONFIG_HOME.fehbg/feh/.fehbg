@@ -1,3 +1,11 @@
 #!/bin/sh
+
+. "$XDG_CONFIG_HOME/rc.d/common.function.sh"
+
+if [ ! -e "${WALLPAPER}" ] || [ "${WALLPAPER_FORCE_LAST}" ]; then
+	# last_modified_image is defined in the home modules common.function.sh
+	WALLPAPER="$(last_modified_image ${WALLPAPERS_DIR})"
+fi
+
 echo "feh: setting wallpaper to: $WALLPAPER"  | systemd-cat -p info
 feh --no-fehbg --bg-fill "$WALLPAPER"
