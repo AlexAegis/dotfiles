@@ -1,0 +1,14 @@
+[Unit]
+Description=Wal apply wallpaper
+Documentation=man:wal(1)
+After=daemon-reload.service
+PartOf=feh-wallpaper.path
+
+[Service]
+Type=oneshot
+ExecStart=%E/wal/wal.sh
+ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+
+[Install]
+WantedBy=xsession.target
+WantedBy=daemon-reload.service

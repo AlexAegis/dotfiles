@@ -8,6 +8,11 @@ Install plugins
 
 ### [vim-plug](https://github.com/junegunn/vim-plug)
 
+### [wal](../wal)
+
+Wal is an optional dependency of this `vim` module. If installed, and the
+`wal` variable is set, then `vim` will use the global `wal` theme.
+
 ### Fugitive
 
 ## Autoload .vimrc securely
