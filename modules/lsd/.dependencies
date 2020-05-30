@@ -1,1 +1,1 @@
-cargo ? [ ! $pacman ]
+rust ? [ ! $pacman ]
