@@ -10,7 +10,8 @@ if [ ! -e "${WALLPAPER}" ] || [ "${WALLPAPER_FORCE_LAST}" ]; then
 	WALLPAPER="$(last_modified_image "${WALLPAPERS_DIR}")"
 fi
 
-wal --backend haishoku --saturate 0.4 -i "${WALLPAPER}"
+#backends: haishoku colorz
+wal --backend colorz --saturate 0.6 -i "${WALLPAPER}"
 
 # polybar doesn't really want to restart if set wal here, so I poke it
 # manually

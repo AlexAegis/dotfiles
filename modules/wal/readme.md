@@ -15,7 +15,8 @@ Uses `accent = ${xrdb:color4:#222}` as the accent color.
 
 ### [Vim](../vim)
 
-not yet
+If this module is enabled `40-wal.conf` sets a variable named `WAL`. If this
+variable is set, `vim` will load the `wal` theme.
 
 ### [VS Code](../vscode)
 
