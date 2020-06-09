@@ -1,1 +1,2 @@
-sys-arch ? [ $arch ]
+sys-arch ? [ $arch ] # To make sure genfstab is installed.
+# It's in extra/arch-install-scripts
