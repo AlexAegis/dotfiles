@@ -56,3 +56,11 @@
 	path = modules/kakoune/XDG_CONFIG_HOME.kakoune/kak/plugins/plug.kak
 	url = https://github.com/andreyorst/plug.kak
 	branch = master
+[submodule "modules/refind/resources/themes/rEFInd-minimal"]
+	path = modules/refind/resources/themes/rEFInd-minimal
+	url = https://github.com/EvanPurkhiser/rEFInd-minimal
+	branch = master
+[submodule "modules/refind/resources/themes/refind-theme-regular"]
+	path = modules/refind/resources/themes/refind-theme-regular
+	url = https://github.com/bobafetthotmail/refind-theme-regular.git
+	branch = master

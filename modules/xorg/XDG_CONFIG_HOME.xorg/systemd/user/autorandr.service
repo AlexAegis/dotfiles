@@ -1,0 +1,13 @@
+[Unit]
+Description=Autorandr
+Documentation=man:autorandr(1)
+OnFailure=notify-failure@%N.service
+Wants=notify-restart@%N.service
+
+[Service]
+Type=forking
+ExecStart=autorandr
+ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+
+[Install]
+WantedBy=xsession.target
