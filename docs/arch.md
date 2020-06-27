@@ -9,7 +9,7 @@ grouped together at the beginning, up to step 12.
 ## Step by step Installation
 
 This assumes US keyboard layout for the installation. Setting it to your
-preference can wait until the setup is done. If you wan't to do the temporary
+preference can wait until the setup is done. If you want to do the temporary
 keyboard layout change anyway (for passwords it can be useful to use your
 native layout) then check the [set the keyboard layout][guide] section in the
 guide.
