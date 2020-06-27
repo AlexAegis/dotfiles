@@ -1,0 +1,11 @@
+[Unit]
+Description=Udiskie disk manager
+Documentation=man:dunst(1)
+Wants=notify-restart@%N.service
+
+[Service]
+ExecStart=/usr/bin/udiskie --automount --notify --tray
+ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+
+[Install]
+WantedBy=default.target
