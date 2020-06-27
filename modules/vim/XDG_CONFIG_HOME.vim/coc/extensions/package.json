@@ -14,8 +14,8 @@
 		"coc-prettier": ">=1.1.14",
 		"coc-python": ">=1.2.12",
 		"coc-rust-analyzer": ">=0.6.1",
-		"coc-tag": ">=1.2.4",
-		"coc-tsserver": ">=1.5.1",
+		"coc-tag": ">=1.2.5",
+		"coc-tsserver": ">=1.5.2",
 		"coc-word": ">=1.2.2",
 		"coc-yaml": ">=1.0.4"
 	}
