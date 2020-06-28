@@ -46,4 +46,10 @@ guide.
     
 4. Boot into the installed system!
 
+5. Update the system
+
+```sh
+xbps-install -Su # Run this twice! First it will likely update only itself, on a second run it will update everything else!
+```
+
 [guide]: https://docs.voidlinux.org/installation/live-images/guide.html
