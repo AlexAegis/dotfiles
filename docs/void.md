@@ -22,7 +22,7 @@ guide.
 
 2. Create the partitions you want to install to and use. The process is explained in [partitioning.md](./partitioning.md).
 
-    You will need a 512 MB EFI partition!
+    You **will** need a 512 MB EFI partition!
 
 3. Run the void installer, [read the guide for more information on what each section does][guide]
 
@@ -30,9 +30,7 @@ guide.
     
     2. Set up the bootloader   
     
-        > If this is your only installation, select a partition (512MiB) where your bootloader will be installed,
-        > If you already have a bootloader, you may select `none`, and later manually add void as a bootable entry.
-        > If you use already use refind, just select none, it will find it.
+        Select the disk where the EFI partition is
     
     2. Set root password
     
@@ -40,23 +38,12 @@ guide.
     
     4. Set hostname
     
-    5. Set up mount points in the Partition menu
+    5. Set up mount points in the Partition menu, the efi partition goes to `/boot/efi`!
     
     6. Verify settings using the 'Settings' menu (Userpassword will be visible, root not)
     
     7. Run Install
     
-    8. If you did setup the bootloader with `none`, you can set up an efistub boot entry and boot directly into Void
-    
-        ```
-        sudo efibootmgr --disk /dev/sdX --part Y --create --label "Void" --loader /vmlinuz-linux --unicode "root=PARTUUID=$(sudo blkid /dev/sdXX) resume=PARTUUID=$(sudo blkid /dev/sdXX) rw initrd=\initramfs-linux.img" --verbose
-        ```
-
-        Where `--disk` points to the device where the efi partition is, `--part` is the number of that partition. In the `--unicode` section, root should point to the `root` partition, and `resume` to the `swap` partition. `--loader` and `initrd` might have to be renamed, check the `/boot` folder on the root partition to see these. 
-        
-        > If you are `root` then `sudo` is not necessary, but if you are not, don't forget to use it in the subshells too, otherwise empty results will be used.
-        
-        > If you added some bad entries you can delete them using `sudo efibootmgr -b 000X -B` where `000X` is the number of the boot entry. Run `efibootmgr` to list the entries.
-    
+4. Boot into the installed system!
 
 [guide]: https://docs.voidlinux.org/installation/live-images/guide.html
