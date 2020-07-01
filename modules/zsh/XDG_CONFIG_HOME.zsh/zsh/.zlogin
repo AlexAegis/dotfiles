@@ -9,4 +9,4 @@ if [ "$TERM" = "linux" ]; then
 fi
 
 # Welcome
-[ $(command -v neofetch) ] && neofetch
+command -v neofetch > /dev/null && neofetch
