@@ -1,3 +1,4 @@
 # In this case circular dependencies should be avoided
 # to make sure the necessary folders are present, especially
 # on a fresh system
+stow
