@@ -14,3 +14,6 @@ _deps
 
 # logfiles
 *.log
+
+# Vim
+*.un~
