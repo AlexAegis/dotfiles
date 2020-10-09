@@ -8,6 +8,6 @@ Modal text editor inspired by vim
 
 ## [Plugins](https://kakoune.org/plugins.html)
 
-### [plug.kak](https://github.com/andreyorst/plug.kak)
+### [plug.kak](https://github.com/robertmeta/plug.kak)
 
 Plugin manager

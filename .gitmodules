@@ -48,13 +48,9 @@
 	path = modules/st/resources/st
 	url = https://github.com/AlexAegis/st
 	branch = master
-[submodule "modules/kakoune/resources/plug.kak"]
-	path = modules/kakoune/resources/plug.kak
-	url = https://github.com/andreyorst/plug.kak
-	branch = master
 [submodule "modules/kakoune/XDG_CONFIG_HOME.kakoune/kak/plugins/plug.kak"]
 	path = modules/kakoune/XDG_CONFIG_HOME.kakoune/kak/plugins/plug.kak
-	url = https://github.com/andreyorst/plug.kak
+	url = https://github.com/robertmeta/plug.kak
 	branch = master
 [submodule "modules/refind/resources/themes/rEFInd-minimal"]
 	path = modules/refind/resources/themes/rEFInd-minimal
