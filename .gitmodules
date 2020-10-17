@@ -60,3 +60,6 @@
 	path = modules/refind/resources/themes/refind-theme-regular
 	url = https://github.com/bobafetthotmail/refind-theme-regular.git
 	branch = master
+[submodule "modules/pass/resources/pass-git-helper"]
+	path = modules/pass/resources/pass-git-helper
+	url = https://github.com/languitar/pass-git-helper

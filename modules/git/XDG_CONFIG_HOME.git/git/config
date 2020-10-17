@@ -1,6 +1,6 @@
 [include]
-    path = ./gitconfig.d/credential-helper.gitconfig
-    path = ./gitconfig.d/wsl-credential-helper.gitconfig
+    path = gitconfig.d/wsl-credential-helper.gitconfig
+    path = gitconfig.d/credential-helper.gitconfig
 
 [user]
 	name = AlexAegis

@@ -1,6 +1,7 @@
 #!/bin/sh
 
-ORIGIN="https://AlexAegis@github.com/AlexAegis/.password-store.git" \
-	pass-install
-
-# git config --global credential.helper /usr/bin/pass-git-helper
+# shellcheck disable=SC2154
+if [ ! "$pacman" ]; then
+	cd ./resources/pass-git-helper/ || exit 1
+	python3 setup.py install --user
+fi

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt install -y pass pass-git-helper
+apt install -y pass

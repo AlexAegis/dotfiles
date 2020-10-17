@@ -2,3 +2,4 @@ xdg
 git
 ssh
 systemd ? [ $systemd ]
+python ? [ ! $pacman ]
