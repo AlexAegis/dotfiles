@@ -15,6 +15,9 @@
 [push]
 	default = upstream
 
+[pull]
+	ff = only
+
 [alias]
 	ci = commit -v
 	co = checkout
