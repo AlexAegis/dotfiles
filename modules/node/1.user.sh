@@ -6,7 +6,5 @@
 # But it's useful to have the env script here so other modules that need node
 # can rely on it being enabled by fnm
 
-fnm install latest
-fnm install latest-v12.x
-fnm install latest-v10.x
-fnm use latest
+fnm install lts-latest
+fnm use lts-latest
