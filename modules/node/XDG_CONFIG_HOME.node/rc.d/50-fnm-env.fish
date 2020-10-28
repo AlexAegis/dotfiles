@@ -1,3 +1,3 @@
 #!/bin/fish
 
-fnm env --multi | source
+fnm env | source

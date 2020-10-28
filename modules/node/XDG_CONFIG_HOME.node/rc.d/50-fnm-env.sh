@@ -1,3 +1,3 @@
 #!/bin/sh
 
-command -v fnm > /dev/null && eval "$(fnm env --multi)"
+command -v fnm > /dev/null && eval "$(fnm env)"
