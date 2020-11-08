@@ -2,7 +2,26 @@
 
 > [Arch Wiki](https://wiki.archlinux.org/index.php/Ruby)
 
+## [rbenv](https://github.com/rbenv/rbenv)
+
+Simple ruby version switcher
+
+### [Ruby Build](https://github.com/rbenv/ruby-build#installation)
+
+As a plugin to rbenv, it can install ruby versions
+
+### Rbenv doctor
+
+This script will check your environment to determine if everything is set up
+correctly or not.
+
+```sh
+curl -fsSL https://github.com/rbenv/rbenv-installer/raw/master/bin/rbenv-doctor | bash
+```
+
 ## [RVM](https://wiki.archlinux.org/index.php/RVM)
+
+> Switched to rbenv
 
 To use rvm, the user must be in the `rvm` group.
 
@@ -14,6 +33,3 @@ You can just invoke a login shell:
 ```sh
 exec su -l "$USER"
 ```
-
-TODO: make it respect rvm_path
-TODO: solve the group restriction on rvm when installing to instantly use it
