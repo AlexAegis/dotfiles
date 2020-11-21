@@ -1,7 +1,5 @@
 xdg
-# for fallback setup `bash` is needed
+# for fallback setup `bash`, `curl` and `unzip` is needed
 bash
-# for fallback setup `curl` is needed
 curl
-# for fallback setup `unzip` is needed
 zip
