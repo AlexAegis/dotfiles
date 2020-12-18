@@ -15,8 +15,8 @@ jobs:
           fetch-depth: 1
       - name: Environment
         run: |
-          echo ::set-env name=SUDO_AVAIL::$(if command -v sudo \
-            2> /dev/null; then echo 1; fi)
+          SUDO_AVAIL=$(if command -v sudo > /dev/null; then echo 1; fi)
+          echo "SUDO_AVAIL=$SUDO_AVAIL" >> $GITHUB_ENV
       - name: Update repositories
         run: |
           ${SUDO_AVAIL:+sudo} apt-get update
