@@ -12,7 +12,7 @@
 	branch = master
 [submodule "modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad"]
 	path = modules/doom/XDG_CONFIG_HOME.doom/gzdoom/iwad
-	url = https://github.com/dgeng/iwad.git
+	url = https://github.com/Electric1447/iwad
 	branch = master
 	ignore = dirty
 [submodule "modules/powerline/XDG_CONFIG_HOME.powerline/powerline/fonts"]
