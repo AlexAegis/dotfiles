@@ -21,11 +21,6 @@ If this module is changed in this aspect, you have to manually change that.
 
 ## Notes
 
-The `user-dirs.dirs` file was made available to the general environment
-by creating a symlink in the `environtment.d` folder
-
-```sh
-ln -s ../user-dirs.dirs xdg-user-dirs.env
-```
-
-TODO: Systemd runtime cleanup on logout shutdown and restart
+See also [xdg-user](../xdg-user) for configurations of folders like `music`,
+`documents` and such. This module is intended to provide the bare minimum of
+XDG configuration as a lot of other modules depend on it.

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 # TODO: set GPU_MANUFACTURER env variable to NVIDIA or AMD and install packages
 # here based on that
