@@ -60,14 +60,15 @@ git clone --recurse-submodules -j8 \
 
 The default `DOTFILES_HOME` location is not applicable on windows so you must
 override it. You can invoke `PowerShell` from `Git Bash`.
+The path has to be defined as it appears from `Git Bash`.
 
 > Still from `Git Bash`
 
 ```sh
-powershell '[Environment]::SetEnvironmentVariable(
-  "DOTFILES_HOME",
-  [Environment]::GetFolderPath([Environment+SpecialFolder]::ApplicationData) + "\dotfiles",
-  [EnvironmentVariableTarget]::User)'
+powershell "[Environment]::SetEnvironmentVariable(
+  'DOTFILES_HOME',
+  '$HOME/AppData/Roaming/dotfiles',
+  [EnvironmentVariableTarget]::User)"
 ```
 
 Then have pont setup itself:
