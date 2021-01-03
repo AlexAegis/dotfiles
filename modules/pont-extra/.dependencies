@@ -1,0 +1,7 @@
+pont
+
+# an XDG module which provides XDG locations of your choice
+# This is where `pont` user level symlink will be stowed to
+xdg
+# stow, to let itself be stowed in the first place
+stow
