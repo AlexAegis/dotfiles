@@ -4,4 +4,4 @@
 # to load necessary environment variables.
 
 # shellcheck disable=SC1091
-. "./XDG_CONFIG_HOME.pont/environment.d/90-pont.conf"
+. "./XDG_CONFIG_HOME.pont-extra/environment.d/90-pont.conf"
