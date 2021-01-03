@@ -44,6 +44,11 @@ pont +arch
 From a POSIX compatibility layer `pont` is usable. To reduce the required
 complexity of mixed os modules, `pont` by default does not run `*.sh`
 scripts and only invokes `*.ps1` PowerShell scripts on these environments.
+Stowing is also disabled as it's not available. You have to write custom
+PowerShells scripts to have this functionality.
+
+It also has to be run manually run from an elevated environment as it cannot
+switch from inside (`sudo` is not available)
 
 ### Setup
 
@@ -51,7 +56,7 @@ First install [Git for Windows](https://git-scm.com/download/win).
 You will need this to clone the `dotfiles` repository and it provides you a
 `MINGW64` environment to run `pont` in.
 
-> From `Git Bash`
+> From administrator `Git Bash`
 
 ```sh
 git clone --recurse-submodules -j8 \
@@ -61,14 +66,15 @@ git clone --recurse-submodules -j8 \
 The default `DOTFILES_HOME` location is not applicable on windows so you must
 override it. You can invoke `PowerShell` from `Git Bash`.
 The path has to be defined as it appears from `Git Bash`.
+The environment variable has to be system wide
 
-> Still from `Git Bash`
+> Still from administrator `Git Bash`
 
 ```sh
 powershell "[Environment]::SetEnvironmentVariable(
   'DOTFILES_HOME',
   '$HOME/AppData/Roaming/dotfiles',
-  [EnvironmentVariableTarget]::User)"
+  [EnvironmentVariableTarget]::Machine)"
 ```
 
 Then have pont setup itself:
