@@ -15,10 +15,10 @@ if ! [ "$ORIGIN" ]; then
 	# No origin file, do local setup
 	echo "Origin file is missing, creating a local store instead of cloning one"
 	echo "If you want to clone instead, revert this script by removing the\
-~/.password-store folder"
+$PASSWORD_STORE_DIR folder"
 	mkdir -p "$PASSWORD_STORE_DIR"
 
-	echo "Creating a fresh gpg key "
+	echo "Creating a fresh gpg key"
 
 	gengpg "Pass"
 

@@ -1,5 +1,6 @@
 xdg
 git
 ssh
+gnupg
 systemd ? [ $systemd ]
 python ? [ ! $pacman ]
