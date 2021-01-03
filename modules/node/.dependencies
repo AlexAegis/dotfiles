@@ -3,3 +3,4 @@ xdg
 bash
 curl
 zip
+chocolatey ? [ $windows ]

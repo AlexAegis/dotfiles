@@ -38,3 +38,46 @@ Then install whatever you'd like. For example, to bootstrap an arch system:
 ```sh
 pont +arch
 ```
+
+## On Windows
+
+From a POSIX compatibility layer `pont` is usable. To reduce the required
+complexity of mixed os modules, `pont` by default does not run `*.sh`
+scripts and only invokes `*.ps1` PowerShell scripts on these environments.
+
+### Setup
+
+First install [Git for Windows](https://git-scm.com/download/win).
+You will need this to clone the `dotfiles` repository and it provides you a
+`MINGW64` environment to run `pont` in.
+
+> From `Git Bash`
+
+```sh
+git clone --recurse-submodules -j8 \
+  http://www.github.com/AlexAegis/dotfiles ~/AppData/Roaming/dotfiles
+```
+
+The default `DOTFILES_HOME` location is not applicable on windows so you must
+override it. You can invoke `PowerShell` from `Git Bash`.
+
+> Still from `Git Bash`
+
+```sh
+powershell '[Environment]::SetEnvironmentVariable(
+  "DOTFILES_HOME",
+  [Environment]::GetFolderPath([Environment+SpecialFolder]::ApplicationData) + "\dotfiles",
+  [EnvironmentVariableTarget]::User)'
+```
+
+Then have pont setup itself:
+
+```sh
+~/AppData/Roaming/dotfiles/modules/pont/pont.sh pont
+```
+
+After this you can use `pont`. Installing the `windows` preset:
+
+```sh
+pont +windows
+```
