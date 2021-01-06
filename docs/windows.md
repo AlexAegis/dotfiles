@@ -96,9 +96,17 @@ Tick in `Let me use a different input method for each app window`
 
 ### [VLC](https://www.videolan.org/vlc/)
 
+```ps1
+choco install vlc -y
+```
+
 ### [HEVC Video Codecs](https://www.microsoft.com/en-us/p/hevc-video-extensions/9nmzlz57r3t7)
 
 ### [Plex Media Server](https://www.plex.tv/media-server-downloads/#plex-app)
+
+```ps1
+choco install plexmediaserver -y
+```
 
 ## Gaming
 
