@@ -92,6 +92,14 @@ Tick in `Let me use a different input method for each app window`
 
 ### [VoiceMeeter Banana](https://vb-audio.com/Voicemeeter/banana.htm)
 
+## Video
+
+### [VLC](https://www.videolan.org/vlc/)
+
+### [HEVC Video Codecs](https://www.microsoft.com/en-us/p/hevc-video-extensions/9nmzlz57r3t7)
+
+### [Plex Media Server](https://www.plex.tv/media-server-downloads/#plex-app)
+
 ## Gaming
 
 ### [Steam](https://store.steampowered.com/)
