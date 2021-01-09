@@ -5,4 +5,4 @@
 # Making sure the 'wheel' group exists
 groupadd --force wheel
 # append the 'wheel' group to the user
-usermod -aG wheel "$USER"
+usermod -aG wheel "${SUDO_USER-$USER}"
