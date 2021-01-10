@@ -5,4 +5,3 @@ git clone https://github.com/momo-lab/pyenv-install-latest.git \
 
 # shellcheck disable=SC1091
 . './u.user.sh'
-
