@@ -38,6 +38,12 @@ choco install nodejs -y
 choco install python -y
 ```
 
+### [7zip](https://www.7-zip.org/)
+
+```ps1
+choco install 7zip -y
+```
+
 ### [qBittorrent](https://www.qbittorrent.org/)
 
 ```ps1
