@@ -3,3 +3,5 @@ sys-arch ? [ $arch ]
 sys-ubuntu ? [ $ubuntu ]
 sys-void ? [ $void ]
 nerdfonts
+grep
+sed
