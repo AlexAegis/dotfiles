@@ -29,6 +29,7 @@ endif
 let mapleader=' '
 let maplocalleader=' '
 set undofile
+set visualbell					" Silence
 set updatetime=100				" Default is 4000
 set number relativenumber		" Gutter numbers
 set splitbelow splitright		" Order of window splitting
