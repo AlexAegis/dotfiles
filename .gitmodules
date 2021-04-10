@@ -63,3 +63,6 @@
 [submodule "modules/pass/resources/pass-git-helper"]
 	path = modules/pass/resources/pass-git-helper
 	url = https://github.com/languitar/pass-git-helper
+[submodule "modules/windows-terminal/resources/windows-terminal-shaders"]
+	path = modules/windows-terminal/resources/windows-terminal-shaders
+	url = https://github.com/Hammster/windows-terminal-shaders
