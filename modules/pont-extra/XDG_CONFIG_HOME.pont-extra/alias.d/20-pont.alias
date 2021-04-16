@@ -1,6 +1,7 @@
 #!/bin/sh
 
 alias cdot='cd $DOTFILES_HOME'
+alias codot='code $DOTFILES_HOME'
 alias pontpull="pont -p" # Pull dotfiles home
 alias pontup="pont -iu" # Update all installed
 alias pontre="pont -ox" # Re-execute outdated ones
