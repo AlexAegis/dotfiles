@@ -1,2 +1,0 @@
-# Enable the architectures keyword, for example ~amd64
-*/* ~$(portageq envvar ARCH)

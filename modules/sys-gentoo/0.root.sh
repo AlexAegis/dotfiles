@@ -27,3 +27,6 @@ folderify /etc/portage/package.use
 # Install make conf and other default portage files
 # shellcheck disable=SC1091
 ./XDG_BIN_HOME.sys-gentoo/install-portage-config.sh
+
+echo "*/* ~$(portageq envvar ARCH)" > \
+	/etc/portage/package.accept_keywords/10-architecture
