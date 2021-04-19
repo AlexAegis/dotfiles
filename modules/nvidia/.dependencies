@@ -1,2 +1,3 @@
 xdg
 chocolatey ? [ $windows ]
+sys-gentoo ? [ $gentoo ] # portage install
