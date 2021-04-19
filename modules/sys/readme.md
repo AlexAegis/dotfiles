@@ -1,5 +1,4 @@
 # sys
 
-Junction module, it only contains conditional dependencies
-
-TODO: Mention this in the docs
+Various common system configurations. It also automatically install system
+specific modules because it depends on them conditionally.
