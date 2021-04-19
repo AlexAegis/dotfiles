@@ -1,0 +1,6 @@
+# Global pulseaudio flag
+*/* pulseaudio
+# Pulseaudio
+media-video/pulseaudio bluetooth dbus alsa alsa-plugin X asyncns elogind equalizer gconf glib gtk ipv6 libsamplerate orc qt5 realtime udev webrtx-aec
+# required by media-sound/pulseaudio-13.0-r1::gentoo[alsa,alsa-plugin]
+>=media-plugins/alsa-plugins-1.2.2 pulseaudio

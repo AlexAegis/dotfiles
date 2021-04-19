@@ -1,0 +1,1 @@
+sys-gentoo ? [ $gentoo ] # portage install
