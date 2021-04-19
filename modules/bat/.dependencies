@@ -1,2 +1,2 @@
 # apt is not here because it can fail on older ubuntu version
-rust ? [ ! $pacman ]
+rust ? [ ! $pacman ] && [ ! $emerge ]
