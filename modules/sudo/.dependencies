@@ -1,1 +1,3 @@
-xdg
+# This module should not have any dependencies as other dependencies are most
+# likely to depend on sudo itself. Check the `sudo-extra` module for
+# additional configurations that do utilize other dependencies.

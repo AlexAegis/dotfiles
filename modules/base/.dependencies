@@ -1,2 +1,5 @@
 # This module is always selected, anything that's listed here will be installed
 # before this, like in the case of any other modules
+sudo
+tar
+stow

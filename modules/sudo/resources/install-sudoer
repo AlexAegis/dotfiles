@@ -1,8 +1,9 @@
 #!/bin/sh
 
-# Only install it if it's correct
+# Only install it if it's correct, visudo basically "lints" the file for us
+# visudo is installed alongside sudo
 if [ -z "$(sudo visudo -c -q -f "$1")" ]; then
-	echo "Installing "$1" to /etc/sudoers.d/"
+	echo "Installing $1 to /etc/sudoers.d/"
 	install --owner=root \
 		--group=root \
 		--mode=440 "$1" /etc/sudoers.d/

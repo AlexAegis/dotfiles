@@ -8,7 +8,7 @@
 ## Failure to use 'visudo' won't result in syntax or file permission errors
 ## that prevent sudo from running because these are handled in the install.
 ##
-## See the 0.root.sh file for the details on why.
+## See the 1.root.sh file for the details on why.
 ##
 
 %wheel ALL=(ALL) NOPASSWD: ALL
