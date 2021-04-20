@@ -1,1 +1,2 @@
 xdg
+sys-gentoo ? [ $gentoo ] # portage install
