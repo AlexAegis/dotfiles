@@ -1,11 +1,14 @@
 #!/bin/sh
 
+# shellcheck disable=SC1091
+. "./XDG_CONFIG_HOME.python/rc.d/pyenv.sh"
+
 # Use the install latest plugin, answer no if it asks to reinstall the same
 # version
 echo n | pyenv install-latest
 
 # Set global version to the latest
-pyenv versions | tail -n 1 | sed 's/^ *//g' > "$(pyenv root)"/version
+pyenv versions | tail -n 1 | sed 's/^ *//g' > "$(pyenv root)"/versions
 
 # Upgrade pip
 pip install --upgrade pip
