@@ -1,1 +1,1 @@
-rust ? [ ! $pacman ]
+rust ? [ ! $pacman ] && [ ! $emerge ]
