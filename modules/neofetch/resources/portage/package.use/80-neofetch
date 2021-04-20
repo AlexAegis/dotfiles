@@ -1,0 +1,3 @@
+# required by app-misc/neofetch-7.1.0::gentoo[X]
+# required by app-misc/neofetch (argument)
+>=www-client/w3m-0.5.3_p20190105 imlib
