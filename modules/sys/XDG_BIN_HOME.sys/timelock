@@ -9,30 +9,82 @@
 
 TIMELOCKFILE_EXTENSION='timelock'
 TIMELOCK_DIR="${TIMELOCK_DIR:-$XDG_CACHE_HOME/timelock}"
+TIMELOCK_LOG_LEVEL=1
 timelock_name=''
-timelock_duration=''
+timelock_duration_or_human_readable=''
 mode='set' # 'set' | 'remove' | 'check'
+
+
+# C_RESET='\033[0m'
+# C_RED='\033[0;31m'
+# C_GREEN='\033[0;32m'
+# C_YELLOW='\033[0;33m'
+# C_BLUE='\033[0;34m'
+# C_CYAN='\033[0;36m'
+
+
+
+
+log_trace() {
+	# Visible at and under log level 0
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 0 ] && \
+		echo "${C_CYAN}[  Trace  ]: $*${C_RESET}" >&2
+}
+
+log_info() {
+	# Visible at and under log level 1
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 1 ] && \
+		echo "${C_BLUE}[  Info   ]: $*${C_RESET}" >&2
+}
+
+log_warning() {
+	# Visible at and under log level 2
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 2 ] && \
+		echo "${C_YELLOW}[ Warning ]: $*${C_RESET}" >&2
+}
+
+log_success() {
+	# Visible at and under log level 2, same as warning but green
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 2 ] && \
+		echo "${C_GREEN}[ Success ]: $*${C_RESET}" >&2
+}
+
+log_error() {
+	# Visible at and under log level 3
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 3 ] && \
+		echo "${C_RED}[  Error  ]: $*${C_RESET}" >&2
+}
+
+obfuscate_directory() {
+	if [ "${1##$HOME}" = "${1}" ]; then
+		echo "$1"
+	else
+		echo "~${1##$HOME}"
+	fi
+}
 
 show_help() {
 	echo "$(show_version)
+Usage: timelock [OPTION]... (NAME) (DURATION)
 
 This script is meant to debounce execution of other scripts. It just saves an
 expiration date to a named file.
 
-# Debounce execution to once a minute
-if timelock X; then
-	X
-	timelock X 60
-fi
+	# Debounce execution to once a minute
+	if timelock X; then
+		X
+		timelock X 60
+	fi
 
-Usage: timelock [OPTION]... NAME (DURATION)
 
-NAME is mandatory, and describe the lock to operate on.
+
+NAME describes the lock to operate on. If not present then it will list all
+locks and their status
 If DURATION is provided a lock will be created, expiring
-in DURATION seconds.
+in DURATION seconds or whatever date interprets it if it's not a number.
 If DURATION is not provided, it will check if the timelock is expired or not,
 returning 1 if NOT expired, and 0 if expired.
-Locks are located in $TIMELOCK_DIR
+Locks are located in $(obfuscate_directory "$TIMELOCK_DIR")
 
 -h, --help                    -- Print information on usage and flags then
                                  exit
@@ -49,48 +101,95 @@ show_version() {
 }
 
 parse_args() {
-	/usr/bin/getopt -u -o "hVfrR\
-" -l "help,version,force,remove,remove-all-expired\
+	IFS='
+'
+	/usr/bin/getopt -o "hVlvq\
+pfrR\
+\
+" -l "help,version,log,log-level,verbose,quiet,\
+print,force,remove,remove-all-expired\
+\
 " -- "$@" || exit 1
 }
 
 interpret_args() {
-	IFS='
-'
+	# Not a perfect solution on keeping the quotes intact, spaces inside it
+	# will still be crunched by getopt
+	log_trace 'interpret' "$@"
+	IFS=' '
 	arg_pos=0
-	while :; do
-		[ "$1" ] || break
-		case $1 in
+	while [ "$1" ]; do
+		log_trace "Arg fragment $1"
+		if [ ! "$1" = "${1#\'}" ] && [ ! "$1" = "${1%\'}" ]; then
+			# starts end ends with quote
+			arg="${1%\'}"
+			arg="${arg#\'}"
+		elif [ ! "$1" = "${1#\'}" ]; then
+			# starts with but does not end with
+			arg="${1#\'}"
+			shift
+			continue
+		elif [ ! "$1" = "${1%\'}" ]; then
+			# ends but not starts with a quote
+			arg="$arg ${1%\'}"
+		elif [ "$arg" ]; then
+			# middle character, just prepend
+			arg="$arg $1"
+			shift
+			continue
+		else
+			# non quoted
+			arg="$1"
+		fi
+		log_trace "Arg $arg"
+
+		case $arg in
 			-h | -\? | --help) show_help ;;
 			-V | --version) show_version ;;
+			-l | --log | --log-level)
+				case $2 in
+					'trace' | 'TRACE' | '0') TIMELOCK_LOG_LEVEL='0' ;;
+					'info' | 'INFO' | '1') TIMELOCK_LOG_LEVEL='1' ;;
+					'warning' | 'WARNING' | '2') TIMELOCK_LOG_LEVEL='2' ;;
+					'success' | 'SUCCESS') TIMELOCK_LOG_LEVEL='2' ;;
+					'error' | 'ERROR' | '3') TIMELOCK_LOG_LEVEL='3' ;;
+					'none' | 'NONE' | '4') TIMELOCK_LOG_LEVEL='4' ;;
+					*) log_error "Invalid loglevel: $2"; exit 1 ;;
+				esac
+				shift
+				;;
+			-v | --verbose)	TIMELOCK_LOG_LEVEL=0 ;; # Log level trace
+			-q | --quiet) TIMELOCK_LOG_LEVEL=3 ;; # Log level error
 			-r | --remove) mode='remove' ;;
 			-R | --remove-all-expired) mode='remove-all-expired' ;;
 			-f | --force) force='1' ;;
+			-p | --print) print='1' ;;
 			--)	;;
-			-?*) log_error "Unknown option (ignored): $1";;
+			-?*) log_error "Unknown option (ignored): $arg";;
 			*) # The rest are positional arguments
 				arg_pos=$(( arg_pos + 1 ))
 				case $arg_pos in
 					1)
-						timelock_name=$1;
-						timelock_file="$TIMELOCK_DIR/$1.$TIMELOCKFILE_EXTENSION"
-						if [ ! $force ] && \
-						   	[ ! "$mode" = "remove" ] && \
-						    [ -e "$timelock_file" ] && \
-							! timelock_check ; then
-							echo "Lock $1 already exists and is not expired"
+						timelock_name=$arg;
+						timelock_file="$TIMELOCK_DIR/$arg.$TIMELOCKFILE_EXTENSION"
+						;;
+					2)
+						timelock_duration_or_human_readable="$arg";
+						if test "$timelock_duration_or_human_readable" -ge '0' 2>/dev/null; then
+							now=$(date_now)
+							timelock_end="$(( "$now" + "$timelock_duration_or_human_readable" ))";
+						elif timelock_end=$(date --date="$timelock_duration_or_human_readable" +%s 2>/dev/null); then
+							timelock_comment="$arg"
+						else
+							log_error "duration is not a number or not a human readable string: $arg"
 							exit 1
 						fi
 						;;
-					2)
-						if [ ! "$1" -ge 0 ]; then
-							echo "time is not a positive number"; exit 1
-						fi
-						timelock_duration="$1";;
-					*) echo 'Excess positional arguments'; exit 1;;
+					*) log_error 'Excess positional arguments'; exit 1;;
 				esac
 				;;
 		esac
+		arg=''
 		shift
 	done
 }
@@ -100,9 +199,15 @@ date_now() {
 }
 
 timelock_check() {
+	log_trace "timelock_check $*"
 	timelock_file="${2:-$TIMELOCK_DIR/$1.$TIMELOCKFILE_EXTENSION}"
+	log_trace "Check $1 at $timelock_file"
+	expiration_date="$(sed '3q;d' "$timelock_file")" # teleport as much as you like
+	if [ "$print" ]; then
+		date -d@"$expiration_date"
+	fi
 	if [ ! -e "$timelock_file" ] \
-		|| [ "$(date +%s)" -gt "$(sed '3q;d' "$timelock_file")" ]; then
+		|| [ "$(date +%s)" -gt "$expiration_date" ]; then
 		return 0
 	else
 		return 1
@@ -110,6 +215,7 @@ timelock_check() {
 }
 
 timelock_check_exit() {
+	log_trace "timelock_check_exit $*"
 	if timelock_check "$1"; then
 		exit 0
 	else
@@ -118,6 +224,9 @@ timelock_check_exit() {
 }
 
 timelock_set() {
+	# $1 lock name
+	# $2 lock expiration date
+	# $3 lock comment
 	timelock_file="$TIMELOCK_DIR/$1.$TIMELOCKFILE_EXTENSION"
 
 	if [ ! -d "$TIMELOCK_DIR" ]; then
@@ -125,11 +234,11 @@ timelock_set() {
 	fi
 	if [ "$force" ] || timelock_check "$1"; then
 		now=$(date_now)
-		expiration=$(( "$now" + "$2" ))
-		printf '%s\n%s\n%s' "$now" "$2" "$expiration" > "$timelock_file"
+		duration=$(( "$2" - "$now" ))
+		log_trace "creating lock"
+		printf '%s\n%s\n%s\n%s' "$now" "$duration" "$2" "$3" > "$timelock_file"
 	else
-		echo "Can't set non-expired lock unless forced." >&2
-		exit 1
+		log_error "Can't set non-expired lock unless forced."; exit 1
 	fi
 }
 
@@ -152,33 +261,48 @@ timelock_get_lockname_from_filename() {
 }
 
 timelock_list() {
-	for file in "$TIMELOCK_DIR"/*."$TIMELOCKFILE_EXTENSION"; do
+	find "$TIMELOCK_DIR" -mindepth 0 -maxdepth 1 -type f  -name "*.$TIMELOCKFILE_EXTENSION" |
+    while IFS= read -r file; do
+		log_trace "Listing $file"
 		set_time="$(sed '1q;d' "$file")"
 		set_time_date="$(date -d@"$set_time")"
 		duration="$(sed '2q;d' "$file")"
 		expiration_time="$(sed '3q;d' "$file")"
 		expiration_time_date="$(date -d@"$expiration_time")"
+		comment="$(sed '4q;d' "$file")"
 		if timelock_check "x" "$file"; then
 			expired_message="yes"
 		else
 			expired_message="no"
 		fi
-		printf "%s\texpired? %s\texpiration date: %s\tduration: %s\tset date: %s\n" \
+		printf "%s\texpired? %s\texpiration date: %s\tduration: %s\tset date: %s\t%s\n" \
 			"$(timelock_get_lockname_from_filename "$file")" \
 			"$expired_message" \
 			"$expiration_time_date" \
 			"$duration" \
-			"$set_time_date"
+			"$set_time_date" \
+			"$comment"
 	done
+
 }
 
-## Execution
+# Execution
+# ewline_args=''
+# hile [ "$1" ]; do
+# 	if [ "$newline_args" ]; then
+# 		newline_args="$newline_args
+# 1"
+# 	else
+# 		newline_args="$1"
+# 	fi
+# 	shift
+# one
 
 IFS=' '
-# shellcheck disable=SC2046
+# shellcheck disable=2046
 interpret_args $(parse_args "$@")
 
-if [ ! "$mode" = "remove-all-expired" ] && [ ! "$timelock_duration" ]; then
+if [ ! "$mode" = "remove-all-expired" ] && [ ! "$timelock_duration_or_human_readable" ]; then
 	mode='check'
 fi
 
@@ -186,9 +310,11 @@ if [ ! "$mode" = "remove-all-expired" ] && [ ! "$timelock_name" ]; then
 	mode='list'
 fi
 
+log_trace 'mode' $mode
+
 case $mode in
 	'list') timelock_list ;;
-	'set') timelock_set "$timelock_name" "$timelock_duration" ;;
+	'set') timelock_set "$timelock_name" "$timelock_end" "$timelock_comment" ;;
 	'check') timelock_check_exit "$timelock_name" ;;
 	'remove') timelock_remove "$timelock_file" ;;
 	'remove-all-expired') timelock_remove_all_expired ;;
