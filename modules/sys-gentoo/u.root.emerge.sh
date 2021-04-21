@@ -1,5 +1,5 @@
 #!/bin/sh
 
 emerge --sync
-emaint sync -R # Sync all repositories
+emaint sync -A # Sync all repositories
 emerge --update --changed-use --deep @world
