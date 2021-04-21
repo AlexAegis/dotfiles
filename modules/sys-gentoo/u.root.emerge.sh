@@ -11,5 +11,3 @@ else
 fi
 emerge --update --changed-use --deep @world
 emerge --depclean
-
-# shellcheck disable=SC1073 disable=SC1072 disable=SC1140 disable=SC1050
