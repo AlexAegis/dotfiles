@@ -2,3 +2,4 @@
 
 # TODO: Add flags
 alias nf="neofetch"
+alias clnf="clear && nf"
