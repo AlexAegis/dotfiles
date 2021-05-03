@@ -2,5 +2,5 @@
 
 add-apt-repository universe
 
-apt update -y
-apt upgrade -y
+# shellcheck disable=SC1091
+./u.root.apt.sh
