@@ -1,6 +1,8 @@
-# [xdg](https://wiki.archlinux.org/index.php/XDG_Base_Directory)
+# [xdg](https://specifications.freedesktop.org/basedir-spec/latest/)
 
-[Freedesktop Basedir Specification](https://specifications.freedesktop.org/basedir-spec/latest/)
+Freedesktop Basedir Specification
+
+> [Arch Wiki](https://wiki.archlinux.org/index.php/XDG_Base_Directory)
 
 This module contains the XDG variable definitions
 
