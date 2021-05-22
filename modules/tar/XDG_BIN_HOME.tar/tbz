@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# target filename, automatic extension, wether or not it's provided
+TARGET_FILE="${1%%.tar.bz2}.tar.bz2"
+SOURCE="${2:-$1}"
+
+if [ -z "$1" ]; then
+	echo "Provide target file" >&2
+	exit 1
+fi
+
+if [ -e "$TARGET_FILE" ]; then
+	echo "Target file already exists" >&2
+	exit 1
+fi
+
+if ! [ -e "$SOURCE" ]; then
+	echo "Source does not exists" >&2
+	exit 1
+fi
+
+tar cfj "$TARGET_FILE" "$SOURCE"

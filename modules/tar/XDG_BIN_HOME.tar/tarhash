@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Hash file contents in a directory to discover changes
+tar --absolute-names -c "${1-.}" | sha1sum

@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# target filename, automatic extension, wether or not it's provided
+SOURCE_FILE="${1}"
+TARGET="${2:-.}"
+
+if [ -z "$1" ]; then
+	echo "Provide a source file" >&2
+	exit 1
+fi
+
+if [ "${SOURCE_FILE#/}" = "${SOURCE_FILE}" ] && [ "${SOURCE_FILE#./}" = "${SOURCE_FILE}" ]; then
+	# If it's NOT an absolute path and is NOT already starting with a dot
+	SOURCE_FILE="./$SOURCE_FILE"
+fi
+
+# autoattach extension
+if ! [ -f "$SOURCE_FILE" ]; then
+	SOURCE_FILE_DIR="${SOURCE_FILE%/*}/"
+	SOURCE_FILE_NAME="${SOURCE_FILE##*/}"
+	SOURCE_FILE=$(find "$SOURCE_FILE_DIR" -type f -name "$SOURCE_FILE_NAME"'.tar*' | sed 1q)
+fi
+
+if ! [ -e "$SOURCE_FILE" ]; then
+	echo "File $SOURCE_FILE does not exist" >&2
+	exit 1
+fi
+
+compression_type="${3:-unknown}"
+
+if [ "${compression_type}" = "unknown" ]; then
+	# Autodiscover compression by extension
+	if ! [ "${SOURCE_FILE%%.gz}" = "${SOURCE_FILE}" ]; then
+		compression_type="gzip"
+	elif ! [ "${SOURCE_FILE%%.bz2}" = "${SOURCE_FILE}" ]; then
+		compression_type="bzip2"
+	elif ! [ "${SOURCE_FILE%%.tar}" = "${SOURCE_FILE}" ]; then
+		compression_type="none"
+	fi
+fi
+
+if ! [ -d "$TARGET" ]; then
+	mkdir -p "$TARGET"
+fi
+
+if [ ${compression_type} = 'gzip' ]; then
+	tar xfz "$SOURCE_FILE" --directory "$TARGET"
+elif [ ${compression_type} = 'bzip2' ]; then
+	tar xfj "$SOURCE_FILE" --directory "$TARGET"
+elif [ ${compression_type} = 'none' ]; then
+	tar xf "$SOURCE_FILE" --directory "$TARGET"
+elif [ ${compression_type} = 'unknown' ]; then
+	echo "Compression type is not known, rename file or" \
+	"provide compression type with the 3rd argument" >&2
+	exit 1
+fi
+
