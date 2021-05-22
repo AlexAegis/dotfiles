@@ -12,6 +12,35 @@ on it's own.
 gpg-connect-agent reloadagent /bye
 ```
 
+## Trust
+
+To edit the trust of keys
+
+```sh
+gpg --edit-key <id>
+gpg> trust
+```
+
+## ASCII Armor
+
+```sh
+gpg --list-secret-keys --keyid-format LONG
+```
+
+Then using the id in the `ssb` line under your key
+(`ssb rsa4096/<this-part> 2021-01-01 [SEA]`), you can generate an armored
+public key block.
+
+```sh
+gpg --armor --export <ssb-id>
+```
+
+You can then add this to certain services you want to authenticate with, like
+GitHub.
+
+> Tip: If you store these in a file, use the extension `.asc`, like
+> `id.pub.asc`
+
 ## TTY
 
 You can force gnupg to use a certain tty when asking for a password with an
