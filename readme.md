@@ -1,7 +1,6 @@
 # dotfiles
 
 [![Lint](https://github.com/AlexAegis/dotfiles/workflows/Lint/badge.svg)](https://github.com/AlexAegis/dotfiles/actions?query=workflow%3ALint)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=AlexAegis/dotfiles)](https://dependabot.com)
 
 My dotmodules™, and a live example of
 [pont](https://github.com/alexaegis/pont), my dotmodule manager.
