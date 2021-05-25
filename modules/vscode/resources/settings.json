@@ -1,0 +1,147 @@
+{
+	"editor.mouseWheelZoom": true,
+	"editor.fontFamily": "InconsolataGo Nerd Font Mono, FuraCode Nerd Font, Cascadia Mono, Consolas, 'Courier New', monospace",
+	"editor.tabSize": 4,
+	"editor.useTabStops": true,
+	"editor.fontLigatures": true,
+	"editor.suggestSelection": "first",
+	"editor.rulers": [
+		{
+			"column": 80,
+			"color": "#ffffff10"
+		},
+		{
+			"column": 100,
+			"color": "#6666668e"
+		}
+	],
+	"editor.selectionClipboard": false,
+	"explorer.confirmDragAndDrop": false,
+	"explorer.compactFolders": false,
+	"terminal.integrated.fontFamily": "InconsolataGo Nerd Font Mono, FuraCode Nerd Font, Cascadia Mono, Consolas, 'Courier New', monospace",
+	"terminal.integrated.fontSize": 18,
+	"terminal.integrated.defaultProfile.windows": "PowerShell",
+	"terminal.integrated.defaultProfile.linux": "zsh",
+	"terminal.integrated.tabs.enabled": true,
+	"terminal.integrated.tabs.hideCondition": "singleTerminal",
+	"terminal.integrated.tabs.focusMode": "singleClick",
+	"terminal.integrated.tabs.showActiveTerminal": "singleTerminal",
+	"terminal.integrated.profiles.linux": {
+		"zsh": {
+			"path": "zsh",
+			"icon": "terminal"
+		},
+		"bash": {
+			"path": "bash",
+			"icon": "terminal-bash"
+		},
+		"fish": {
+			"path": "fish"
+		},
+		"tmux": {
+			"path": "tmux",
+			"icon": "terminal-tmux"
+		},
+		"pwsh": {
+			"path": "pwsh",
+			"icon": "terminal-powershell"
+		}
+	},
+	"workbench.editor.wrapTabs": true,
+	"workbench.editor.decorations.badges": true,
+	"workbench.iconTheme": "material-icon-theme",
+	"workbench.colorTheme": "Community Material Theme Darker High Contrast",
+	"debug.console.fontFamily": "InconsolataGo Nerd Font Mono",
+	"debug.onTaskErrors": "showErrors",
+	"debug.javascript.usePreview": false,
+	"git.enableSmartCommit": true,
+	"git.confirmSync": false,
+	"git.autofetch": true,
+	"remote.extensionKind": {
+		"ms-azuretools.vscode-docker": "workspace"
+	},
+	"remote.SSH.enableDynamicForwarding": false,
+	"markdown.preview.typographer": true,
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.python"
+	},
+	"material-icon-theme.folders.associations": {
+		"module": "font",
+		"component": "components",
+		"doc": "markdown",
+		"animation": "delta",
+		"guard": "ngrx-effects",
+		"directive": "ngrx-actions",
+		"interceptor": "middleware",
+		"validator": "coverage",
+		"e2e": "test",
+		"target": "dist",
+		"rust": "delta",
+		"scope": "delta",
+		"benches": "benchmark",
+		".benchmark": "benchmark",
+		".templates": "template",
+		"modules": "font",
+		"directives": "ngrx-actions",
+		"store": "Redux-store",
+		"actions": "ngrx-actions",
+		"action": "ngrx-actions",
+		"effects": "Ngrx-effects",
+		"effect": "Ngrx-effects",
+		"reducers": "ngrx-reducer",
+		"reducer": "ngrx-reducer"
+	},
+	"material-icon-theme.files.associations": {
+		"*.animation.ts": "purescript",
+		"*.facade.ts": "angular-service",
+		".mocharc": "mocha"
+	},
+	"gitlens.gitCommands.closeOnFocusOut": true,
+	"shellcheck.disableVersionCheck": true,
+	"todo-tree.tree.showScanModeButton": false,
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"python.languageServer": "Pylance",
+	"liveServer.settings.donotShowInfoMsg": true,
+	"explorer.confirmDelete": false,
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"nativescript.analytics.enabled": false,
+	"files.autoSave": "off",
+	"workbench.editorAssociations": [
+		{
+			"viewType": "jupyter.notebook.ipynb",
+			"filenamePattern": "*.ipynb"
+		}
+	],
+	"shellcheck.useWSL": true,
+	"rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
+	"editor.stickyTabStops": true,
+	"remote.SSH.remotePlatform": {
+		"esero1569": "linux"
+	},
+	"angular.experimental-ivy": true,
+	"java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m -javaagent:\"/home/alex/.vscode-server/extensions/gabrielbb.vscode-lombok-1.0.1/server/lombok.jar\"",
+	"todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "XXX", "[ ]", "[x]"],
+	"todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+	"editor.renderControlCharacters": true,
+	"window.dialogStyle": "custom",
+	"window.zoomLevel": 1,
+	"files.associations": {
+		"vimrc": "viml"
+	},
+	"redhat.telemetry.enabled": false
+}
