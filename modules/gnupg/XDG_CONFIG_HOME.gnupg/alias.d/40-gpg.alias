@@ -1,0 +1,3 @@
+#!/bin/sh
+
+alias fixgpgtty='export GPG_TTY=$(tty)'
