@@ -1,3 +1,4 @@
 xdg
 home
 sys-gentoo ? [ $gentoo ] # portage install
+paru ? [ $pacman ]

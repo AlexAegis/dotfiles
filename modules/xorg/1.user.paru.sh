@@ -2,4 +2,4 @@
 
 # list xinit as a session
 # ? not used. Maybe with non systemd systems
-# yay -Syu --needed --noconfirm xinit-xsession
+# paru -Syu --needed --noconfirm xinit-xsession
