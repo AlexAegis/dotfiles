@@ -57,6 +57,3 @@
 [submodule "modules/windows-terminal/resources/windows-terminal-shaders"]
 	path = modules/windows-terminal/resources/windows-terminal-shaders
 	url = https://www.github.com/Hammster/windows-terminal-shaders
-[submodule "modules/paru/resources/paru"]
-	path = modules/paru/resources/paru
-	url = https://www.github.com/morganamilo/paru
