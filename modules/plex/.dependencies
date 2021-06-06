@@ -1,2 +1,3 @@
 transmission
 chocolatey ? [ $windows ]
+paru ? [ $pacman ]
