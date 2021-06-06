@@ -1,4 +1,4 @@
-yay ? [ $pacman ]
+paru ? [ $pacman ]
 xdg ? [ $pacman ]
 make ? [ $pacman ]
 git ? [ $pacman ]
