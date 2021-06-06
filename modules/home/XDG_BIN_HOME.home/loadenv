@@ -17,7 +17,7 @@ DIR="$XDG_CONFIG_HOME/environment.d" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 # shellcheck source=/dev/null
 # Load if no already loaded
 if [ ! "$CONF_LOADED" ] || [ "$LOAD_CONF" ]; then
-	echo "Manually loading *.conf files!"
+	[ ! "$QUIET" ] &&`` echo "Manually loading *.conf files!"
 	DIR="$XDG_CONFIG_HOME/environment.d" REGEX=".*\.conf" . \
 		"$XDG_BIN_HOME/sourcein"
 fi
