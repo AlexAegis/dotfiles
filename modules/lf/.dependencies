@@ -1,2 +1,3 @@
 # because of the icon settings
 nerdfonts
+paru ? [ $pacman ]
