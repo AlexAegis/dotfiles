@@ -6,6 +6,18 @@
 This module sets up the `gpg` environment, but doesn't generate anything
 on it's own.
 
+## PAM
+
+Automatic pam unlock handled by
+[pam-gnupg](https://github.com/cruegge/pam-gnupg)
+
+### SSH
+
+You can add your ssh keys to the gnupg keys with `ssh-add`. It's pre-requisites
+are having the `SSH_AUTH_SOCK` variable set, and the `ssh-agent` running.
+
+You only have to do this once for your ssh key.
+
 ## Reloading the config
 
 ```sh

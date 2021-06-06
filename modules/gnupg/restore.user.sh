@@ -9,6 +9,9 @@ if [ -e "$BACKUP_DIR" ]; then
 	gpg --import "$BACKUP_DIR/backup.priv.asc"
 	gpg --import "$BACKUP_DIR/backup.sub_priv.asc"
 	gpg --import-ownertrust "$BACKUP_DIR/backup.ownertrust.txt"
+
+	# add gnupg keygrips to the pam-gnupg file
+	./XDG_BIN_HOME.gnupg/setup-pam-gnupg
 else
 	echo "ERROR: Backup not found at: $BACKUP_DIR"
 fi

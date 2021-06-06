@@ -1,2 +1,3 @@
 xdg
+home # for the appendabsent script
 systemd ? [ $systemd ]
