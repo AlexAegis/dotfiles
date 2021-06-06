@@ -6,4 +6,5 @@ pacman -Syu --needed --noconfirm \
 	autorandr \
 	arandr \
 	xf86-input-evdev \
-	usbutils
+	usbutils \
+	xterm
