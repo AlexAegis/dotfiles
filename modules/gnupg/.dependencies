@@ -1,3 +1,5 @@
 xdg
 home # for the appendabsent script
+ssh
 systemd ? [ $systemd ]
+paru ? [ $pacman ]
