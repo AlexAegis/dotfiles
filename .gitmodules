@@ -23,10 +23,6 @@
 	path = modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes
 	url = https://www.github.com/davatorium/rofi-themes
 	branch = master
-[submodule "modules/picom/resources/picom"]
-	path = modules/picom/resources/picom
-	url = https://www.github.com/ibhagwan/picom
-	branch = next
 [submodule "modules/sddm/resources/sddm-chili"]
 	path = modules/sddm/resources/sddm-chili
 	url = https://www.github.com/Crystalix007/sddm-chili

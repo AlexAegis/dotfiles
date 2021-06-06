@@ -1,3 +1,4 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm picom
+# temporary, until it's not merged, use this fork
+pacman -Syu --needed --noconfirm meson uthash

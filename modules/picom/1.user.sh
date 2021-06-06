@@ -2,9 +2,20 @@
 
 # temporary, until it's not merged, use this fork
 
-cd ./resources/picom || exit 1
+PICOM_DIR="$XDG_CACHE_HOME/picom"
 
-pacman -Syu --needed --noconfirm meson uthash
+if ! [ -d "$PICOM_DIR/.git" ]; then
+	git clone https://github.com/yshui/picom "$PICOM_DIR"
+	git checkout next
+	git pull
+else
+	(
+		cd "$PICOM_DIR" || exit 1
+		git pull
+	)
+fi
+
+cd "$PICOM_DIR" || exit 1
 
 meson --buildtype=release . build
 
