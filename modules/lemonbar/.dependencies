@@ -1,3 +1,4 @@
 xdg
 systemd ? [ $systemd ]
 xorg
+paru ? [ $pacman ]
