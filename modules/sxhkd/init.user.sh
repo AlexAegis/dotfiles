@@ -1,5 +1,5 @@
 #!/bin/sh
 
-mkdir -p \
-	"$HOME/.config/systemd/user" \
-	"$HOME/.config/sxhkd/sxhkdrc.d"
+mkdir -p "$XDG_CONFIG_HOME/entr/watchers"
+mkdir -p "$XDG_CONFIG_HOME/systemd/user"
+mkdir -p "$XDG_CONFIG_HOME/sxhkd/sxhkdrc.d"
