@@ -1,3 +1,3 @@
 #!/bin/sh
 
-yay -Syu
+paru -Syu
