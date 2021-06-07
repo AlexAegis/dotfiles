@@ -5,6 +5,7 @@ sed -i 's/#Color/Color\nILoveCandy/g' /etc/pacman.conf
 # TODO: If the config editor script is ready, use it here
 
 sed -i 's|#\[multilib\]|\[multilib\]\nInclude = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+sed -i 's/#ParallelDownloads.*/ParallelDownloads = 6/g' /etc/pacman.conf
 # Some useful scripts like `paccache`
 pacman -Syu --needed --noconfirm pacman-contrib
 
