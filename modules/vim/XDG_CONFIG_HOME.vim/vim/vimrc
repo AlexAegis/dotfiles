@@ -258,6 +258,7 @@ let g:gitgutter_sign_removed_first_line = '█'
 let g:gitgutter_sign_modified_removed = '█'
 let g:gitgutter_highlight_linenrs = 1
 """ neoclide/coc.nvim
+let g:coc_config_home = "$XDG_CONFIG_HOME/vim/"
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
 nmap <F2> <Plug>(coc-rename)
@@ -265,6 +266,8 @@ nmap <F2> <Plug>(coc-rename)
 nnoremap <silent> <leader><space> :CocAction<cr>
 
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
+vmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
 
 " TextEdit might fail if hidden is not set.
 set hidden
@@ -383,7 +386,27 @@ command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organize
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 "" coc extensions
 """
-" TODO: let g:coc_global_extensions^='coc-emmet'
+let g:coc_global_extensions = [
+	\'coc-json',
+	\'coc-git',
+	\'coc-emmet',
+	\'coc-html',
+	\'coc-lists',
+	\'coc-prettier',
+	\'coc-rust-analyzer',
+	\'coc-tsserver',
+	\'coc-python',
+	\'coc-yaml',
+	\'coc-word',
+	\'coc-tag',
+	\'coc-java',
+	\'coc-highlight',
+	\'coc-css',
+	\'coc-dictionary',
+	\'coc-emoji',
+	\'coc-eslint'
+\]
+
 """""""""""""
 "  Folding  "
 """""""""""""

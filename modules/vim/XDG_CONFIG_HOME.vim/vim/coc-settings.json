@@ -1,5 +1,13 @@
 {
+	"$schema": "https://raw.githubusercontent.com/neoclide/coc.nvim/master/data/schema.json",
+	"diagnostic.refreshOnInsertMode": true,
 	"suggest.autoTrigger": "trigger",
+	"suggest.timeout": 20000,
+	// "suggest.floatEnable": true,
+	// "diagnostic.messageTarget": "float",
+	// "signature.target": "float",
+	"coc.preferences.formatOnType": true,
+	"coc.preferences.hoverTarget": "float",
 	"coc.preferences.formatOnSaveFiletypes": [
 		"css",
 		"markdown",
@@ -8,6 +16,7 @@
 		"json",
 		"html"
 	],
+	"coc.preferences.extensionUpdateCheck": "daily",
 	"git.enableGutters": true,
 	"git.addedSign.hlGroup": "GitGutterAdd",
 	"git.changedSign.hlGroup": "GitGutterChange",
