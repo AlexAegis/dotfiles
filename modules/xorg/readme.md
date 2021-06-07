@@ -2,6 +2,16 @@
 
 TODO: Implement config reload on display change using xrandr
 
+## Inspection
+
+With `xprop`, clicking on a window lets you inspect it's various X properties
+like it's wm_class, that can be used to identify elements in compositor
+configurations.
+
+```sh
+xprop
+```
+
 ## [Monitor Layout](https://wiki.gentoo.org/wiki/Xorg/Multiple_monitors)
 
 ### Config based
