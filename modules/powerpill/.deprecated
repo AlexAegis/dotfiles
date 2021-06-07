@@ -1,1 +1,3 @@
 # Not really developed anymore
+# No longer needed since pacman 6.x.x, parallel downloads are supported
+pacman
