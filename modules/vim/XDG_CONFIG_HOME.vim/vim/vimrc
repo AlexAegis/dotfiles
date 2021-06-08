@@ -69,7 +69,7 @@ set softtabstop=4        " number of spaces used as tab for editing
 set shiftwidth=4         " number of spaces used to autoindent
 " set expandtab            " expand tabs into spaces
 set smarttab             " smart tabulation and backspace
-set bs=indent,eol,start  " allow backspacing over everything
+set backspace=indent,eol,start  " allow backspacing over everything
 
 "let &t_8f = "\e[38;2;%lu;%lu;%lum"
 "let &t_8b = "\e[48;2;%lu;%lu;%lum"
@@ -556,6 +556,7 @@ inoremap <silent><expr><bs>
 	\ &backspace =~? '.*eol\&.*start\&.*indent\&' &&
 	\ !search('\S','nbW',line('.')) ? (col('.') != 1 ? "\<C-U>" : "") .
 	\ "\<bs>" . (getline(line('.')-1) =~ '\S' ? "" : "\<C-F>") : "\<bs>"
+
 "" Terminal
 :tnoremap <Esc> <C-\><C-n>
 " fzf
