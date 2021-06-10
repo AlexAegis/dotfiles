@@ -14,5 +14,3 @@ if [ -e /etc/pam.d/login ]; then
 	appendabsent 'auth     optional  pam_gnupg.so store-only' /etc/pam.d/login
 	appendabsent 'session  optional  pam_gnupg.so' /etc/pam.d/login
 fi
-
-./XDG_BIN_HOME.gnupg/setup-pam-gnupg
