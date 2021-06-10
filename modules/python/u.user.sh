@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# update pyenv
+(
+	cd "$PYENV_HOME" || exit 1
+	git pull
+)
 # shellcheck disable=SC1091
 . "./XDG_CONFIG_HOME.python/rc.d/pyenv.sh"
 
