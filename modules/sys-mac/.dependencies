@@ -1,0 +1,3 @@
+# not really a dependency but is treated as a very important module as it's
+# the package manager for macOS
+brew
