@@ -1,0 +1,10 @@
+# The installer is a bash script
+bash
+# brew is actually dependent on ruby and git but you get those
+# from xcode on mac
+xcode ? [ $mac ]
+# brew technically works on other systems too so I left these dependencies
+# here. Although I don't see any reason in using it elsewhere as they have
+# their own solutions anyway, and there are other alternatives like nix.
+git ? [ ! $mac ]
+ruby ? [ ! $mac ]
