@@ -1,5 +1,16 @@
 # Windows
 
+## Timezone settings
+
+To dual boot with Windows it is recommended to configure Windows to use UTC,
+rather than Linux to use localtime.
+
+> From elevated command line or powershell
+
+```ps
+reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f
+```
+
 ## [Chocolatey](https://chocolatey.org/)
 
 To update everything
