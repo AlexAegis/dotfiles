@@ -1,0 +1,57 @@
+#!/bin/sh
+
+if ! [ "$1" ]; then
+	echo "target not defined"
+	exit 1
+	# TODO: auto find the first parent that has a .git folder/file
+else
+	target="${1%/}"
+fi
+
+# to allow repeated execution without the toggling behavior
+if [ "$2" = 'ssh' ] || [ "$2" = 'http' ]; then
+	mode="$2"
+else
+	mode="auto"
+fi
+
+if ! [ -d "$target" ]; then
+	echo "target directory does not exist"
+	exit 1
+fi
+
+if ! [ -e "$target/.git" ]; then
+	echo "target directory is not a git repository or submodule"
+	exit 1
+fi
+
+if [ -d "$target/.git" ]; then
+	target_config="$target/.git/config"
+elif [ -f "$target/.git" ]; then
+	gitdir=$(cut -d ' ' -f 2 "$target/.git")
+	target_config="$target/$gitdir/config"
+fi
+
+echo "target config: $target_config"
+
+convert_http_to_ssh() {
+	echo "Switching to ssh based github urls"
+	sed -i -e 's|https\?://\(www.\)\?github.com/|git@github.com:|g' "$target_config"
+}
+
+convert_ssh_to_http() {
+	echo "Switching to http based github urls"
+	sed -i -e 's|git@github.com:|https://www.github.com/|g' "$target_config"
+}
+
+if [ "$mode" = 'ssh' ]; then
+	convert_http_to_ssh
+elif [ "$mode" = 'http' ]; then
+	convert_ssh_to_http
+else # auto
+	if grep -e 'https\?://\(www.\)\?github.com/' "$target_config"; then
+		convert_http_to_ssh
+	else
+		convert_ssh_to_http
+	fi
+fi
