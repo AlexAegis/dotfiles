@@ -4,6 +4,7 @@ coreutils
 # and the module itself with sys-base or something
 sys-arch ? [ $arch ]
 sys-debian ? [ $debian ]
+sys-freebsd ? [ $freebsd ]
 sys-gentoo ? [ $gentoo ]
 sys-mac ? [ $mac ]
 sys-ubuntu ? [ $ubuntu ]
