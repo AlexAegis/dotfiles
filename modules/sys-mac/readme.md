@@ -8,6 +8,8 @@ macOS specific system setup
 
 - `View > Sort By > Name (Snap to Grid)`
 - `View > Show Path Bar`
+- `Finder > Prefrences > General`
+  - Untick desktop items
 
 ### Keyboard settings
 
