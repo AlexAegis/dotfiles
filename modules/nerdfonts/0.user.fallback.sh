@@ -1,12 +1,13 @@
 #!/bin/sh
 
-mkdir -p "$XDG_CACHE_HOME/nerd-fonts"
-cd "$XDG_CACHE_HOME/nerd-fonts" || exit 1
-if [ -d "$XDG_CACHE_HOME/nerd-fonts/.git" ]; then
-	git pull
+if [ -d "$NERDFONTS_REPOSITORY/.git" ]; then
+	(
+		cd "$NERDFONTS_REPOSITORY" || exit 1
+		git pull
+	)
 else
 	git clone --depth=1 https://github.com/ryanoasis/nerd-fonts \
-		"$XDG_CACHE_HOME/nerd-fonts"
+		"$NERDFONTS_REPOSITORY"
 fi
 
-"$XDG_CACHE_HOME/nerd-fonts/install.sh"
+"$NERDFONTS_REPOSITORY/install.sh"
