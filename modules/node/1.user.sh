@@ -7,5 +7,5 @@
 # can rely on it being enabled by fnm
 
 fnm install lts-latest
-fnm install 15
-fnm use 15
+fnm install 16
+fnm use 16

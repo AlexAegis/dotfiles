@@ -4,3 +4,6 @@ bash
 curl
 zip
 chocolatey ? [ $windows ]
+# Even though it's not directly used, the install script of fnm does use it
+# when available
+brew ? [ $mac ]
