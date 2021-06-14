@@ -1,0 +1,3 @@
+#!/bin/sh
+
+alias sysup="pont -eu sys"
