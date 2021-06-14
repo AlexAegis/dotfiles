@@ -34,9 +34,10 @@ if [ -n "$REFIND_ROOT" ]; then
 	# https://github.com/EvanPurkhiser/rEFInd-minimal
 	# https://github.com/kvnbias/refind-theme
 	# https://github.com/bobafetthotmail/refind-theme-regular
+	# https://github.com/dheishman/refind-dreary/highres
 
-	REFIND_THEME_NAME="refind-theme-regular"
-	REFIND_THEME_GIT_REPO="https://github.com/bobafetthotmail/$REFIND_THEME_NAME"
+	REFIND_THEME_NAME="refind-dreary"
+	REFIND_THEME_GIT_REPO="https://github.com/dheishman/$REFIND_THEME_NAME"
 
 	REFIND_THEME_DIR="$XDG_CACHE_HOME/$REFIND_THEME_NAME"
 
@@ -60,6 +61,10 @@ if [ -n "$REFIND_ROOT" ]; then
 		install -Dm 755 "$PONT_MODULES_HOME/refind/resources/$REFIND_THEME_NAME/theme-config.conf" \
 			"$REFIND_DIR/theme-config.conf"
 		appendabsent "include theme-config.conf" "$REFIND_DIR/refind.conf"
+	fi
+	if [ -e "$PONT_MODULES_HOME/refind/resources/$REFIND_THEME_NAME/theme-config.sh" ]; then
+		"$PONT_MODULES_HOME/refind/resources/$REFIND_THEME_NAME/theme-config.sh" \
+			"$REFIND_DIR/themes/$REFIND_THEME_NAME"
 	fi
 else
 	echo "No refind installation detected, mount it under /boot/efi or " \
