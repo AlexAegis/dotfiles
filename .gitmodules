@@ -39,14 +39,6 @@
 	path = modules/kakoune/XDG_CONFIG_HOME.kakoune/kak/plugins/plug.kak
 	url = https://www.github.com/robertmeta/plug.kak
 	branch = master
-[submodule "modules/refind/resources/themes/rEFInd-minimal"]
-	path = modules/refind/resources/themes/rEFInd-minimal
-	url = https://www.github.com/EvanPurkhiser/rEFInd-minimal
-	branch = master
-[submodule "modules/refind/resources/themes/refind-theme-regular"]
-	path = modules/refind/resources/themes/refind-theme-regular
-	url = https://www.github.com/bobafetthotmail/refind-theme-regular.git
-	branch = master
 [submodule "modules/pass/resources/pass-git-helper"]
 	path = modules/pass/resources/pass-git-helper
 	url = https://www.github.com/languitar/pass-git-helper
