@@ -1,0 +1,9 @@
+[Trigger]
+Operation=Upgrade
+Type=Package
+Target=refind
+
+[Action]
+Description = Updating rEFInd on the mounted refind partition
+When=PostTransaction
+Exec=/bin/sh -c 'if [ -d /mnt/refind/EFI/refind ]; then; /usr/bin/refind-install --yes --root /mnt/refind; fi'

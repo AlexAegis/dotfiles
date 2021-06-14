@@ -1,3 +1,3 @@
 #!/bin/sh
 
-refind-install
+refind_apply_config

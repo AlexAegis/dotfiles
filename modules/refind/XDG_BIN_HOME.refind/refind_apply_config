@@ -1,0 +1,60 @@
+#!/bin/sh
+
+if [ -z "$REFIND_ROOT" ]; then
+	if [ -d /mnt/refind/EFI/refind ]; then
+		REFIND_ROOT="/mnt/refind"
+	elif [ -d /boot/efi/EFI/refind ]; then
+		REFIND_ROOT="/"
+	fi
+fi
+
+REFIND_DIR="$REFIND_ROOT/EFI/refind"
+CUSTOM_CONFIG_FILE="custom.conf"
+
+if [ -n "$REFIND_ROOT" ]; then
+	echo "Using Refind root at $REFIND_ROOT"
+	# update refind
+	refind-install --yes --root "$REFIND_ROOT"
+	# add custom config file
+	install -Dm 755 "$PONT_MODULES_HOME/refind/resources/$CUSTOM_CONFIG_FILE" \
+			"$REFIND_DIR/$CUSTOM_CONFIG_FILE"
+	# Add resoltion entry, setting it to default UEFI resolution
+	resolution='0' # $(get_primary_resolution | sed 's/x/ /')
+	if [ -n "$resolution" ]; then
+		echo "resolution $resolution" >> "$REFIND_DIR/$CUSTOM_CONFIG_FILE"
+	fi
+	# include custom install file in the main configuration file
+	appendabsent "include $CUSTOM_CONFIG_FILE" "$REFIND_DIR/refind.conf"
+	# Install theme
+	## Remove existing themes
+	sed '/include themes/d' -i "$REFIND_DIR/refind.conf"
+	rm -rf "$REFIND_DIR/themes"
+
+	# themes
+	# https://github.com/EvanPurkhiser/rEFInd-minimal
+	# https://github.com/kvnbias/refind-theme
+
+	REFIND_THEME_NAME="refind-theme"
+	REFIND_THEME_GIT_REPO="https://github.com/kvnbias/$REFIND_THEME_NAME"
+
+	REFIND_THEME_DIR="$XDG_CACHE_HOME/$REFIND_THEME_NAME"
+
+	if [ -d "$REFIND_THEME_DIR/.git" ]; then
+		(
+			cd "$REFIND_THEME_DIR" || exit 1
+			git pull
+		)
+	else
+		git clone "$REFIND_THEME_GIT_REPO" "$REFIND_THEME_DIR"
+	fi
+	mkdir "$REFIND_DIR/themes"
+	cp -r "$REFIND_THEME_DIR" "$REFIND_DIR/themes/$REFIND_THEME_NAME"
+	chmod -R 755 "$REFIND_DIR/themes"
+
+	echo "include themes/$REFIND_THEME_NAME/theme.conf" >> \
+		"$REFIND_DIR/refind.conf"
+else
+	echo "No refind installation detected, mount it under /boot/efi or " \
+		"/mnt/refind/boot/efi"
+fi
+
