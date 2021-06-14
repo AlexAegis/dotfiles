@@ -11,6 +11,10 @@ rather than Linux to use localtime.
 reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f
 ```
 
+Make sure to set both `Set time automatically` and
+`Set timezone automatically` to on in the Date & time settings page, then hit
+Sync Now.
+
 ## [Chocolatey](https://chocolatey.org/)
 
 To update everything
