@@ -1,0 +1,96 @@
+#!/bin/sh
+
+expand_single_args() {
+	var="${1#-}" # cut off first, and only dash
+	while [ "$var" ]; do
+		next="${var#?}"
+		first_char="${var%$next}"
+		echo "-$first_char"
+		var="$next" # next
+	done
+}
+
+# POSIX compliant argument parser.
+# This function will parse and return a separated argument list. It handles
+# long arguments and checks for missing or extra values.
+# it handles both whitespace and '=' separated values
+# it also treats quoted parameters as one
+# It does NOT check for unknown variables as there is no list of allowed args
+# but those are easy to handle later
+parse_args() {
+	# first parameter is a single string, an IFS separated list of arguments
+	# that should have a single value
+	with_parameters="$1"
+	shift
+	while [ "$1" ]; do
+		single_cut_with_equalparam="${1##-}"
+		single_cut="${single_cut_with_equalparam%%=*}" # = value cut pff
+		double_cut_with_equalparam="${1##--}"
+		double_cut="${double_cut_with_equalparam%%=*}" # = value cut pff
+		equalparam=${1##*=}
+		if [ "$equalparam" = "$1" ]; then
+			equalparam=''
+		fi
+		# starts with one dash but not two
+		if ! [ "$single_cut_with_equalparam" = "$1" ] && [ "$double_cut_with_equalparam" = "$1" ]; then
+			split_args=$(expand_single_args "$single_cut")
+			shift
+			if [ -n "$equalparam" ]; then
+				set -- "$equalparam" "$@"
+			fi
+			# shellcheck disable=SC2086
+			set -- $split_args "$@"
+		# two dash
+		elif ! [ "$double_cut_with_equalparam" = "$1" ]; then
+			shift
+			if [ -n "$equalparam" ]; then
+				set -- "$equalparam" "$@"
+			fi
+			set -- "--$double_cut" "$@"
+		fi
+
+		has_parameter=''
+		for a in $with_parameters; do
+			if [ "$a" = "$1" ]; then
+				has_parameter='1'
+				break
+			fi
+		done
+
+		if [ -n "$has_parameter" ]; then
+			if [ -z "$2" ] || ! [ "${2##-}" = "$2" ]; then
+				echo "$1 is missing it's parameter!" >&2
+				exit 1
+			fi
+		else
+			if [ -n "$2" ] && [ "${2##-}" = "$2" ]; then
+				echo "$1 has a parameter ($2) when it shouldn't have one!" >&2
+				exit 1
+			fi
+		fi
+
+		echo "$1"
+		shift
+	done
+}
+
+# When using in scripts
+# handle_args() {
+# 	while [ "$1" ]; do
+# 		case "$1" in
+# 			-h | --help) echo 'help' ;;
+# 			-v | --version) echo 'version' ;;
+# 			-e | --echo) echo "echo: $2"; shift ;;
+# 			* ) echo 'unknown arg' ;;
+# 		esac
+# 		shift
+# 	done
+# }
+#
+# handle_args $(parse_args "$args_with_parameters" "$@")
+
+args_with_parameters="$1"
+shift
+
+# shellcheck disable=SC2046
+parse_args "$args_with_parameters" "$@"
