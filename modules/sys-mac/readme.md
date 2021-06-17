@@ -24,3 +24,16 @@ and the `Select next source in Input menu` to `Shift+Option+Space`.
 > The suggested alternative of using the Option key makes this feature in-line
 > with Windows where input sources are selectable with `Super+Space` and
 > `Shift+Super+Space`
+
+### Dock & Menu Bar
+
+System > Dock & Menu Bar
+
+- Minimise windows into application icon
+- Magnification (Slightly above Dock Size)
+
+### Trackpad
+
+System > Trackpad > More Gestures
+
+Tick all
