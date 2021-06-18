@@ -11,8 +11,8 @@ expand_single_args() {
 }
 
 # POSIX compliant argument parser.
-# This function will parse and return a separated argument list. It handles
-# long arguments and checks for missing or extra values.
+# This function will parse and return a newline separated argument list. It
+# handles long arguments and checks for missing or extra values.
 # it handles both whitespace and '=' separated values
 # it also treats quoted parameters as one
 # It does NOT check for unknown variables as there is no list of allowed args
@@ -62,14 +62,15 @@ parse_args() {
 				echo "$1 is missing it's parameter!" >&2
 				exit 1
 			fi
-		else
-			if [ -n "$2" ] && [ "${2##-}" = "$2" ]; then
-				echo "$1 has a parameter ($2) when it shouldn't have one!" >&2
-				exit 1
-			fi
+		# TODO: handle rest parameters
+		#else
+		#	if [ -n "$2" ] && [ "${2##-}" = "$2" ]; then
+		#		echo "$1 has a parameter ($2) when it shouldn't have one!" >&2
+		#		exit 1
+		#	fi
 		fi
 
-		echo "$1"
+		printf "%s\n" "$1"
 		shift
 	done
 }
