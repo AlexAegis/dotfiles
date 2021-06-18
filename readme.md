@@ -16,7 +16,7 @@ This will set up itself:
 
 ```sh
 git clone --recurse-submodules -j8 \
-  http://www.github.com/AlexAegis/dotfiles ~/.config/dotfiles
+  https://www.github.com/AlexAegis/dotfiles ~/.config/dotfiles
 ~/.config/dotfiles/modules/pont/pont.sh pont
 ```
 
@@ -59,7 +59,7 @@ You will need this to clone the `dotfiles` repository and it provides you a
 
 ```sh
 git clone --recurse-submodules -j8 \
-  http://www.github.com/AlexAegis/dotfiles ~/AppData/Roaming/dotfiles
+  https://www.github.com/AlexAegis/dotfiles ~/AppData/Roaming/dotfiles
 ```
 
 The default `DOTFILES_HOME` location is not applicable on windows so you must
