@@ -1,3 +1,4 @@
 xdg
 zip ? [ ! $pacman ]
 curl ? [ ! $pacman ]
+brew ? [ $mac ]
