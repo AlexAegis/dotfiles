@@ -10,8 +10,7 @@ fi
 export LOADENV_RC_EXTS="sh zsh" # used by loadenv
 # TODO: The compinit file generates errors on debian buster
 # Custom Compdef
-# TODO: XDG_CONFIG_HOME
-fpath=(~/.config/zsh/compdef $fpath)
+fpath=($XDG_CONFIG_HOME/zsh/compdef $fpath)
 unsetopt PROMPT_SP
 # Enable Powerlevel10k instant prompt. Should stay close to the top
 # of ~/.config/zsh/.zshrc. Initialization code that may require console input

@@ -9,4 +9,6 @@ if [ "$TERM" = "linux" ]; then
 fi
 
 # Welcome
-command -v neofetch > /dev/null && neofetch
+if command -v neofetch; then
+	neofetch
+fi
