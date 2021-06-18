@@ -267,8 +267,6 @@ timelock_list() {
 # 	shift
 # one
 
-IFS='
-'
 # shellcheck disable=2046
 interpret_args $(parse_args "" "$@")
 
