@@ -7,15 +7,11 @@
 # for argument parsing
 IFS=' '
 
-parse_args() {
-	/usr/bin/getopt -o "ted" -l "target,exec,delay" -- "$@" || exit 1
-}
-
 TARGET=
 EXEC=
 DELAY=
 
-for arg in $(parse_args "$@"); do
+for arg in $(parse_args "" "$@"); do
 	case $arg in
 		-t | --target)
 			if [ -d "$2" ]; then
