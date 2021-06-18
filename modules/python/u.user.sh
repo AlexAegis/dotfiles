@@ -1,5 +1,10 @@
 #!/bin/sh
 
+if [ "$mac" ]; then
+	export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
+	export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
+fi
+
 # update pyenv
 (
 	cd "$PYENV_HOME" || exit 1
