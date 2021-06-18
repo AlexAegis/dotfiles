@@ -50,10 +50,10 @@ interpret_args() {
 }
 
 transform_entries() {
-	while :; do
-		[ "$1" ] || break
-		[ "$char" ] && printf ' '
-
+	insert_space=$1
+	shift
+	while [ "$1" ]; do
+		[ "$insert_space" = 'true' ] && [ "$char" ] && printf ' '
 		tmp="$1"
 		while [ -n "$tmp" ]; do
 			rest="${tmp#?}"
@@ -99,8 +99,14 @@ transform_entries() {
 # shellcheck disable=SC2046
 interpret_args $(parse_args "" "$@")
 
-# shellcheck disable=SC2086
-transform_entries $entries
+transform_entries 'true' $entries
 
-printf '
-'
+if [ -z "$entries" ]; then
+	while read line; do
+		transform_entries 'false' "$line"
+		printf '\n'
+	done
+else
+	printf '\n'
+fi
+# shellcheck disable=SC2086
