@@ -11,12 +11,22 @@ script_location=$(
 	pwd
 )
 if [ -L "$script_location/loadenv" ]; then
-	script_location=$(readlink "$script_location/loadenv")
+	script_link_location=$(readlink "$script_location/loadenv")
+	if ! [ "${script_link_location#\/}" = "$script_link_location" ]; then
+		# absulte link
+		script_location="$script_link_location"
+	else
+		# relative link
+		script_location="$script_location/$script_link_location"
+	fi
 	script_location=${script_location%\/*} # cut filename
 fi
 if [ -e "$script_location/../../xdg/e.user.sh" ]; then
+	cd "$script_location/../../xdg" || exit 1
+	set -a
 	# shellcheck source=/dev/null
 	. "$script_location/../../xdg/e.user.sh"
+	set +a
 fi
 
 
