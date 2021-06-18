@@ -1,3 +1,4 @@
 xdg
 # for sys-debians add-apt-repository if necessary
 sys ? [ $debian ]
+brew ? [ $mac ]
