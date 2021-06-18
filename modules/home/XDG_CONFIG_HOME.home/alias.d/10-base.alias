@@ -6,8 +6,7 @@
 alias restart="sudo reboot now"
 
 ## Environment
-# TODO explore if you can use XDG vars here reliably
-alias renv='LOAD_CONF=1 . "$HOME/.local/bin/loadenv"'
+alias renv='LOAD_CONF=1 . "$XDG_BIN_HOME/loadenv"'
 
 ## terminal
 
