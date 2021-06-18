@@ -12,12 +12,12 @@ mkdir -p "$ZDOTDIR/bin"
 curl -sfL git.io/antibody | sh -s - -b "$ZDOTDIR/bin"
 
 echo "Installing plugins"
-antibody bundle <"$ZDOTDIR/.zsh-plugins.antibody" \
+"$ZDOTDIR/bin/antibody" bundle <"$ZDOTDIR/.zsh-plugins.antibody" \
 	>"$ZDOTDIR/.zsh-plugins.antibody.sh"
 
 # TODO: call update and move update
 echo "Updating plugins"
-antibody update
+"$ZDOTDIR/bin/antibody" update
 
 echo "Fixing permissions"
 
