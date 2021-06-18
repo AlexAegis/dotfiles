@@ -16,12 +16,6 @@ show_help() {
 	exit 0
 }
 
-parse_args() {
-	/usr/bin/getopt -u -o "hv\
-" -l "help,version,\
-" -- "$@" || exit 1
-}
-
 interpret_args() {
 	IFS='
 '
@@ -102,11 +96,8 @@ transform_entries() {
 }
 
 ## Execution
-
-IFS=' '
-
 # shellcheck disable=SC2046
-interpret_args $(parse_args "$@")
+interpret_args $(parse_args "" "$@")
 
 # shellcheck disable=SC2086
 transform_entries $entries
