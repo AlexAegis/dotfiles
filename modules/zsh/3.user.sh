@@ -24,8 +24,10 @@ cat <<EOF > "$HOME/.zshenv"
 # This is here for compatibility reasons, using a login manager, this is not
 # needed, but when logging directly into zsh, systemd envs are not available
 
-# ZSH Environment
+# Minimal ZSH Environment
 if [ -e "$XDG_CONFIG_HOME/environment.d/20-zshenv.conf" ]; then
+	export XDG_CACHE_HOME="$XDG_CACHE_HOME"
+	export XDG_CONFIG_HOME="$XDG_CONFIG_HOME"
 	# shellcheck disable=SC1090,SC1091
 	. "$XDG_CONFIG_HOME/environment.d/20-zshenv.conf"
 fi
