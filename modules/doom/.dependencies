@@ -2,3 +2,4 @@ xdg
 7z
 rar
 paru ? [ $pacman ]
+brew ? [ $mac ]
