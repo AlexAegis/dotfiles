@@ -12,12 +12,10 @@ echo "#!/bin/zsh
 # This is here for compatibility reasons, using a login manager, this is not
 # needed, but when logging directly into zsh, systemd envs are not available
 
-[ \"\$VERBOSE\" = 1 ] && echo \"Loading .zshenv\"
-
-
 # ZSH Environment
-. \"$XDG_CONFIG_HOME/environment.d/10-xdg.conf\"
-. \"$XDG_CONFIG_HOME/environment.d/20-zshenv.conf\"
+if [ -e \"$XDG_CONFIG_HOME/environment.d/20-zshenv.conf\" ]; then
+	. \"$XDG_CONFIG_HOME/environment.d/20-zshenv.conf\"
+fi
 # rest is loaded by the startup scripts in ZDOTDIR, set in 20-zshenv.conf
-
+# inluding the ~/.profile file (which in turn loads the entire environment)
 " > "$HOME/.zshenv"
