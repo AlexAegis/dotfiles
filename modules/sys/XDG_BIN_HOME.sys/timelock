@@ -14,6 +14,7 @@ timelock_name=''
 timelock_duration_or_human_readable=''
 mode='set' # 'set' | 'remove' | 'check'
 
+mkdir -p "$TIMELOCK_DIR"
 
 # C_RESET='\033[0m'
 # C_RED='\033[0;31m'
@@ -100,50 +101,16 @@ show_version() {
 	echo "timelock version: 1.0.0" && exit 0
 }
 
-parse_args() {
-	IFS='
-'
-	/usr/bin/getopt -o "hVlvq\
-pfrR\
-\
-" -l "help,version,log,log-level,verbose,quiet,\
-print,force,remove,remove-all-expired\
-\
-" -- "$@" || exit 1
-}
-
 interpret_args() {
 	# Not a perfect solution on keeping the quotes intact, spaces inside it
 	# will still be crunched by getopt
 	log_trace 'interpret' "$@"
-	IFS=' '
+
 	arg_pos=0
 	while [ "$1" ]; do
-		log_trace "Arg fragment $1"
-		if [ ! "$1" = "${1#\'}" ] && [ ! "$1" = "${1%\'}" ]; then
-			# starts end ends with quote
-			arg="${1%\'}"
-			arg="${arg#\'}"
-		elif [ ! "$1" = "${1#\'}" ]; then
-			# starts with but does not end with
-			arg="${1#\'}"
-			shift
-			continue
-		elif [ ! "$1" = "${1%\'}" ]; then
-			# ends but not starts with a quote
-			arg="$arg ${1%\'}"
-		elif [ "$arg" ]; then
-			# middle character, just prepend
-			arg="$arg $1"
-			shift
-			continue
-		else
-			# non quoted
-			arg="$1"
-		fi
-		log_trace "Arg $arg"
+		log_trace "Argument: $1"
 
-		case $arg in
+		case $1 in
 			-h | -\? | --help) show_help ;;
 			-V | --version) show_version ;;
 			-l | --log | --log-level)
@@ -165,23 +132,23 @@ interpret_args() {
 			-f | --force) force='1' ;;
 			-p | --print) print='1' ;;
 			--)	;;
-			-?*) log_error "Unknown option (ignored): $arg";;
+			-?*) log_error "Unknown option (ignored): $1";;
 			*) # The rest are positional arguments
 				arg_pos=$(( arg_pos + 1 ))
 				case $arg_pos in
 					1)
-						timelock_name=$arg;
-						timelock_file="$TIMELOCK_DIR/$arg.$TIMELOCKFILE_EXTENSION"
+						timelock_name=$1;
+						timelock_file="$TIMELOCK_DIR/$1.$TIMELOCKFILE_EXTENSION"
 						;;
 					2)
-						timelock_duration_or_human_readable="$arg";
+						timelock_duration_or_human_readable="$1";
 						if test "$timelock_duration_or_human_readable" -ge '0' 2>/dev/null; then
 							now=$(date_now)
-							timelock_end="$(( "$now" + "$timelock_duration_or_human_readable" ))";
+							timelock_end="$(( $now + $timelock_duration_or_human_readable ))";
 						elif timelock_end=$(date --date="$timelock_duration_or_human_readable" +%s 2>/dev/null); then
-							timelock_comment="$arg"
+							timelock_comment="$1"
 						else
-							log_error "duration is not a number or not a human readable string: $arg"
+							log_error "duration is not a number or not a human readable string: $1"
 							exit 1
 						fi
 						;;
@@ -201,13 +168,15 @@ date_now() {
 timelock_check() {
 	log_trace "timelock_check $*"
 	timelock_file="${2:-$TIMELOCK_DIR/$1.$TIMELOCKFILE_EXTENSION}"
+	if [ ! -e "$timelock_file" ]; then
+		return 0
+	fi
 	log_trace "Check $1 at $timelock_file"
 	expiration_date="$(sed '3q;d' "$timelock_file")" # teleport as much as you like
 	if [ "$print" ]; then
 		date -d@"$expiration_date"
 	fi
-	if [ ! -e "$timelock_file" ] \
-		|| [ "$(date +%s)" -gt "$expiration_date" ]; then
+	if [ "$(date +%s)" -gt "$expiration_date" ]; then
 		return 0
 	else
 		return 1
@@ -234,7 +203,7 @@ timelock_set() {
 	fi
 	if [ "$force" ] || timelock_check "$1"; then
 		now=$(date_now)
-		duration=$(( "$2" - "$now" ))
+		duration=$(( $2 - $now ))
 		log_trace "creating lock"
 		printf '%s\n%s\n%s\n%s' "$now" "$duration" "$2" "$3" > "$timelock_file"
 	else
@@ -298,9 +267,10 @@ timelock_list() {
 # 	shift
 # one
 
-IFS=' '
+IFS='
+'
 # shellcheck disable=2046
-interpret_args $(parse_args "$@")
+interpret_args $(parse_args "" "$@")
 
 if [ ! "$mode" = "remove-all-expired" ] && [ ! "$timelock_duration_or_human_readable" ]; then
 	mode='check'
