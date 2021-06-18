@@ -1,3 +1,6 @@
 #!/bin/sh
 
-fc-cache -vf
+# Reset font info cache on linux systems
+if command -v fc-cache; then
+	fc-cache -vf
+fi
