@@ -45,5 +45,5 @@ Use the `j` flag instead of the `z` flag for files with extension `.tar.bz2`.
 > changes. It also excludes the file where the hash is saved of course.
 
 ```sh
-tar --absolute-names -c "<directory>" | sha1sum
+tar -c "<directory>" 2> /dev/null | sha1sum
 ```
