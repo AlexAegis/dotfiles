@@ -3,4 +3,4 @@
 add-apt-repository universe
 
 # shellcheck disable=SC1091
-./u.root.apt.sh
+./u.root.apt-get.sh

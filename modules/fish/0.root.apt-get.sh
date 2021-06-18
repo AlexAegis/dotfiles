@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # Install Package
-apt install -y fish
+apt-get install -y fish
