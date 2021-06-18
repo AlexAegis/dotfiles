@@ -1,14 +1,8 @@
 [include]
+	path = gitconfig.d/user.gitconfig
 	path = gitconfig.d/wsl-credential-helper.gitconfig
 	path = gitconfig.d/credential-helper.gitconfig
 	path = gitconfig.d/gpg-signing-key.gitconfig
-
-[user]
-	name = AlexAegis
-	email = alexaegis@gmail.com
-
-[github]
-	user = AlexAegis
 
 [credential]
 	useHttpPath = true
