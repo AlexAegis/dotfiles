@@ -22,11 +22,13 @@ if [ -L "$script_location/loadenv" ]; then
 	script_location=${script_location%\/*} # cut filename
 fi
 if [ -e "$script_location/../../xdg/e.user.sh" ]; then
+	current_pwd=$(pwd)
 	cd "$script_location/../../xdg" || exit 1
 	set -a
 	# shellcheck source=/dev/null
 	. "$script_location/../../xdg/e.user.sh"
 	set +a
+	cd "$current_pwd" || exit 1
 fi
 
 
