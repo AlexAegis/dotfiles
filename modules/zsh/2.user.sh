@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# it's already the default on macOS
-if ! [ "$mac" ]; then
+# skip if it's already the default
+if ! [ "${SHELL##*\/}" = "zsh" ]; then
 	# set the default shell to zsh
 	chsh -s /bin/zsh
 fi
