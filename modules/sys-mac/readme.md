@@ -2,6 +2,17 @@
 
 macOS specific system setup
 
+## Notes
+
+### Full Disk Access
+
+> System Preferences > Security & Privacy > Privacy > Full Disk Access
+
+macOS utilizes extended permission bits and some files (`ls -al` marks these
+with a `+` at the end of the permission bits, however if it's also a symlink it
+will only display `@`. More info in `man stat`.) are not accessible by default
+unless `Full Disk Access` is given to the Terminal Emulator you're using.
+
 ## Manual Setup
 
 ### Finder
