@@ -1,3 +1,5 @@
 # because of the icon settings
+xdg
 nerdfonts
 paru ? [ $pacman ]
+brew ? [ $mac ]
