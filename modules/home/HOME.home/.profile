@@ -14,12 +14,12 @@ XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 
 # preload xdg env so loadenv can load the rest according to that
 if [ ! "$CONF_LOADED" ]; then
-	# shellcheck disable=SC1090
+	# shellcheck disable=SC1090,SC1091
 	. "$XDG_CONFIG_HOME/environment.d/10-xdg.conf"
 fi
 
 # ? loadenv loads shell specific stuff (alias, rc drop ins) and conf files
 # ? when needed
-# shellcheck disable=SC1090
+# shellcheck disable=SC1090,SC1091
 [ -e "$XDG_BIN_HOME/loadenv" ] && . "$XDG_BIN_HOME/loadenv"
 set +a
