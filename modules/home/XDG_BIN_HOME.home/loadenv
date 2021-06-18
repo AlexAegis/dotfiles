@@ -49,11 +49,12 @@ DIR="$XDG_CONFIG_HOME" REGEX=".*\.alias" . "$XDG_BIN_HOME/sourcein"
 # shellcheck source=/dev/null
 DIR="$XDG_CONFIG_HOME/alias.d" REGEX=".*\.alias" . "$XDG_BIN_HOME/sourcein"
 
-[ ! "$QUIET" ] && echo "Loading every \
-	.$(echo "${LOADENV_RC_EXTS:-sh}" | sed 's@ @ .@g') rc files"
-# shellcheck source=/dev/null
-DIR="$XDG_CONFIG_HOME/rc.d" \
-	REGEX=".*\.\($(echo "${LOADENV_RC_EXTS:-sh}" | sed 's@ @\\|@g')\)" \
-	. "$XDG_BIN_HOME/sourcein"
+[ ! "$QUIET" ] && echo "Loading every" \
+	".$(echo "${LOADENV_RC_EXTS:-sh}" | sed 's@ @ .@g') rc files"
+# while earlier an advanced regex was used to read all the extensions together
+# a simple solution had to be implemented because BSD find did not support it
+for ext in $(echo $LOADENV_RC_EXTS | tr ' ' '\n'); do
+	DIR="$XDG_CONFIG_HOME/rc.d" REGEX=".*\.$ext" . "$XDG_BIN_HOME/sourcein"
+done
 
 set +a
