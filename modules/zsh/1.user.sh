@@ -21,6 +21,5 @@ echo "Installing plugins"
 echo "Fixing permissions"
 chmod -R 700 "$XDG_CACHE_HOME/antibody"
 chmod -R 700 "$XDG_CONFIG_HOME/zsh"
-compaudit | xargs chmod g-w,o-w
 
 # TODO: Apply zsh-defer source to applicable plugins

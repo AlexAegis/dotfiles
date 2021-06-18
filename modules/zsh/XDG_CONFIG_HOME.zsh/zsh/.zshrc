@@ -25,7 +25,13 @@ fi
 # the fzf plugin is no longer used but this is left here as reference
 # . ~/.config/environment.d/51-fzf.conf
 # Order matters so you can overwrite stuff that the plugins load
-[ -f "$ZDOTDIR/.zsh-plugins.antibody.sh" ] && . "$ZDOTDIR/.zsh-plugins.antibody.sh"
+# omzsh throws some unnecessary warnings unless comfix is disabled
+# while it's loading
+[ -f "$ZDOTDIR/.zsh-plugins.antibody.sh" ] && \
+	ZSH_DISABLE_COMPFIX=true . "$ZDOTDIR/.zsh-plugins.antibody.sh"
+# ! YOUR ENVIRONMENT LOADS AT THIS POINT! ANYTHING BEFORE IT MUST WORK WITHOUT
+# ! IT OR PRECOMPILE IT IN THE .zshenv FILE LIKE THE $XDG_CONFIG_HOME AND
+# ! XDG_CACHE_HOME FILES ARE (and anything in the 20-zshenv.conf file)!
 [ -f "$HOME/.profile" ] && QUIET=1 . "$HOME/.profile"
 
 
