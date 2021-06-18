@@ -1,2 +1,2 @@
 xdg
-rust ? [ ! $pacman ] && [ ! $emerge ]
+rust ? [ ! $pacman ] && [ ! $emerge ] && [ ! $brew ]
