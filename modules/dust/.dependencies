@@ -1,0 +1,2 @@
+rust ? [ ! $brew ] && [ ! $pacman ]
+paru ? [ $pacman ]
