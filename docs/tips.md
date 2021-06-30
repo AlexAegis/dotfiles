@@ -2,8 +2,11 @@
 
 ## [Check if program exists](https://stackoverflow.com/questions/592620)
 
+> Don't forget to route it's output to `/dev/null` when using this in an
+> `if` statement.
+
 ```sh
-command -v <program>
+command -v <program> > /dev/null
 ```
 
 Don't use `which`, it's relatively expensive
