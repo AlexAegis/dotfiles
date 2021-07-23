@@ -3,3 +3,5 @@ home # for the appendabsent script
 ssh
 systemd ? [ $systemd ]
 paru ? [ $pacman ]
+make ? [ ! $pacman ]
+pam
