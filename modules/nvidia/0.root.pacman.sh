@@ -7,5 +7,5 @@
 # TODO: Or make this dotmodule autodetect it
 # if [ uname -r something something ]
 # pacman -Syu --needed --noconfirm dkms nvidia-dkms
-
-pacman -Syu --needed --noconfirm nvidia nvidia-settings
+# nvidia-utils for vulkan support
+pacman -Syu --needed --noconfirm nvidia nvidia-settings nvidia-utils
