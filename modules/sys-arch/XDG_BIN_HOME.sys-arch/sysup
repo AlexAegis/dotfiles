@@ -1,5 +1,0 @@
-#!/bin/sh
-
-sudo pacman -Syu --needed --noconfirm
-${SUDO_USER:+sudo -u $SUDO_USER} \
-	yay -Syu --needed --noconfirm
