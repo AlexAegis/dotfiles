@@ -55,7 +55,8 @@ DIR="$XDG_CONFIG_HOME/alias.d" REGEX=".*\.alias" . "$XDG_BIN_HOME/sourcein"
 	".$(echo "${LOADENV_RC_EXTS:-sh}" | sed 's@ @ .@g') rc files"
 # while earlier an advanced regex was used to read all the extensions together
 # a simple solution had to be implemented because BSD find did not support it
-for ext in $(echo $LOADENV_RC_EXTS | tr ' ' '\n'); do
+for ext in $(echo "$LOADENV_RC_EXTS" | tr ' ' '\n'); do
+	# shellcheck disable=SC1091
 	DIR="$XDG_CONFIG_HOME/rc.d" REGEX=".*\.$ext" . "$XDG_BIN_HOME/sourcein"
 done
 
