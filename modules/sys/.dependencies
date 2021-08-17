@@ -11,3 +11,5 @@ sys-mac ? [ $mac ]
 sys-ubuntu ? [ $ubuntu ]
 sys-void ? [ $void ]
 sys-windows ? [ $windows ]
+
+keyring

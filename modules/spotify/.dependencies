@@ -1,4 +1,6 @@
 # Could specify it as :audio to depend on the current audio solution
 # But that would require conditional deprecation
 :audio
+curl
+gnupg
 paru ? [ $pacman ]
