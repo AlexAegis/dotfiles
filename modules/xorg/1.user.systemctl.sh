@@ -4,4 +4,5 @@
 # needs_root_rights=yes' \
 # 	>"/etc/X11/Xwrapper.config"
 
-systemctl start --user autorandr.service
+# TODO: can't be run from tty, needs display, move to xorg-extras
+# systemctl start --user autorandr.service
