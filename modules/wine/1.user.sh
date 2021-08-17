@@ -1,3 +1,5 @@
 #!/bin/sh
 
-winetricks tahoma corefonts ie8
+winetricks tahoma corefonts
+
+# only one 32 bit: ie8
