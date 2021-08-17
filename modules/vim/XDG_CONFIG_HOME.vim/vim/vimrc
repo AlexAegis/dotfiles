@@ -127,7 +127,6 @@ Plug 'neoclide/jsonc.vim'
 Plug 'majutsushi/tagbar'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'rust-lang/rust.vim'
-Plug 'puremourning/vimspector'
 Plug 'doums/coBra' "
 Plug 'preservim/nerdcommenter'
 Plug 'ryanoasis/vim-devicons'
