@@ -5,3 +5,14 @@
 ## [KDE Wallet](https://wiki.archlinux.org/title/KDE_Wallet)
 
 KDE Keychain solution
+
+## Troubleshooting
+
+### Missing applications
+
+To regenerate the settings run these:
+
+```sh
+cp /etc/xdg/menus/applications.menu ~/.config/menus/
+kbuildsycoca5 --noincremental
+```
