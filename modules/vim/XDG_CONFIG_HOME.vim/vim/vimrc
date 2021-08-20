@@ -134,6 +134,7 @@ Plug 'jistr/vim-nerdtree-tabs'
 Plug 'tpope/vim-eunuch'
 Plug 'will133/vim-dirdiff'
 Plug 'AndrewRadev/linediff.vim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 " Don't use this plugin if wal isn't installed and enabled
 if executable('wal') && ($WAL != '')
 	Plug 'dylanaraps/wal.vim'
