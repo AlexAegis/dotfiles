@@ -4,6 +4,7 @@
 # Since this can be different from system to system I only create a default
 # one that is free to change without changing the global config
 
+if ! [ -e "$XDG_CONFIG_HOME/git/gitconfig.d/user.gitconfig" ]; then
 cat <<EOF > "$XDG_CONFIG_HOME/git/gitconfig.d/user.gitconfig"
 [user]
 	name = AlexAegis
@@ -12,3 +13,4 @@ cat <<EOF > "$XDG_CONFIG_HOME/git/gitconfig.d/user.gitconfig"
 [github]
 	user = AlexAegis
 EOF
+fi
