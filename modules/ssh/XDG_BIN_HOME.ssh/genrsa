@@ -1,12 +1,15 @@
 #!/bin/sh
 
-TARGET=${1:-"$HOME/.ssh"}
-NAME=${2:-"id_rsa"}
+# Generates a non-password protected rsa key pair
+
+NAME=${1:-"id_rsa"}
+TARGET=${2:-"$HOME/.ssh"}
 
 RSA_PRIV="$TARGET/$NAME"
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4086 -out "$RSA_PRIV"
 openssl pkey -in "$RSA_PRIV" -out "$RSA_PRIV.pub" -pubout
 ssh-keygen -f "$RSA_PRIV" -y >"$RSA_PRIV.pub"
+# Comment origin at the end
 sed -i "$ s/$/ $USER@$(hostname)/" "$RSA_PRIV.pub"
 
 chmod 400 "$RSA_PRIV" "$RSA_PRIV.pub"
