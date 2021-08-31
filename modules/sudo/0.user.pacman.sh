@@ -1,3 +1,9 @@
 #!/bin/sh
 
-su -c 'pacman -Syu --needed --noconfirm sudo'
+command='pacman -Syu --needed --noconfirm sudo'
+
+if command -v sudo >/dev/null; then
+	sudo sh -c "$command"
+else
+	su -c "$command"
+fi
