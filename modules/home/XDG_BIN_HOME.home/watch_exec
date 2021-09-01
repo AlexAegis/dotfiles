@@ -9,13 +9,13 @@ IFS=' '
 
 TARGET=
 EXEC=
-DELAY=
+DELAY=2 # 2 seconds
 
 for arg in $(parse_args "" "$@"); do
 	case $arg in
 		-t | --target)
 			if [ -d "$2" ]; then
-				if [ $TARGET ]; then
+				if [ "$TARGET" ]; then
 					TARGET="$TARGET
 $2"
 				else
@@ -29,7 +29,7 @@ $2"
 			;;
 		-e | --exec)
 			if [ "$2" ]; then
-				if [ $EXEC ]; then
+				if [ "$EXEC" ]; then
 					EXEC="$EXEC
 $2"
 				else
@@ -85,13 +85,12 @@ while :; do
 	# freshly calculating the target so newly added symlinks are resolved too
 	TARGET=$(/usr/bin/find $TARGET -maxdepth 3 -exec /usr/bin/readlink -f {} \;)
 	wait_notification $TARGET
-
-	[ $DELAY ] && sleep $DELAY
 	echo "Notification! Execute all: $EXEC"
 	for exe in $EXEC; do
 		echo "exe $exe"
 		eval "$exe"
 	done
+	[ $DELAY ] && sleep $DELAY
 done
 
 echo 'Watch exec terminated'
