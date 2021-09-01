@@ -10,4 +10,4 @@ ExecStart=%E/entr/bin/entr-start-watchers.sh
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 
 [Install]
-WantedBy=default.target
+WantedBy=watcher.target

@@ -8,4 +8,4 @@ ExecStart=%E/systemd/restart_on_change \
 	-t "%E/environment.d" -s "daemon-reload"
 
 [Install]
-WantedBy=default.target
+WantedBy=watcher.target

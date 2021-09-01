@@ -1,0 +1,6 @@
+[Unit]
+Description=Watcher target
+Requires=default.target
+After=default.target
+AllowIsolate=yes
+ConditionEnvironment=SYSTEMD_SERVICE_FILE_WATCHERS='enabled'

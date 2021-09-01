@@ -7,4 +7,4 @@ Wants=notify-restart@%N.service
 ExecStart=%E/systemd/restart_on_change -t "%E/polybar" -s "polybar@%i"
 
 [Install]
-WantedBy=default.target
+WantedBy=watcher.target

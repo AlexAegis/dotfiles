@@ -11,4 +11,4 @@ StartLimitBurst=5
 StartLimitIntervalSec=10
 
 [Install]
-WantedBy=default.target
+WantedBy=watcher.target
