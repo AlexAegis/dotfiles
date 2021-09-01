@@ -23,8 +23,9 @@ cat <<EOF > "$HOME/.profile"
 # Load environmental variables and aliases
 if [ -e "$XDG_BIN_HOME/loadenv" ]; then
 	set -a
+	export XDG_BIN_HOME="$XDG_BIN_HOME"
 	# shellcheck disable=SC1090,SC1091
-	. "$XDG_BIN_HOME/loadenv"
+	. "\$XDG_BIN_HOME/loadenv"
 	set +a
 fi
 EOF
