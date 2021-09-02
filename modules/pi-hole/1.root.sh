@@ -3,5 +3,6 @@
 # shellcheck disable=SC1091
 . "./u.root.sh"
 
-# Ask for a password for the admin panel
-pihole -a -p
+pihole -a -p # Ask for a password for the admin panel
+pihole -a -c # Use Celsius
+pihole -a -e $(git config user.email) # Set contact mail
