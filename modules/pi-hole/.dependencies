@@ -3,3 +3,5 @@ systemd ? [ $systemd ]
 nginx
 pi-network-server
 php
+curl
+sys
