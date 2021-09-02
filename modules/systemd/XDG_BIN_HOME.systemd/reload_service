@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if command -v systemctl >/dev/null; then
+	systemctl daemon-reload
+
+	if systemctl is-active --quiet "$1"; then
+		systemctl reload "$1" || systemctl restart "$1"
+	else
+		systemctl start "$1"
+	fi
+fi
