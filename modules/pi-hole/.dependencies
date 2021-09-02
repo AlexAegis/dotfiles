@@ -5,3 +5,5 @@ pi-network-server
 php
 curl
 sys
+wget
+bash
