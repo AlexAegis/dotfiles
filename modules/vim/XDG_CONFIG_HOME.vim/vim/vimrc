@@ -11,9 +11,11 @@
 """"""""""""""""
 "  Environment "
 """"""""""""""""
+" Vim will not create these folders for you
+" https://vimhelp.org/options.txt.html#%27backupdir%27
 set runtimepath^=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after
-set directory=$XDG_CACHE_HOME/vim/swap//,.,~/tmp,/var/tmp,/tmp
-set backupdir=$XDG_CONFIG_HOME/vim/backup//,.,~/tmp,~/
+set directory=$XDG_CACHE_HOME/vim/swap//,.,$XDG_CACHE_HOME/tmp,/var/tmp,/tmp
+set backupdir=$XDG_CONFIG_HOME/vim/backup//,.,$XDG_CACHE_HOME/tmp
 set undodir=$XDG_CONFIG_HOME/vim/undo//,.
 let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
 let &packpath=&runtimepath
