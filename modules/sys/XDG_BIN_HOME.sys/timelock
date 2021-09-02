@@ -90,8 +90,20 @@ Locks are located in $(obfuscate_directory "$TIMELOCK_DIR")
 -h, --help                    -- Print information on usage and flags then
                                  exit
 -V, --version                 -- Print script version then exit
+-l <LOGLEVEL>,
+--log <LOGLEVEL>,
+--log-level <LOGLEVEL>,       -- set log level, possible values are:
+                                 0, trace, TRACE
+                                 1, info, INFO
+                                 2, warning, WARNING, success, SUCCESS
+                                 3, error, ERROR
+                                 4, none, NONE
+                                	each option in a line mean the same thing
+-v, --verbose                 -- log level 0 (trace)
+-q, --quiet                   -- log level 3 (error)
 -f, --force                   -- Set, even if not expired
 -r, --remove                  -- Remove the lock instead setting it
+-u, --unlock                  -- Alias for removing a lock
 -R, --remove-all-expired      -- Checks for expired locks and removed them
 "
 	exit 0
@@ -127,7 +139,7 @@ interpret_args() {
 				;;
 			-v | --verbose)	TIMELOCK_LOG_LEVEL=0 ;; # Log level trace
 			-q | --quiet) TIMELOCK_LOG_LEVEL=3 ;; # Log level error
-			-r | --remove) mode='remove' ;;
+			-r | --remove | -u | --unlock) mode='remove' ;;
 			-R | --remove-all-expired) mode='remove-all-expired' ;;
 			-f | --force) force='1' ;;
 			-p | --print) print='1' ;;
@@ -212,6 +224,7 @@ timelock_set() {
 }
 
 timelock_remove() {
+	log_info "Removing lock $(timelock_get_lockname_from_filename "$1")"
 	rm "$1"
 }
 
@@ -270,7 +283,10 @@ timelock_list() {
 # shellcheck disable=2046
 interpret_args $(parse_args "" "$@")
 
-if [ ! "$mode" = "remove-all-expired" ] && [ ! "$timelock_duration_or_human_readable" ]; then
+if [ ! "$mode" = "remove-all-expired" ] \
+	&& [ ! "$mode" = "remove" ] \
+	&& [ "$timelock_name" ] \
+	&& [ ! "$timelock_duration_or_human_readable" ]; then
 	mode='check'
 fi
 
