@@ -6,10 +6,12 @@
 # TODO: Refactor with ini editor
 mkdir -p /etc/samba
 touch /etc/samba/smb.conf
-if ! grep -qEi "[global]" /etc/samba/smb.conf >/dev/null; then
+if ! grep -qEi "\[global\]" /etc/samba/smb.conf >/dev/null; then
 cat << EOF >> /etc/samba/smb.conf
 [global]
 security = user
-
+log file = /var/log/samba/%m.log
+logging = systemd
 EOF
 fi
+
