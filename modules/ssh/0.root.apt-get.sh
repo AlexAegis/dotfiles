@@ -1,3 +1,3 @@
 #!/bin/sh
 
-apt-get install -y openssl openssh-server openssh-client
+apt-get install -y openssh-server openssh-client

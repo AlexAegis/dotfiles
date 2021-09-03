@@ -9,12 +9,12 @@ TARGET=${1:-"$HOME/.ssh"}
 openssl req -nodes -x509 -newkey rsa:4086 -keyout "$TARGET/ca.key" \
 	-out "$TARGET/ca.crt" \
 	-subj "/C=HU/ST=Budapest/L=Budapest/O=aegis/OU=root/CN=$(hostname -f)\
-/emailAddress=alexaegis@gmail.com"
+/emailAddress=$(git config user.email)"
 
 # Generate server cert to be signed
 openssl req -nodes -newkey rsa:4086 -keyout "$TARGET/server.key" \
 	-out "$TARGET/server.csr" -subj "/C=HU/ST=Budapest/L=Budapest/\
-O=aegis/OU=server/CN=$(hostname -f)/emailAddress=alexaegis@gmail.com"
+O=aegis/OU=server/CN=$(hostname -f)/emailAddress=$(git config user.email)"
 
 # Sign the server cert
 openssl x509 -req -in "$TARGET/server.csr" -CA "$TARGET/ca.crt" \
@@ -26,7 +26,7 @@ cat "$TARGET/server.key" "$TARGET/server.crt" >"$TARGET/server.pem"
 # Generate client cert to be signed
 openssl req -nodes -newkey rsa:4086 -keyout "$TARGET/client.key" \
 	-out "$TARGET/client.csr" -subj "/C=HU/ST=Budapest/L=Budapest/\
-O=aegis/OU=client/CN=$(hostname -f)/emailAddress=alexaegis@gmail.com"
+O=aegis/OU=client/CN=$(hostname -f)/emailAddress=$(git config user.email)"
 
 # Sign the client cert
 openssl x509 -req -in "$TARGET/client.csr" -CA "$TARGET/ca.crt" \
