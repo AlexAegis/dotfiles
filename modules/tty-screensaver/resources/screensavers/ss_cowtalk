@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cowtalk() {
+	fortune | cowsay -n -f $(ls /usr/share/cows/ | shuf -n1) | lolcat
+}
+
+cowtalk
+while sleep ${1:-4}; do
+	clear
+	cowtalk
+done
