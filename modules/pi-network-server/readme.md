@@ -11,3 +11,11 @@ module).
 
 > Check your local networks setting to set up a fixed ip agains the MAC
 > address of the pi server.
+
+## Bootconfig
+
+You can add kernel flags in `/boot/cmdline.txt`
+
+Add `root=/dev/sdXX` to point to your root partition.
+
+And add `quiet` to disable console logging.
