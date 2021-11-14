@@ -1,9 +1,8 @@
 #!/bin/sh
 
 if ! [ "$1" ]; then
-	echo "target not defined"
-	exit 1
-	# TODO: auto find the first parent that has a .git folder/file
+	target="$(git rev-parse --show-toplevel)"
+	echo "target not defined, using git repository root: ${target}"
 else
 	target="${1%/}"
 fi
