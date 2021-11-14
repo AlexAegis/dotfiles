@@ -8,3 +8,11 @@
 ```sh
 7z a -p<password> <target>.7z <...files>
 ```
+
+## Usage
+
+### Unzipping
+
+```sh
+7z x example.zip -oexample
+```
