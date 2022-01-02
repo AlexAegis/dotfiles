@@ -1,0 +1,12 @@
+[Unit]
+Description=Barrier Client daemon
+After=network.target
+
+[Service]
+User=barrier
+Group=barrier
+ExecStart=barrierc --enable-crypto --display :0 --debug INFO -f 192.168.0.220
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

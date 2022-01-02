@@ -1,0 +1,14 @@
+[Unit]
+Description=Barrier Client daemon
+After=network.target
+StartLimitBurst=3
+StartLimitIntervalSec=60
+
+[Service]
+ExecStart=barrierc --enable-crypto --display :0 --debug INFO -f %i
+ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=xsession.target

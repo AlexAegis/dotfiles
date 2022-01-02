@@ -1,0 +1,5 @@
+chocolatey ? [ $windows ]
+sys
+xdg
+xorg
+ssl
