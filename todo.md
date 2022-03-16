@@ -1,5 +1,13 @@
 # Ideas
 
+TODO: ssh depends on genpg but that installs later, dont use it.
+
+TODO: Gnupg fails to install ./autogen.sh: 3: autoreconf: not found
+/home/alex/.config/dotfiles/modules/pont/../../modules/gnupg/1.root.fallback.sh: 20: ./configure: not found
+
+TODO: Installing ./resources/10-wheel to /etc/sudoers.d/
+install: invalid group ‘wheel’ usermod -aG wheel $USER & maz not work
+
 TODO: tiling desktop session entry, one stoic and one fancy
 
 TODO: Floating faded background neofetch on startup

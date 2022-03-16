@@ -10,3 +10,6 @@ Since git doesn't really support config directories or globbed config imports
 all possible git config files have to be explicitly mentioned in the main
 git config file. Thankfully it does not throw a tantrum for non-existent
 files.
+
+TODO: The gitconfig file should be created dynamically as the key handle can be
+different
