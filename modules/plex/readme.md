@@ -4,8 +4,24 @@
 
 Media server
 
-<https://forums.plex.tv/t/complete-walkthrough-for-sharing-a-plex-media-server-between-windows-and-raspberry-pi/297862>
+Web interface available under `host:32400/web`
 
-TODO: set up dhcp address for the server
+## Disabling Auth on local network
 
-TODO: Run it in another user
+Add `192.168.0.1/255.255.255.0` (Or whatever your local network is in
+gateway/mask format) To your servers Network settings, to the
+`List of IP addresses and networks that are allowed without auth` field.
+
+Connecting to Plex from this network then wont require a pin.
+
+## Disabling unwanted services
+
+Go to `web/index.html#!/settings/online-media-sources`
+
+And disable everything you don't need. You might also have to unpin these.
+
+## Removing old servers
+
+Go to `web/index.html#!/settings/devices/all`
+
+Remove unwanted servers.

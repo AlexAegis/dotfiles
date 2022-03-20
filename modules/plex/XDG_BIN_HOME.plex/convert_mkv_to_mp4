@@ -1,0 +1,23 @@
+#!/bin/sh
+
+while [ "$1" ]; do
+	(
+		folder="$1"
+		if ! [ -d "$1" ]; then
+			folder="${1%/*}"
+		fi
+		cd "$folder" || exit 1
+		# Process all paths
+		find -iname "*.mkv" | while read file; do
+			echo "Converting $file to mp4"
+			ffmpeg -i "$file" -codec copy "${file%.*}.mp4" # copy into mp4 container
+			if [ "$?" = "0" ]; then
+				echo "Removing original file..."
+				rm "$file" # remove original if the conversion was successful
+			else
+				echo "Conversion failed!"
+			fi
+		done
+	)
+	shift
+done
