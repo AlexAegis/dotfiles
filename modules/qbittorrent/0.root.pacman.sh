@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm qbittorrent
+pacman -Syu --needed --noconfirm qbittorrent qbittorrent-nox
