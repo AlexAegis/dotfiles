@@ -7,17 +7,25 @@
 # TODO: Refactor with ini editor
 mkdir -p /etc/samba
 touch /etc/samba/smb.conf
-if ! grep -qEi "[PiShare]" /etc/samba/smb.conf >/dev/null; then
+if ! grep -qEi "\[pimedia\]" /etc/samba/smb.conf >/dev/null; then
 cat << EOF >> /etc/samba/smb.conf
-[PiShare]
-	comment=Pi Share
+[media]
+	comment=Media Share
 	path=/var/media
 	browseable=yes
 	writeable=yes
 	only guest=no
-	create mask=0740
-	directory mask=0750
 	public=no
+	valid users = @media
+	force user = media
+	force group = +media
+	create mask = 0664
+	directory mask = 2775
+	force create mode = 0664
+	force directory mode = 2775
 EOF
 fi
 
+mkdir -p /var/media
+useradd -M -U media
+chown -R media:media /var/media

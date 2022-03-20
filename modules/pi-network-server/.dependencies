@@ -2,3 +2,6 @@ ssh
 sshd
 samba
 xdg
+systemd ? [ $systemd ]
+sys
+tty-screensavers
