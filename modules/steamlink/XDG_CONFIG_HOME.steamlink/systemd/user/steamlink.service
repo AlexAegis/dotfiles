@@ -1,0 +1,11 @@
+[Unit]
+Description=Steamlink
+
+[Service]
+ExecStart=/usr/bin/steamlink
+ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=graphical.target
