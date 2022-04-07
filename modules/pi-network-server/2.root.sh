@@ -27,5 +27,5 @@ EOF
 fi
 
 mkdir -p /var/media
-useradd -M -U media
+try_create_service_user.sh media
 chown -R media:media /var/media
