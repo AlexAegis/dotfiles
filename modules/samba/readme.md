@@ -6,7 +6,7 @@ The standard Windows interoperability suite
 
 ## Mapped Network Drives
 
-Avaialble at `\\HOSTNAME.local\SHARENAME`
+Available at `\\HOSTNAME.local\SHARENAME`
 
 ## Reload
 
