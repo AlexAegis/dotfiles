@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # Set up a samba password for the user
-smbpasswd -a "${SAMBA_USER:-$USER}"
+smbpasswd -a "${SUDO_USER:-$USER}"

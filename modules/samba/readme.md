@@ -4,6 +4,14 @@
 
 The standard Windows interoperability suite
 
+## Access
+
+Add users and change passwords using `smbpasswd`
+
+```sh
+smbpasswd -a <user>
+```
+
 ## Mapped Network Drives
 
 Available at `\\HOSTNAME.local\SHARENAME`
