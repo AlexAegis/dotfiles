@@ -1,3 +1,3 @@
 #!/bin/sh
 
-systemctl enable --now sshd.service
+reload_service sshd.service
