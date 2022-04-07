@@ -4,6 +4,7 @@
 ## System
 
 alias restart="sudo reboot now"
+alias lsblk="lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,FSSIZE,FSUSE%,FSUSED,FSAVAIL,PARTUUID,UUID"
 
 ## Environment
 alias renv='LOAD_CONF=1 . "$XDG_BIN_HOME/loadenv"'
