@@ -385,19 +385,38 @@ guide.
     1. Create an admin user for yourself
 
        ```sh
-       useradd -m -U -G wheel,root -s /bin/zsh alex
+       useradd -m -U -G wheel,root -s /bin/zsh <user>
        ```
 
-    2. Give sudo access to yourself
-
-       > `visudo` is not needed here, it only does a syntax check \
-       > If you are confident enough, leave it out. \
-       > Make sure `vi` is installed if you want to do the check
+    2. Change your password
 
        ```sh
-       echo 'alex ALL=(ALL:ALL) ALL' > /etc/sudoers.d/05-alex
-       chmod 440 /etc/sudoers.d/05-alex
-       visudo -cf /etc/sudoers.d/05-alex
+       passwd <user>
+       ```
+
+    3. Give passwordless sudo access to the wheel group
+
+       Launch `visudo`, and uncomment or add this line:
+
+       ```ini
+       %wheel ALL=(ALL:ALL) NOPASSWD: ALL
+       ```
+
+       If you only want to add it to your user alone:
+
+       > The `visudo` is not necessary here, it only does a syntax check \
+       > If you are confident enough, leave it out.
+
+       ```sh
+       echo '<user> ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/05-<user>
+       chmod 440 /etc/sudoers.d/05-<user>
+       ```
+
+       And optionally do a syntax check with `visudo` if you didn't edit the
+       file with that:
+
+       ```sh
+       visudo -cf /etc/sudoers.d/05-<user>
        ```
 
        > It starts with `05` so that most of the later installed sudoer files
@@ -405,12 +424,18 @@ guide.
        > even more permissions (NOPASSWD: ALL) will only have an effect on this
        > user if it's loaded after this, less permissive one.
 
-    3. Optionally create a guest user
+    4. Optionally create a guest user and delete unused users
 
        > Good for experimenting how things work in an unpriviliged environment
 
        ```sh
        useradd -m -U -s /bin/zsh guest
+       ```
+
+       ARM images come with a default `alarm` user, you can delete that:
+
+       ```sh
+       userdel alarm
        ```
 
 19. Reboot into the installed system

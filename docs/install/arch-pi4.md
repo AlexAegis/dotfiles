@@ -42,3 +42,9 @@ works out of the box.
 
 Thank you so much kyoshiro for figuring this out!
 <https://archlinuxarm.org/forum/viewtopic.php?f=67&t=15422&start=20#p68473>
+
+## Setup
+
+Follow the same steps as for a [normal arch installation](./arch.md)
+
+Don't forget to update the locale, the default is `C`.
