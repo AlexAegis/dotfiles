@@ -5,7 +5,10 @@ if command -v systemctl >/dev/null; then
 
 	if systemctl is-active --quiet "$1"; then
 		systemctl reload "$1" || systemctl restart "$1"
-	else
+	elif systemctl is-enabled --quiet "$1"; then
 		systemctl start "$1"
+	else
+		systemctl enable --now "$1"
 	fi
+
 fi
