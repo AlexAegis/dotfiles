@@ -1,0 +1,15 @@
+{
+	"recommendations": [
+		"editorconfig.editorconfig",
+		"eamodio.gitlens",
+		"mhutchie.git-graph",
+		"Gruntfuggly.todo-tree",
+		"aaron-bond.better-comments",
+		"esbenp.prettier-vscode",
+		"DavidAnson.vscode-markdownlint",
+		"npxms.hide-gitignored",
+		"timonwong.shellcheck",
+		"coolbear.systemd-unit-file",
+		"dunstontc.viml"
+	]
+}
