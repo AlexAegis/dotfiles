@@ -1,5 +1,6 @@
 paru ? [ $pacman ]
 systemd ? [ $systemd ]
+git
 nginx
 pi-network-server
 php

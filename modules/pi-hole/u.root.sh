@@ -5,6 +5,7 @@ cp ./resources/nginx/nginx.pihole-proxy.conf "$NGINX_SITES_ENABLED/"
 cp ./resources/systemd/resolved.conf /etc/systemd
 cp ./resources/systemd/pihole.conf /etc/systemd/system/php-fpm.service.d/
 cp ./resources/pihole-updatelists.conf /etc/
+cp ./resources/pihole-FTL.conf /etc/pihole/pihole-FTL.conf
 
 reload_service php-fpm
 reload_service systemd-resolved
