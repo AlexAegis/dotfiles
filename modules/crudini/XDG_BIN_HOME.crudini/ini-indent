@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Adds a leading tab for every line not starting with `[`, `#`, `;` or a tab.
+
+sed -i '/^[\t#;\[]/! s/^/\t/g' "$1"
