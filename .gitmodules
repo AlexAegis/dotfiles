@@ -2,10 +2,6 @@
 	path = modules/pont
 	url = https://www.github.com/AlexAegis/pont
 	branch = master
-[submodule ".vscode"]
-	path = .vscode
-	url = https://www.github.com/AlexAegis/.vscode
-	branch = shell
 [submodule "modules/wallpapers"]
 	path = modules/wallpapers
 	url = https://www.github.com/AlexAegis/wallpapers
