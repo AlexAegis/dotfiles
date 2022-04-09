@@ -13,10 +13,10 @@
 		"coc-lists": ">=1.4.2",
 		"coc-prettier": ">=9.2.3",
 		"coc-python": ">=1.2.13",
-		"coc-rust-analyzer": ">=0.61.0",
+		"coc-rust-analyzer": ">=0.61.2",
 		"coc-tag": ">=1.2.5",
-		"coc-tsserver": ">=1.9.14",
+		"coc-tsserver": ">=1.9.17",
 		"coc-word": ">=1.2.2",
-		"coc-yaml": ">=1.7.4"
+		"coc-yaml": ">=1.7.5"
 	}
 }
