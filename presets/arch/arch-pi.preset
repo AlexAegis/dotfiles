@@ -15,5 +15,8 @@ locale
 pi-hole
 pi-network-server
 emby
-lightdm
 tty-screensaver
+# Optional desktop environment, won't launch on pi unless manually started
+lightdm
+xfce
+barrier
