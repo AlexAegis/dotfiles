@@ -17,7 +17,7 @@ if ! id "$username" 2>/dev/null; then
 		# group doesnt exist, create one with the user
 		if [ -z "${CREATE_WITH_HOME}" ]; then
 			# With a home folder
-			useradd -U "$username"
+			useradd -m -U "$username"
 		else
 			# Without
 			useradd -M -U "$username"
@@ -26,7 +26,7 @@ if ! id "$username" 2>/dev/null; then
 		# group exists, do not create one for the user, just add them to it
 		if [ -z "${CREATE_WITH_HOME}" ]; then
 			# With a home folder
-			useradd -N "$username"
+			useradd -m -N "$username"
 		else
 			# Without
 			useradd -M -N "$username"
