@@ -1,0 +1,2 @@
+# While it is usable on Linux (x86), there's no point.
+[ "$mac" ]
