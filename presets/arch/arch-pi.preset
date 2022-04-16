@@ -1,6 +1,7 @@
 sudo
 sudo-extra
 pont-extra
+:sys
 ssh
 sshd
 gnupg
@@ -14,3 +15,5 @@ locale
 pi-hole
 pi-network-server
 emby
+lightdm
+tty-screensaver

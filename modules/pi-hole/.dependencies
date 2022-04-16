@@ -5,6 +5,6 @@ nginx
 pi-network-server
 php
 curl
-sys
+:sys
 wget
 bash

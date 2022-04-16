@@ -1,15 +1,4 @@
 xdg
 coreutils
 home # because of parse_args and appendabsent
-# TODO: once conditionfiles are done, this can be replaced with a tag
-# and the module itself with sys-base or something
-sys-arch ? [ $arch ]
-sys-debian ? [ $debian ]
-sys-freebsd ? [ $freebsd ]
-sys-gentoo ? [ $gentoo ]
-sys-mac ? [ $mac ]
-sys-ubuntu ? [ $ubuntu ]
-sys-void ? [ $void ]
-sys-windows ? [ $windows ]
-
 keyring

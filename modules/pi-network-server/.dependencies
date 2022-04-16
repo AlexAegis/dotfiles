@@ -3,6 +3,7 @@ sshd
 samba
 xdg
 systemd ? [ $systemd ]
-sys
+:sys
 tty-screensavers
 crudini
+lightdm

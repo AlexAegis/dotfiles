@@ -1,4 +1,4 @@
 chocolatey ? [ $windows ]
 systemd ? [ $systemd ]
-sys
+:sys
 home
