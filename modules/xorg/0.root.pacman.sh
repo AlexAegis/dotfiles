@@ -1,6 +1,7 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm \
+# Conflicts in the xorg bundle, --noconfirm is removed
+pacman -Syu --needed \
 	xorg \
 	xorg-xinit \
 	autorandr \
