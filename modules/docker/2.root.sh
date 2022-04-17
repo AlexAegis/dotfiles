@@ -1,3 +1,4 @@
 #!/bin/sh
 
-usermod -a -G docker "$USER"
+# Add the current user to the docker group
+usermod -aG docker "${SUDO_USER:-$USER}"
