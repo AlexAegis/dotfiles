@@ -5,4 +5,4 @@ groupadd --force media
 mkdir -p /var/media
 chown -R root:media /var/media
 # Add your user to the group for access
-usermod -aG media "${SUDO_USER:-USER}"
+usermod -aG media "${SUDO_USER:-$USER}"
