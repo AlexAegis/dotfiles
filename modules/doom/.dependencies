@@ -1,5 +1,5 @@
 xdg
 7z
 rar
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 brew ? [ $mac ]

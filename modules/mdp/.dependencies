@@ -1,4 +1,4 @@
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 xdg ? [ $pacman ]
 make ? [ $pacman ]
 git ? [ $pacman ]

@@ -1,2 +1,2 @@
 rust ? [ ! $brew ] && [ ! $pacman ]
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]

@@ -1,1 +1,1 @@
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]

@@ -4,4 +4,4 @@ ssh
 gnupg
 systemd ? [ $systemd ]
 python ? [ ! $pacman ]
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]

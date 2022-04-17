@@ -1,5 +1,5 @@
 xdg
 home
 sys-gentoo ? [ $gentoo ] # portage install
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 sudo

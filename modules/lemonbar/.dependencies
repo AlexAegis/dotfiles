@@ -1,4 +1,4 @@
 xdg
 systemd ? [ $systemd ]
 xorg
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]

@@ -1,2 +1,2 @@
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 systemd ? [ $systemd ]

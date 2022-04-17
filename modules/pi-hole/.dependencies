@@ -1,4 +1,4 @@
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 systemd ? [ $systemd ]
 git
 nginx

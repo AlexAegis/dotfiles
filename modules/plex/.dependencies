@@ -1,6 +1,6 @@
 systemd ? [ $systemd ]
 transmission
 chocolatey ? [ $windows ]
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 nginx
 ffmpeg

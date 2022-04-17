@@ -1,5 +1,5 @@
 # because of the icon settings
 xdg
 nerdfonts
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 brew ? [ $mac ]

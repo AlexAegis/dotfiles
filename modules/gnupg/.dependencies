@@ -2,6 +2,6 @@ xdg
 home # for the appendabsent script
 ssh
 systemd ? [ $systemd ]
-paru ? [ $pacman ]
+:aur-helper ? [ $pacman ]
 make ? [ ! $pacman ]
 pam
