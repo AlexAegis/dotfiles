@@ -4,6 +4,6 @@ samba
 xdg
 systemd ? [ $systemd ]
 :sys
-tty-screensavers
+tty-screensaver
 crudini
 lightdm
