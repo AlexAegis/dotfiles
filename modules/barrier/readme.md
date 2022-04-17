@@ -11,6 +11,20 @@ On the machine where you host your peripherials, launch barrier as the server.
 The server has to be configured with a screen matching the hostname of the
 client for it accept that client.
 
+### Windows DPI Fix
+
+> https://github.com/debauchee/barrier/issues/1638
+
+1. Go to `C:\Program Files\Barrier`
+2. Right click `barriers.exe`, Properties
+3. Go to Compatibility Tab
+4. Click `Change settings for all users`
+5. Click `Change high DPI settings`
+6. Tick in `Use this setting to fix...`
+7. Tick in `Override high DPI scaling behavior`
+8. OK. OK. OK.
+9. Restart server (Completely quit it from the taskbar)
+
 ### SSL
 
 By default an SSL cert is missing for barrier to use so generate one:
