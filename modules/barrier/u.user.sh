@@ -25,12 +25,18 @@ fi
 timeout 2s openssl s_client -connect "${BARRIER_SERVER_IP}:${BARRIER_SERVER_PORT}" \
     < /dev/null 2>/dev/null | \
     openssl x509 -fingerprint -sha256 -noout -in /dev/stdin | \
-    cut -d '=' -f 2 | sed -e 's/://g' -e 's/^/v2:sha256:/' > "$trusted_file"
+    cut -d '=' -f 2 | sed -e 's/://g' -e 's/^/v2:sha256:/' > "$trusted_file.tmp"
 
 timeout 2s openssl s_client -connect "${BARRIER_SERVER_IP}:${BARRIER_SERVER_PORT}" \
     < /dev/null 2>/dev/null | \
     openssl x509 -fingerprint -sha1 -noout -in /dev/stdin | \
-    cut -d '=' -f 2 | sed -e 's/://g' -e's/^/v2:sha1:/' >> "$trusted_file"
+    cut -d '=' -f 2 | sed -e 's/://g' -e's/^/v2:sha1:/' >> "$trusted_file.tmp"
+
+if [ -s "$trusted_file.tmp" ]; then
+    mv "$trusted_file.tmp" "$trusted_file"
+else
+    rm "$trusted_file.tmp"
+fi
 
 # Stop and disable all server listeners and start the currently configured one
 
