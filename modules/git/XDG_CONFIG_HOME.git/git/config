@@ -3,6 +3,7 @@
 	path = gitconfig.d/wsl-credential-helper.gitconfig
 	path = gitconfig.d/credential-helper.gitconfig
 	path = gitconfig.d/gpg-signing-key.gitconfig
+	path = gitconfig.d/kde.gitconfig
 
 [credential]
 	useHttpPath = true
