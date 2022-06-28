@@ -2,7 +2,11 @@
 	"editor.tabSize": 4,
 	"editor.formatOnSave": true,
 	"editor.autoIndent": "full",
-	"editor.quickSuggestions": true,
+	"editor.quickSuggestions": {
+		"comments": "on",
+		"strings": "on",
+		"other": "on"
+	},
 	"editor.mouseWheelZoom": true,
 	"editor.semanticHighlighting.enabled": true,
 	"editor.fontLigatures": true,
