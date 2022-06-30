@@ -29,6 +29,12 @@ To update everything on startup
 choco install choco-upgrade-all-at-startup -y
 ```
 
+To enable auto confirmation on installs
+
+```ps1
+choco feature enable -n allowGlobalConfirmation
+```
+
 ### [Git](https://git-scm.com/download/win)
 
 ```ps1
@@ -47,10 +53,22 @@ choco install vscode -y
 choco install nodejs -y
 ```
 
+### [Rust](https://www.rust-lang.org/)
+
+```ps1
+choco install rust -y
+```
+
 ### [Python](https://www.python.org/)
 
 ```ps1
 choco install python -y
+```
+
+### [mingw](https://www.mingw-w64.org/)
+
+```ps1
+choco install mingw -y
 ```
 
 ### [7zip](https://www.7-zip.org/)
