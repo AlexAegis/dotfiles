@@ -65,6 +65,12 @@ choco install rust -y
 choco install python -y
 ```
 
+### [gnupg](https://www.gnupg.org/)
+
+```ps1
+choco install gnupg -y
+```
+
 ### [mingw](https://www.mingw-w64.org/)
 
 ```ps1
