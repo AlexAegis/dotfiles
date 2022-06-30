@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env powershell
 
 rustup install nightly
 rustup default stable
