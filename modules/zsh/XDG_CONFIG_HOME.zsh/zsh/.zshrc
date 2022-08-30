@@ -27,8 +27,9 @@ fi
 # Order matters so you can overwrite stuff that the plugins load
 # omzsh throws some unnecessary warnings unless comfix is disabled
 # while it's loading
-[ -f "$ZDOTDIR/.zsh-plugins.antibody.sh" ] && \
-	ZSH_DISABLE_COMPFIX=true . "$ZDOTDIR/.zsh-plugins.antibody.sh"
+
+. "$ANTIDOTE_DIR/antidote.zsh"
+. "$ZDOTDIR/.zsh-plugins.zsh"
 # ! YOUR ENVIRONMENT LOADS AT THIS POINT! ANYTHING BEFORE IT MUST WORK WITHOUT
 # ! IT OR PRECOMPILE IT IN THE .zshenv FILE LIKE THE $XDG_CONFIG_HOME AND
 # ! XDG_CACHE_HOME FILES ARE (and anything in the 20-zshenv.conf file)!

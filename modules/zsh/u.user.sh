@@ -2,7 +2,16 @@
 
 echo "Updating plugins"
 
-# if it has problems regarding changes in the cache just delete it and reinstall
-# the module rm -rf ~/.cache/antibody/                                                                                                               ✔  23:05:50
-rm "$ZDOTDIR"/.zcompdump*
-"$ZDOTDIR/bin/antibody" update
+# Antidote https://getantidote.github.io/
+if ! [ -d "$ANTIDOTE_DIR/.git" ]; then
+	echo "Installing Antidote..."
+	git clone --depth=1 https://github.com/mattmc3/antidote.git "$ANTIDOTE_DIR"
+else
+	echo "Updating Antidote..."
+	(
+		cd "$ANTIDOTE_DIR" || exit 1
+		git pull
+	)
+fi
+
+/bin/zsh "./XDG_BIN_HOME.zsh/antidote-bundle.zsh"
