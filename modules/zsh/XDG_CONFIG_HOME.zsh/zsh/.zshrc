@@ -1,6 +1,7 @@
 #!/bin/zsh
 # zsh startup file
 # start profiling
+# BENCH=1
 if [ "$BENCH" ]; then
 	zmodload zsh/zprof
 fi
@@ -9,9 +10,14 @@ fi
 
 export LOADENV_RC_EXTS="sh zsh" # used by loadenv
 # TODO: The compinit file generates errors on debian buster
+
+unsetopt PROMPT_SP
+autoload -Uz promptinit && promptinit
+autoload -Uz compinit && compinit
+
 # Custom Compdef
 fpath=($XDG_CONFIG_HOME/zsh/compdef $fpath)
-unsetopt PROMPT_SP
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top
 # of ~/.config/zsh/.zshrc. Initialization code that may require console input
 # (password prompts, [y/n] confirmations, etc.) must go above this block,
@@ -27,7 +33,6 @@ fi
 # Order matters so you can overwrite stuff that the plugins load
 # omzsh throws some unnecessary warnings unless comfix is disabled
 # while it's loading
-
 . "$ANTIDOTE_DIR/antidote.zsh"
 . "$ZDOTDIR/.zsh-plugins.zsh"
 # ! YOUR ENVIRONMENT LOADS AT THIS POINT! ANYTHING BEFORE IT MUST WORK WITHOUT
@@ -78,12 +83,6 @@ zstyle ':completion:*' special-dirs false
 # TODO: bugged and removes autocomplete suggestions
 export POWERLEVEL9K_EXPERIMENTAL_TIME_REALTIME=false
 
-# zsh-users/zsh-autosuggestions
-# https://github.com/zsh-users/zsh-autosuggestions
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#444"
-export ZSH_AUTOSUGGEST_STRATEGY=(completion history)
-export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-export ZSH_AUTOSUGGEST_USE_ASYNC=1
 
 # direnv hook
 if [ command -v direnv > /dev/null 2>&1 ]; then

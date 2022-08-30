@@ -3,7 +3,7 @@ romkatv/powerlevel10k
 alexaegis/pont
 djui/alias-tips
 caarlos0/zsh-mkc
-softmoth/zsh-vim-mode
+# softmoth/zsh-vim-mode
 # Aloxaf/fzf-tab
 # junegunn/fzf
 
@@ -25,6 +25,7 @@ robbyrussell/oh-my-zsh path:plugins/themes
 
 ## completions must be after oh-my-zsh
 zsh-users/zsh-completions
-zsh-users/zsh-autosuggestions
+# buggy
+# zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting
 zsh-users/zsh-history-substring-search

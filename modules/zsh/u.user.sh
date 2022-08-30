@@ -15,3 +15,5 @@ else
 fi
 
 /bin/zsh "./XDG_BIN_HOME.zsh/antidote-bundle.zsh"
+
+# antidote update
