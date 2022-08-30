@@ -64,3 +64,11 @@ environmental variable:
 export GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 ```
+
+## Test
+
+Testing gpg signing functionality
+
+```sh
+echo "test" | gpg --clearsign
+```
