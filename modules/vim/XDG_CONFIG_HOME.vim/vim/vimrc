@@ -114,7 +114,6 @@ Plug 'machakann/vim-highlightedyank'
 Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
-Plug 'scrooloose/nerdtree' ", { 'on':  'NERDTreeToggle' }
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'camspiers/animate.vim'
 Plug 'camspiers/lens.vim'
@@ -127,7 +126,7 @@ Plug 'rainglow/vim'
 Plug 'mkarmona/colorsbox'
 Plug 'neoclide/jsonc.vim'
 Plug 'majutsushi/tagbar'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 Plug 'rust-lang/rust.vim'
 Plug 'doums/coBra' "
 Plug 'preservim/nerdcommenter'
@@ -263,6 +262,7 @@ let g:gitgutter_sign_removed_first_line = '█'
 let g:gitgutter_sign_modified_removed = '█'
 let g:gitgutter_highlight_linenrs = 1
 """ neoclide/coc.nvim
+let g:coc_disable_startup_warning = 1
 let g:coc_config_home = "$XDG_CONFIG_HOME/vim/"
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
@@ -296,9 +296,10 @@ set signcolumn=yes
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-	\ pumvisible() ? "\<C-n>" :
-	\ <SID>check_back_space() ? "\<TAB>" :
-	\ coc#refresh()
+      \ coc#pum#visible() ? coc#pum#next(1):
+      \ <SID>check_back_space() ? "\<Tab>" :
+      \ coc#refresh()
+
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
@@ -306,9 +307,12 @@ function! s:check_back_space() abort
 	return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" Accept completion with Enter.
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() :
-	\"\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+inoremap <silent><expr> <C-x><C-z> coc#pum#visible() ? coc#pum#stop() : "\<C-x>\<C-z>"
+
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+hi CocSearch ctermfg=12 guifg=#18A3FF
+hi CocMenuSel ctermbg=109 guibg=#13354A
 
 " Use <c-space> to trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
