@@ -15,6 +15,20 @@ Make sure to set both `Set time automatically` and
 `Set timezone automatically` to on in the Date & time settings page, then hit
 Sync Now.
 
+## [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)
+
+WSL is preinstalled on Windows 11, just run the following command to install `Unbuntu` for example:
+
+```ps1
+wsl --install --distribution Ubuntu
+```
+
+To get a list of available distributions run
+
+```ps1
+wsl --list --online
+```
+
 ## [Chocolatey](https://chocolatey.org/)
 
 To update everything
@@ -47,10 +61,20 @@ choco install git -y
 choco install vscode -y
 ```
 
-### [NodeJS](https://nodejs.org/en/)
+### [fnm](https://github.com/Schniz/fnm) 
+
+> To then install [NodeJS](https://nodejs.org/en/)
 
 ```ps1
-choco install nodejs -y
+choco install fnm -y
+```
+
+Then make sure you have a PowerShell profile file at
+`~\Documents\PowerShell\Microsoft.PowerShell_profile.ps1`
+with the following content:
+
+```ps1
+fnm env --use-on-cd | Out-String | Invoke-Expression
 ```
 
 ### [Rust](https://www.rust-lang.org/)
