@@ -149,7 +149,8 @@ choco install nvidia-display-driver
 
 ### Keyboard
 
-Tick in `Let me use a different input method for each app window`
+1. Go to Time & Language > Typing > Advanced Keyboard Settings
+2. Tick in `Let me use a different input method for each app window`
 
 ### Passworldless Login
 
