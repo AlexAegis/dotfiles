@@ -119,6 +119,18 @@ choco install qbittorrent -y
 choco install wiztree -y
 ```
 
+### [Spotify](https://open.spotify.com/)
+
+```ps1
+choco install spotify -y
+```
+
+- Log in
+- Open Settings
+- Audio Quality > Streaming Quality > Set to Very High
+- Audio Quality > Download > Set to Very High
+- Set all playlists to download
+
 ## Fonts
 
 - [Powerline Fonts](https://github.com/powerline/fonts)
