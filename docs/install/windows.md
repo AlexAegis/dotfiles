@@ -113,6 +113,12 @@ choco install 7zip -y
 choco install qbittorrent -y
 ```
 
+### [WizTree](https://diskanalyzer.com/)
+
+```ps1
+choco install wiztree -y
+```
+
 ## WSL
 
 [Installation Guide](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
