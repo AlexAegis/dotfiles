@@ -119,21 +119,10 @@ choco install qbittorrent -y
 choco install wiztree -y
 ```
 
-## WSL
-
-[Installation Guide](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
-
-### Windows Terminal
-
-[From Microsoft Store](https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701)
-
-### Ubuntu
-
-[From Microsoft Store](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6)
-
 ## Fonts
 
-[Powerline Fonts](https://github.com/powerline/fonts)
+- [Powerline Fonts](https://github.com/powerline/fonts)
+- [NerdFonts](https://github.com/ryanoasis/nerd-fonts)
 
 ### PowerShell Exectuion Policy
 
