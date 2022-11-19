@@ -159,6 +159,12 @@ Tick in `Let me use a different input method for each app window`
 3. Uncheck `Users Must Enter a User Name and Password to Use This Computer`
 4. Click Ok and enter your Microsoft accounts password
 
+### File extensions & Hidden Items
+
+1. Open up File Explorer
+2. Click View > Show > File Extensions
+3. Click View > Show > Hidden Items
+
 ## VoIP
 
 ### [Discord](https://discord.com/download)
