@@ -161,6 +161,11 @@ choco install nvidia-display-driver
 2. Click View > Show > File Extensions
 3. Click View > Show > Hidden Items
 
+### Taskbar
+
+1. Go to Personalization > Taskbar > Taskbar Behaviors
+2. Set [Taskbar alignment to left](https://i.kym-cdn.com/entries/icons/original/000/026/152/gigachad.jpg)
+
 ## VoIP
 
 ### [Discord](https://discord.com/download)
