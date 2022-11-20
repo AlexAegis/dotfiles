@@ -126,7 +126,7 @@ Plug 'rainglow/vim'
 Plug 'mkarmona/colorsbox'
 Plug 'neoclide/jsonc.vim'
 Plug 'majutsushi/tagbar'
-Plug 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': 'yarn install --frozen-lockfile'}
 Plug 'rust-lang/rust.vim'
 Plug 'doums/coBra' "
 Plug 'preservim/nerdcommenter'
