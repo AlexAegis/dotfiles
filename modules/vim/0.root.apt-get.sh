@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # ctags for the tagbar plugin
-apt-get install -y vim ctags
+apt-get install -y vim universal-ctags
