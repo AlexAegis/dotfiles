@@ -4,4 +4,7 @@
 . "./0.user.sh"
 . "./1.user.sh"
 
-npm install -g npm@7
+# update npm and other common package managers
+npm install -g npm
+npm install -g yarn
+npm install -g pnpm
