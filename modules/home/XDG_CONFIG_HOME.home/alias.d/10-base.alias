@@ -16,6 +16,7 @@ alias rm="rm -r" # remove folders too by default
 alias cd..="echo 'You missed a space again!' && cd .."
 alias popath='export PATH="$(pwd):$PATH"' # temporary path modification
 alias path="echo \$PATH"
+alias cwd="pwd" # print working directory => current working directory
 
 ## ls
 alias ls="ls -a"
