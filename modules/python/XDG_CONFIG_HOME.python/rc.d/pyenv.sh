@@ -2,4 +2,4 @@
 
 # Prompted by calling `pyenv init`
 
-eval "$(pyenv init --path)"
+eval "$(pyenv init -)"

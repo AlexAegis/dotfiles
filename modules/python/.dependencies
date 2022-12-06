@@ -1,3 +1,7 @@
 xdg
 chocolatey ? [ $windows ]
 xcode ? [ $mac ]
+wget
+curl
+git
+gcc
