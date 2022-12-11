@@ -10,3 +10,4 @@ rustup component add rustfmt
 
 # Cargo extensions
 cargo install cargo-tree
+cargo install cargo-edit
