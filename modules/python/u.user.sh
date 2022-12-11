@@ -23,4 +23,4 @@ pyenv versions | tail -n 1 | sed 's/^ *//g' > "$(pyenv root)"/versions
 # Upgrade pip
 pip install --upgrade pip
 # Install common global tools
-pip install setuptools wheel pipenv
+pip install setuptools wheel pipenv poetry
