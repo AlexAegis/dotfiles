@@ -14,5 +14,11 @@ crudini --merge /srv/minecraft/server.properties << EOF
 query.port=26666
 rcon.port=26676
 server-port=26666
+difficulty=hard
 motd=MinePi
+view-distance=14
+online-mode=true
 EOF
+
+# online-mode=false allows players with non original copies of minecraft to join
+# with an offline account
