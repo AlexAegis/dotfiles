@@ -1,0 +1,28 @@
+#!/bin/sh
+
+git_repo_dir="${GIT_REPO_HOME:-$HOME/git}"
+repositories=""
+banned="node_modules
+.turbo
+archive
+"
+
+collect_repositories() {
+	for directory in "$1"/*; do
+		if [ -d "$directory" ]; then
+			if [ -d "${directory}/.git" ]; then
+				repositories="${repositories}
+${directory}"
+
+			elif [ "$(echo "$banned" | grep -x "${directory##*/}")" = '' ]; then
+				collect_repositories "${directory}"
+			fi
+		fi
+	done
+}
+
+
+collect_repositories "${git_repo_dir}"
+
+echo "$repositories" |  xargs -I {} -n 1 -P 4 sh -c \
+	'echo "git pulling" {} && git -C {} pull --autostash || echo "failed {}"'
