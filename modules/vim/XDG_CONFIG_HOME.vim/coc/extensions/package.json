@@ -7,7 +7,7 @@
     "coc-eslint": ">=1.5.8",
     "coc-git": ">=2.5.3",
     "coc-highlight": ">=2.0.4",
-    "coc-html": ">=1.7.0",
+    "coc-html": ">=1.8.0",
     "coc-java": ">=1.5.5",
     "coc-json": ">=1.7.0",
     "coc-lists": ">=1.4.5",
@@ -20,6 +20,5 @@
     "coc-yaml": ">=1.9.0"
   },
   "disabled": [],
-  "locked": [],
-  "lastUpdate": 1668903908528
+  "locked": []
 }
