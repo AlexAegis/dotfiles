@@ -9,9 +9,11 @@
 	useHttpPath = true
 
 [push]
-	default = upstream
+	default = current
+	autoSetupRemote = true
 
 [pull]
+	default = current
 	ff = only
 
 [alias]
