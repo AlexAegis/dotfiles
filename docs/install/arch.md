@@ -85,14 +85,18 @@ guide.
       to have (By default `ext4`) then format it.
 
       > `ext4` is a safe bet for a regular setup, it's stable and fast
-      >
-      > `xfs` is also fast but not as widespread as `ext4`
+      > Seriously, for a simple 1 disk setup `ext4` is a really solid choice.
+      > Unless you need `btrfs` features just use `ext4`
 
       ```sh
       mkfs.ext4 /dev/sdb2
       ```
 
-   4. Don't format `swap`!
+   4. Make swap!
+
+      ```sh
+      mkswap /dev/sdb3
+      ```
 
 7. Turn on swap
 
