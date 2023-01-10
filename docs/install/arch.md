@@ -322,11 +322,10 @@ guide.
        vi /etc/locale.gen
        ```
 
-    2. Uncomment the locales you need. Also `en_US.UTF-8 UTF-8`. It should
-       be on line `176`.
+    2. Uncomment the locales you need. Also `en_US.UTF-8 UTF-8`.
 
        ```vim
-       :176<CR> " <CR> means press Return
+       /#en_US.UTF<CR> " <CR> means press Return
        <DEL> " will delete the char under the cursor, which should be `#` here
        " Uncomment any other locales
        :wq
