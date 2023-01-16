@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=torrent
-Group=torrent
+Group=media
 ExecStart=/usr/bin/qbittorrent-nox
 ExecStop=/usr/bin/killall -w qbittorrent-nox
 
