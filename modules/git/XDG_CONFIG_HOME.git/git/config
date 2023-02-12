@@ -5,6 +5,9 @@
 	path = gitconfig.d/gpg-signing-key.gitconfig
 	path = gitconfig.d/kde.gitconfig
 
+[core]
+	editor = nvim
+
 [credential]
 	useHttpPath = true
 
