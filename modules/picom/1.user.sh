@@ -17,8 +17,8 @@ fi
 
 cd "$PICOM_DIR" || exit 1
 
-meson --buildtype=release . build
-
+git submodule update --init --recursive
+meson setup --buildtype=release . build
 ninja -C build
 
 echo "Linking built picom from $(pwd)/build/src/picom"

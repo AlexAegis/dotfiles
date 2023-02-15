@@ -8,7 +8,7 @@ StartLimitBurst=3
 StartLimitIntervalSec=60
 
 [Service]
-ExecStart=%h/.local/bin/picom --experimental-backends
+ExecStart=%h/.local/bin/picom
 ExecReload=/usr/bin/kill -SIGUSR1 $MAINPID
 # Try to restart no matter how the process ended
 Restart=always
