@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm pipewire qpwgraph
+pacman -Syu --needed --noconfirm pipewire pipewire-pulse qpwgraph
