@@ -3,7 +3,7 @@
 if [ -z "$REFIND_ROOT" ]; then
 	if [ -d /mnt/refind/EFI/refind ]; then
 		REFIND_ROOT="/mnt/refind"
-	elif [ -d /boot/efi/EFI/refind ]; then
+	elif [ -d /boot/EFI/refind ]; then
 		REFIND_ROOT="/"
 	fi
 fi

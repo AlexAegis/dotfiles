@@ -1,3 +1,4 @@
-:aur-helper ? [ $pacman ]
-systemd ? [ $systemd ]
+:aur-helper ? [ "$pacman" ]
+systemd ? [ "$systemd" ]
 # git is not needed, but this module provides extra config for it
+crudini
