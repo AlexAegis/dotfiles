@@ -1,7 +1,5 @@
 #!/bin/sh
 
-#!/bin/sh
-
 backup="${BACKUP_DIR:-"$HOME/backup"}/pass"
 
 if [ -e "$backup" ]; then
