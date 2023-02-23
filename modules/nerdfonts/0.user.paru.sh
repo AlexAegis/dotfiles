@@ -1,3 +1,3 @@
 #!/bin/sh
 
-paru -Syu --needed --noconfirm nerd-fonts-complete
+paru -Syu --needed --noconfirm nerd-fonts-meta
