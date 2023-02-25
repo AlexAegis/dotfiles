@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # shellcheck source=/dev/null
-. './u.user.sh'
+. './u.root.sh'
