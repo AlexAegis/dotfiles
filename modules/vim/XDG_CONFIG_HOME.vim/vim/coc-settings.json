@@ -3,9 +3,6 @@
 	"diagnostic.refreshOnInsertMode": true,
 	"suggest.autoTrigger": "trigger",
 	"suggest.timeout": 20000,
-	// "suggest.floatEnable": true,
-	// "diagnostic.messageTarget": "float",
-	// "signature.target": "float",
 	"coc.preferences.formatOnType": false,
 	"coc.preferences.hoverTarget": "float",
 	"coc.preferences.formatOnSaveFiletypes": [

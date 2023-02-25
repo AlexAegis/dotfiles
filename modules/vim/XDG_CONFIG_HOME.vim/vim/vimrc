@@ -4,9 +4,14 @@
 "  \ V /| | | | | | | | | (__
 " (_)_/ |_|_| |_| |_|_|  \___|
 "
-" 2020 Győri Sándor (AlexAegis) <alexaegis@gmail.com>
+" 2020-2023 Győri Sándor (AlexAegis) <alexaegis@gmail.com>
 "
 " Vim and Neovim both start with this file because VIMINIT is set
+
+if has('nvim')
+    source $XDG_CONFIG_HOME/nvim/init.lua
+    finish
+endif
 
 """"""""""""""""
 "  Environment "
