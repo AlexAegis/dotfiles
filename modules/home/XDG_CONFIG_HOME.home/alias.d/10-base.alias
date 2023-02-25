@@ -24,3 +24,5 @@ alias ls="ls -a"
 # -l, --long       Display extended file metadata as a table
 # -F, --classify   Append indicator (one of */=>@|) at the end of the file names
 alias l="ls -AlF"
+
+alias lc='wc -l'
