@@ -1,0 +1,8 @@
+[Desktop Entry]
+# Add the default id_rsa key to keychain
+Exec=ssh-add -q < /dev/null
+Icon=dialog-scripts
+Name=ssh-add.sh
+Path=
+Type=Application
+X-KDE-AutostartScript=true
