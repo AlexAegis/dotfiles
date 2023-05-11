@@ -272,7 +272,17 @@ guide.
     arch-chroot /mnt
     ```
 
-13. Set up the bootloader
+13. Set up the bootloader (Either Refind or Grub)
+
+  1. refind
+
+    1. Install Refind
+
+      ```sh
+       pacman -Su refind
+      ```
+      
+  2. grub
 
     > Assuming `grub`
 
