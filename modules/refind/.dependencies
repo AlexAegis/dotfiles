@@ -1,4 +1,2 @@
-# for resolution detection, same as in grub
-xorg
-# for the appendabsent script
-home
+xorg # for resolution detection, same as in grub
+home # for the appendabsent script
