@@ -1,147 +1,212 @@
 {
-	"editor.mouseWheelZoom": true,
-	"editor.fontFamily": "InconsolataGo Nerd Font Mono, FuraCode Nerd Font, Cascadia Mono, Consolas, 'Courier New', monospace",
-	"editor.tabSize": 4,
-	"editor.useTabStops": true,
-	"editor.fontLigatures": true,
-	"editor.suggestSelection": "first",
-	"editor.rulers": [
-		{
-			"column": 80,
-			"color": "#ffffff10"
-		},
-		{
-			"column": 100,
-			"color": "#6666668e"
-		}
-	],
-	"editor.selectionClipboard": false,
-	"explorer.confirmDragAndDrop": false,
-	"explorer.compactFolders": false,
-	"terminal.integrated.fontFamily": "InconsolataGo Nerd Font Mono, FuraCode Nerd Font, Cascadia Mono, Consolas, 'Courier New', monospace",
-	"terminal.integrated.fontSize": 18,
-	"terminal.integrated.defaultProfile.windows": "PowerShell",
-	"terminal.integrated.defaultProfile.linux": "zsh",
-	"terminal.integrated.tabs.enabled": true,
-	"terminal.integrated.tabs.hideCondition": "singleTerminal",
-	"terminal.integrated.tabs.focusMode": "singleClick",
-	"terminal.integrated.tabs.showActiveTerminal": "singleTerminal",
-	"terminal.integrated.profiles.linux": {
-		"zsh": {
-			"path": "zsh",
-			"icon": "terminal"
-		},
-		"bash": {
-			"path": "bash",
-			"icon": "terminal-bash"
-		},
-		"fish": {
-			"path": "fish"
-		},
-		"tmux": {
-			"path": "tmux",
-			"icon": "terminal-tmux"
-		},
-		"pwsh": {
-			"path": "pwsh",
-			"icon": "terminal-powershell"
-		}
-	},
-	"workbench.editor.wrapTabs": true,
-	"workbench.editor.decorations.badges": true,
-	"workbench.iconTheme": "material-icon-theme",
-	"workbench.colorTheme": "Community Material Theme Darker High Contrast",
-	"debug.console.fontFamily": "InconsolataGo Nerd Font Mono",
-	"debug.onTaskErrors": "showErrors",
-	"debug.javascript.usePreview": false,
-	"git.enableSmartCommit": true,
-	"git.confirmSync": false,
-	"git.autofetch": true,
-	"remote.extensionKind": {
-		"ms-azuretools.vscode-docker": "workspace"
-	},
-	"remote.SSH.enableDynamicForwarding": false,
-	"markdown.preview.typographer": true,
-	"[json]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"[jsonc]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
 	"[html]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"[typescript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[javascript]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
+	"[json]": {
+		"editor.defaultFormatter": "vscode.json-language-features"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[markdown]": {
+		"editor.defaultFormatter": "unifiedjs.vscode-remark"
+	},
 	"[python]": {
 		"editor.defaultFormatter": "ms-python.python"
 	},
-	"material-icon-theme.folders.associations": {
-		"module": "font",
-		"component": "components",
-		"doc": "markdown",
-		"animation": "delta",
-		"guard": "ngrx-effects",
-		"directive": "ngrx-actions",
-		"interceptor": "middleware",
-		"validator": "coverage",
-		"e2e": "test",
-		"target": "dist",
-		"rust": "delta",
-		"scope": "delta",
-		"benches": "benchmark",
-		".benchmark": "benchmark",
-		".templates": "template",
-		"modules": "font",
-		"directives": "ngrx-actions",
-		"store": "Redux-store",
-		"actions": "ngrx-actions",
-		"action": "ngrx-actions",
-		"effects": "Ngrx-effects",
-		"effect": "Ngrx-effects",
-		"reducers": "ngrx-reducer",
-		"reducer": "ngrx-reducer"
+	"[rust]": {
+		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
-	"material-icon-theme.files.associations": {
-		"*.animation.ts": "purescript",
-		"*.facade.ts": "angular-service",
-		".mocharc": "mocha"
+	"[svelte]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode"
 	},
-	"gitlens.gitCommands.closeOnFocusOut": true,
-	"shellcheck.disableVersionCheck": true,
-	"todo-tree.tree.showScanModeButton": false,
-	"typescript.updateImportsOnFileMove.enabled": "always",
-	"python.languageServer": "Pylance",
-	"liveServer.settings.donotShowInfoMsg": true,
-	"explorer.confirmDelete": false,
-	"javascript.updateImportsOnFileMove.enabled": "always",
-	"nativescript.analytics.enabled": false,
-	"files.autoSave": "off",
-	"workbench.editorAssociations": [
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"debug.console.fontFamily": "InconsolataGo Nerd Font Mono, Cascadia Mono, Consolas, 'Courier New', monospace",
+	"debug.onTaskErrors": "showErrors",
+	"diffEditor.ignoreTrimWhitespace": false,
+	"editor.accessibilitySupport": "off",
+	"editor.autoIndent": "full",
+	"editor.codeActionsOnSave": {
+		"source.fixAll": true,
+		"source.fixAll.eslint": true,
+		"source.fixAll.stylelint": true,
+		"source.organizeImports": true
+	},
+	"editor.codeLensFontFamily": "PragmataPro",
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.fontFamily": "Iosevka, PragmataPro, InconsolataGo Nerd Font Mono, FuraCode Nerd Font, Cascadia Mono, Consolas, 'Courier New', monospace",
+	"editor.fontLigatures": true,
+	"editor.formatOnSave": true,
+	"editor.mouseWheelZoom": true,
+	"editor.quickSuggestions": {
+		"comments": false,
+		"other": true,
+		"strings": false
+	},
+	"editor.quickSuggestionsDelay": 0,
+	"editor.renderControlCharacters": true,
+	"editor.rulers": [
 		{
-			"viewType": "jupyter.notebook.ipynb",
-			"filenamePattern": "*.ipynb"
+			"color": "#bdbdbd11",
+			"column": 80
+		},
+		{
+			"color": "#6d6d6d75",
+			"column": 100
 		}
 	],
-	"shellcheck.useWSL": true,
-	"rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
+	// Linux only
+	"editor.selectionClipboard": false,
+	"editor.smoothScrolling": true,
+	"editor.stickyScroll.enabled": true,
 	"editor.stickyTabStops": true,
-	"remote.SSH.remotePlatform": {
-		"esero1569": "linux"
+	"editor.suggest.preview": true,
+	"editor.suggestSelection": "first",
+	"editor.tabCompletion": "off",
+	"editor.tabSize": 4,
+	"editor.snippetSuggestions": "bottom",
+	"editor.suggest.localityBonus": true,
+	"editor.useTabStops": true,
+	"explorer.autoRevealExclude": {
+		"**/node_modules": true
 	},
-	"angular.experimental-ivy": true,
-	"java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m -javaagent:\"/home/alex/.vscode-server/extensions/gabrielbb.vscode-lombok-1.0.1/server/lombok.jar\"",
-	"todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "XXX", "[ ]", "[x]"],
-	"todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
-	"editor.renderControlCharacters": true,
-	"window.dialogStyle": "custom",
-	"window.zoomLevel": 1,
+	"explorer.compactFolders": false,
+	"explorer.confirmDelete": false,
+	"explorer.confirmDragAndDrop": false,
+	"explorer.fileNesting.enabled": true,
+	"explorer.fileNesting.patterns": {
+		"*.js": "${capture}*",
+		"*.json": "${capture}*",
+		"*.jsx": "${capture}*",
+		"*.ts": "${capture}*",
+		"*.tsx": "${capture}*",
+		".eslintrc.cjs": ".eslintignore",
+		".gitignore": ".gitattributes",
+		".prettierrc.cjs": ".prettierignore"
+	},
 	"files.associations": {
 		"vimrc": "viml"
 	},
-	"redhat.telemetry.enabled": false
+	"files.autoSave": "off",
+	"git.autofetch": true,
+	"git.confirmSync": false,
+	"git.enableSmartCommit": true,
+	"githubPullRequests.createOnPublishBranch": "never",
+	"gitlens.advanced.fileHistoryFollowsRenames": true,
+	"gitlens.gitCommands.closeOnFocusOut": true,
+	"gitlens.graph.experimental.minimap.enabled": true,
+	"java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx1G -Xms100m -javaagent:\"/home/alex/.vscode-server/extensions/gabrielbb.vscode-lombok-1.0.1/server/lombok.jar\"",
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"liveServer.settings.donotShowInfoMsg": true,
+	"markdown.preview.typographer": true,
+	"material-icon-theme.files.associations": {
+		"*.animation.ts": "purescript",
+		"*.facade.ts": "angular-service",
+		".mocharc": "mocha",
+		"project.json": "angular",
+		"svelte.config.mjs": "svelte",
+		"svelte.config.ts": "svelte"
+	},
+	"material-icon-theme.folders.associations": {
+		".benchmark": "benchmark",
+		".templates": "template",
+		"action": "ngrx-actions",
+		"actions": "ngrx-actions",
+		"animation": "delta",
+		"benches": "benchmark",
+		"component": "components",
+		"directive": "ngrx-actions",
+		"directives": "ngrx-actions",
+		"doc": "markdown",
+		"e2e": "test",
+		"effect": "Ngrx-effects",
+		"effects": "Ngrx-effects",
+		"guard": "ngrx-effects",
+		"interceptor": "middleware",
+		"module": "font",
+		"modules": "font",
+		"reducer": "ngrx-reducer",
+		"reducers": "ngrx-reducer",
+		"rust": "delta",
+		"scope": "delta",
+		"store": "Redux-store",
+		"target": "dist",
+		"validator": "coverage"
+	},
+	"nativescript.analytics.enabled": false,
+	"npm.keybindingsChangedWarningShown": true,
+	"python.languageServer": "Pylance",
+	"redhat.telemetry.enabled": false,
+	"remote.extensionKind": {
+		"ms-azuretools.vscode-docker": "workspace"
+	},
+	"remote.SSH.enableDynamicForwarding": false,
+	"remote.SSH.remotePlatform": {
+		"esero1569": "linux",
+		"pi": "linux"
+	},
+	"remote.SSH.showLoginTerminal": true,
+	"rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
+	"security.workspace.trust.untrustedFiles": "open",
+	"shellcheck.disableVersionCheck": true,
+	"shellcheck.useWSL": true,
+	"svelte.enable-ts-plugin": true,
+	"svelte.plugin.svelte.note-new-transformation": false,
+	"telemetry.telemetryLevel": "off",
+	"terminal.integrated.defaultProfile.linux": "zsh",
+	"terminal.integrated.defaultProfile.windows": "PowerShell",
+	"terminal.integrated.enableMultiLinePasteWarning": false,
+	"terminal.integrated.fontFamily": "Iosevka Term, PragmataPro for Powerline, InconsolataGo Nerd Font Mono, FuraCode Nerd Font, Cascadia Mono, Consolas, 'Courier New', monospace",
+	"terminal.integrated.fontSize": 14,
+	"terminal.integrated.profiles.linux": {
+		"bash": {
+			"color": "terminal.ansiYellow",
+			"icon": "terminal-bash",
+			"path": "bash"
+		},
+		"fish": {
+			"path": "fish"
+		},
+		"pwsh": {
+			"icon": "terminal-powershell",
+			"path": "pwsh"
+		},
+		"tmux": {
+			"icon": "terminal-tmux",
+			"path": "tmux"
+		},
+		"zsh": {
+			"color": "terminal.ansiCyan",
+			"icon": "terminal",
+			"path": "zsh"
+		}
+	},
+	"terminal.integrated.shellIntegration.enabled": true,
+	"terminal.integrated.smoothScrolling": true,
+	"terminal.integrated.tabs.enabled": false,
+	"terminal.integrated.tabs.focusMode": "singleClick",
+	"terminal.integrated.tabs.location": "left",
+	"terminal.integrated.tabs.showActiveTerminal": "singleTerminalOrNarrow",
+	"todo-tree.general.tags": ["BUG", "HACK", "FIXME", "TODO", "XXX", "[ ]", "[x]"],
+	"todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+	"typescript.preferences.importModuleSpecifier": "relative",
+	"typescript.updateImportsOnFileMove.enabled": "always",
+	"window.commandCenter": false,
+	"window.dialogStyle": "custom",
+	"window.titleBarStyle": "custom",
+	"workbench.editor.decorations.badges": true,
+	"workbench.editor.wrapTabs": true,
+	"workbench.editorAssociations": {
+		"*.ipynb": "jupyter-notebook"
+	},
+	"workbench.iconTheme": "material-icon-theme",
+	"workbench.list.smoothScrolling": true,
+	"workbench.startupEditor": "none",
+	"workbench.colorTheme": "Community Material Theme Darker High Contrast",
+	"window.zoomLevel": 1
 }
