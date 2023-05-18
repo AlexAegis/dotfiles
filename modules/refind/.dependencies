@@ -1,2 +1,3 @@
 xorg # for resolution detection, same as in grub
 home # for the appendabsent script
+apparmor # for the lsm=landlock,lockdown,yama,integrity,apparmor,bpf kernel parameters
