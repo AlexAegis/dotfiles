@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm cuda
+pacman -Syu --needed --noconfirm cuda cudnn
