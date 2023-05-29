@@ -5,6 +5,4 @@
 . "./1.user.sh"
 
 # update npm and other common package managers
-npm install -g npm
-npm install -g yarn
-npm install -g pnpm
+npm install -g npm yarn pnpm npm-check-updates turbo
