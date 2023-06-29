@@ -1,0 +1,4 @@
+xfce
+:aur-helper ? [ $pacman ]
+font-tahoma-8px
+gtk

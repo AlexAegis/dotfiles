@@ -1,2 +1,5 @@
 xorg
 lightdm
+home # not a hard dependency, but this module references the ~/.profile file
+xdg
+gtk

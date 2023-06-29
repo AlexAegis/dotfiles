@@ -2,3 +2,4 @@ xdg
 coreutils
 home # because of parse_args and appendabsent
 keyring
+gtk
