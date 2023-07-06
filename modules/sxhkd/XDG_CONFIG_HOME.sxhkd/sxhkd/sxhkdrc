@@ -8,18 +8,18 @@ super + Escape
 	pkill -USR1 -x sxhkd
 
 alt + m
-	notify-send "main sxhkdrc file available"
+	notify-send "main sxhkdrc file available! Terminal: $TERMINAL Browser: $BROWSER Filemanager: $FILEMANAGER. XDG_BIN_HOME $XDG_BIN_HOME"
 
 alt + space
-	$XDG_BIN_HOME/switchkbmap.sh
+	"$XDG_BIN_HOME"/switchkbmap.sh
 
 # Not TERM, that is set automatically.
 # Both ` and 0 to support other layouts
 super + {grave,0}
-	$TERMINAL
+	"$TERMINAL"
 
 super + w
-	$BROWSER
+	"$BROWSER"
 
 super + e
-	$FILEMANAGER
+	"$FILEMANAGER"
