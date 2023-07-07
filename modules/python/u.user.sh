@@ -18,7 +18,7 @@ fi
 echo n | pyenv install-latest
 
 # Set global version to the latest
-pyenv versions | tail -n 1 | sed 's/^ *//g' > "$(pyenv root)"/versions
+pyenv global "$(pyenv versions | tail -n 1 | sed 's/^ *//g' | cut -d ' ' -f 2)"
 
 # Upgrade pip
 pip install --upgrade pip
