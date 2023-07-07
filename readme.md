@@ -32,6 +32,6 @@ For macOS the `XDG` variables are set around the `~/Library` folder.
 
 ```sh
 git clone --recurse-submodules -j8 \
-  https://www.github.com/AlexAegis/dotfiles ~/Library/Preferences
+  https://www.github.com/AlexAegis/dotfiles ~/Library/Preferences/dotfiles
 ~/Library/Preferences/dotfiles/modules/pont/pont.sh pont
 ```
