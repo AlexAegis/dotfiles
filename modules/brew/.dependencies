@@ -1,5 +1,5 @@
-# The installer is a bash script
-bash
+# The installer is a bash script, but bash is preinstalled on macos
+bash ? [ ! $mac ]
 # brew is actually dependent on ruby and git but you get those
 # from xcode on mac
 xcode ? [ $mac ]
