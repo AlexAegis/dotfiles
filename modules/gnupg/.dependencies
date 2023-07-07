@@ -1,6 +1,7 @@
 xdg
 home # for the appendabsent script
 ssh
+brew ? [ $mac ]
 chocolatey ? [ $windows ]
 systemd ? [ $systemd ]
 :aur-helper ? [ $pacman ]
