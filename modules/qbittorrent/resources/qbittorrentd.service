@@ -1,6 +1,7 @@
 [Unit]
 Description=qBittorrent Daemon Service
 After=network.target
+ConditionPathIsMountPoint=/var/media
 
 [Service]
 User=torrent
