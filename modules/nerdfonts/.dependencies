@@ -1,3 +1,4 @@
 xdg
 fontconfig
 :aur-helper ? [ $pacman ]
+brew ? [ $mac ]
