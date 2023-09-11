@@ -1,3 +1,3 @@
 # [bun](https://bun.sh/)
 
-A JavaScript runtime
+A fast JavaScript runtime
