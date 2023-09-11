@@ -1,3 +1,4 @@
 xdg
 nvim
 chocolatey ? [ $windows ]
+brew ? [ $mac ]
