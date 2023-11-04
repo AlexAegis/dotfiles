@@ -1,0 +1,13 @@
+#!/bin/sh
+
+alias ls="eza -a"
+
+# -a, --all          show hidden and 'dot' files
+# -l, --long         display extended file metadata as a table
+# -F, --classify     display type indicator by file names
+# -h, --header       add a header row to each column
+# -b, --binary       list file sizes with binary prefixes
+# -g, --group        list each file's group
+# -H, --links        list each file's number of hard links
+alias l="eza -alFhbgH --icons --git --time-style=long-iso"
+alias lt="l --tree"
