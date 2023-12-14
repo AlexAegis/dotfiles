@@ -10,7 +10,7 @@
 	"editor.mouseWheelZoom": true,
 	"editor.semanticHighlighting.enabled": true,
 	"editor.fontLigatures": true,
-	"editor.wordBasedSuggestions": true,
+	"editor.wordBasedSuggestions": "matchingDocuments",
 	"editor.suggest.localityBonus": true,
 	"editor.snippetSuggestions": "bottom",
 	"editor.quickSuggestionsDelay": 0,
@@ -19,7 +19,7 @@
 		{ "column": 120, "color": "#6666668e" }
 	],
 	"editor.codeActionsOnSave": {
-		"source.fixAll": true
+		"source.fixAll": "explicit"
 	},
 	"files.exclude": {
 		"**/.git": true,

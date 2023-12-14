@@ -3,4 +3,6 @@
 # completions
 
 # shellcheck disable=SC1091
-. "${BUN_INSTALL}/_bun"
+if [ -f "${BUN_INSTALL}/_bun" ]; then
+	. "${BUN_INSTALL}/_bun"
+fi
