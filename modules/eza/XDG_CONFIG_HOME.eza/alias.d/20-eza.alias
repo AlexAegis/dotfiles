@@ -9,5 +9,5 @@ alias ls="eza -a"
 # -b, --binary       list file sizes with binary prefixes
 # -g, --group        list each file's group
 # -H, --links        list each file's number of hard links
-alias l="eza -alFhbgH --icons --git --time-style=long-iso"
+alias l="eza -alhbgH -F --icons --git --time-style=long-iso"
 alias lt="l --tree"
