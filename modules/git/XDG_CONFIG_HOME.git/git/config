@@ -9,6 +9,10 @@
 	editor = nvim
 	askpass = /usr/bin/ksshaskpass
 
+# reuse recorded resolution (when redoing a rebase it keeps older merge conflict resolutions)
+[rerere]
+	enabled = true
+
 [credential]
 	useHttpPath = true
 
@@ -49,3 +53,4 @@
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
+
