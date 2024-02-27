@@ -10,7 +10,7 @@ Subkey-Type: RSA
 Subkey-Length: 4096
 Name-Real: AlexAegis
 Name-Comment: ${1-$default_comment}
-Name-Email: alexaegis@gmail.com
+Name-Email: alexaegis@pm.me
 Expire-Date: 0
 %commit
 %echo done

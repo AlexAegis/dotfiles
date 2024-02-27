@@ -8,7 +8,7 @@ if ! [ -e "$XDG_CONFIG_HOME/git/gitconfig.d/user.gitconfig" ]; then
 cat <<EOF > "$XDG_CONFIG_HOME/git/gitconfig.d/user.gitconfig"
 [user]
 	name = AlexAegis
-	email = alexaegis@gmail.com
+	email = alexaegis@pm.me
 
 [github]
 	user = AlexAegis

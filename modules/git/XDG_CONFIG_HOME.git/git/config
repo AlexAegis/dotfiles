@@ -38,6 +38,7 @@
 	sub = submodule update --init --recursive
 	dd = diff --cached
 	lc = config --list --show-origin
+	change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f" # https://stackoverflow.com/questions/2919878/git-rewrite-previous-commit-usernames-and-emails git change-commits GIT_AUTHOR_NAME "old name" "new name" (or GIT_AUTHOR_EMAIL)
 
 [color]
 	ui = true
