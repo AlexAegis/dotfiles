@@ -1,3 +1,4 @@
 #!/bin/sh
 
-paru -Syu --needed --noconfirm crudini
+pip install setuptools_scm iniparse
+paru -Syu --needed --noconfirm python-crudini
