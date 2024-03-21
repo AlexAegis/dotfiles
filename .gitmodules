@@ -19,10 +19,6 @@
 	path = modules/emacs/XDG_CONFIG_HOME.emacs/emacs.d
 	url = https://www.github.com/hlissner/doom-emacs
 	branch = master
-[submodule "modules/st/resources/st"]
-	path = modules/st/resources/st
-	url = https://www.github.com/AlexAegis/st
-	branch = master
 [submodule "modules/kakoune/XDG_CONFIG_HOME.kakoune/kak/plugins/plug.kak"]
 	path = modules/kakoune/XDG_CONFIG_HOME.kakoune/kak/plugins/plug.kak
 	url = https://www.github.com/robertmeta/plug.kak
