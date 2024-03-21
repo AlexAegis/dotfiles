@@ -11,10 +11,6 @@
 	url = https://www.github.com/powerline/fonts
 	branch = master
 	ignore = dirty
-[submodule "modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes"]
-	path = modules/rofi/XDG_CONFIG_HOME.rofi/rofi/rofi-themes
-	url = https://www.github.com/davatorium/rofi-themes
-	branch = master
 [submodule "modules/emacs/XDG_CONFIG_HOME.emacs/emacs.d"]
 	path = modules/emacs/XDG_CONFIG_HOME.emacs/emacs.d
 	url = https://www.github.com/hlissner/doom-emacs
