@@ -280,7 +280,20 @@ guide.
 
       ```sh
        pacman -Su refind
+       refind-install
       ```
+    
+    2. If you already have a refind config (from a previous installation)
+       copy it to `/boot` and **update all UUID's** in the 
+       `/boot/refind_linux.conf` file and for any boot-stanza you have under
+       `/boot/EFI/refind/` (I keep all of them in
+       `/boot/EFI/refind/config/boot-stanzas.conf`)
+
+       > The `fstab` file you just generated contains the relevant UUID's!
+    
+    3. If you copied refind, make sure to run `refind-install` again so it's
+       up-to-date
+
       
   2. grub
 
@@ -316,6 +329,28 @@ guide.
 
     > The installation is practically done, but some configurations are needed
     > and can be done while we are `chroot`ed in the new system anyway.
+
+14. Add kernel modules
+
+    1. nvidia
+
+        Edit `/etc/mkinitcpio.conf`
+
+        ```sh
+        vim /etc/mkinitcpio.conf
+        ```
+
+        And add the following modules to the MODULES list.
+
+        ```sh
+        MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
+        ```
+
+    2. Finally regenerate the initramfs
+
+      ```sh
+      mkinitcpio -P
+      ```
 
 14. Set up timezone
 
