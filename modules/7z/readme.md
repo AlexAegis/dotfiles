@@ -3,10 +3,12 @@
 > [Arch Wiki](https://wiki.archlinux.org/index.php/P7zip)\
 > [Gentoo Wiki](https://wiki.gentoo.org/wiki/P7zip)
 
-## Password protected archives
+## Creating protected archives
+
+> You will be prompted for a password if not passed
 
 ```sh
-7z a -p<password> <target>.7z <...files>
+7z a -p'<optional_password>' -mem=AES256 <target>.7z <...files>
 ```
 
 ## Usage
