@@ -8,4 +8,4 @@
 # if [ uname -r something something ]
 # pacman -Syu --needed --noconfirm dkms nvidia-dkms
 # nvidia-utils for vulkan support
-pacman -Syu --needed --noconfirm nvidia nvidia-settings nvidia-utils
+pacman -Syu --needed --noconfirm nvidia nvidia-settings nvidia-utils egl-wayland
