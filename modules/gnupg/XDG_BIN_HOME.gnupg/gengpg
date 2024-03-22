@@ -8,7 +8,7 @@ Key-Type: RSA
 Key-Length: 4096
 Subkey-Type: RSA
 Subkey-Length: 4096
-Name-Real: AlexAegis
+Name-Real: Győri Sándor
 Name-Comment: ${1-$default_comment}
 Name-Email: alexaegis@pm.me
 Expire-Date: 0
