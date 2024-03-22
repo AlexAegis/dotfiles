@@ -12,5 +12,7 @@ pacman -Syu --needed --noconfirm breeze-gtk kde-gtk-config
 pacman -Syu --needed --noconfirm ksshaskpass
 
 # https://store.kde.org/ integration
-pacman -Syu --needed --noconfirm \
-	qt5-base qt5-svg qt5-declarative qt5-quickcontrols
+pacman -Syu --needed --noconfirm qt6-base qt6-svg qt6-declarative
+
+# Filebrowser
+pacman -Syu --needed --noconfirm dolphin filelight
