@@ -15,4 +15,4 @@ pacman -Syu --needed --noconfirm ksshaskpass
 pacman -Syu --needed --noconfirm qt6-base qt6-svg qt6-declarative
 
 # Filebrowser, archive manager, disk usage utility, calculator
-pacman -Syu --needed --noconfirm dolphin ark filelight kcalc
+pacman -Syu --needed --noconfirm dolphin ark filelight kcalc gwenview
