@@ -4,4 +4,4 @@
 # $2 file
 
 # ? Easier with grep and echo than sed
-grep -qF -- "$1" "$2" || echo "$1" >>"$2"
+grep -xqF -- "$1" "$2" || echo "$1" >>"$2"
