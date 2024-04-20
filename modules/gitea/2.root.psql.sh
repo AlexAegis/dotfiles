@@ -1,6 +1,7 @@
 #!/bin/sh
 
-
+# TODO: Fix this, it stalls, also fix it in the ppostgresql module
+# TODO: check if already present, skip if it is
 gitea_postgresql_password=$(read_password "Please enter a password for the gitea role in postgresql")
 echo "Creating gitea postgres role..."
 psql -U postgres postgres -c "CREATE ROLE gitea WITH LOGIN PASSWORD '$gitea_postgresql_password';"
