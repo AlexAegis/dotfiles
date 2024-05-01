@@ -36,7 +36,27 @@ guide.
    fdisk -l | grep 'Disk /'
    ```
 
-5. Open `cfdisk` to format said drive(s)
+5. If the drive is an nvme drive, you may want to flush it to restore factory
+   write speeds
+
+  > [Arch Wiki SSD Memory Cell Clearing](https://wiki.archlinux.org/title/Solid_state_drive/Memory_cell_clearing#Format_command)
+
+  Install `nvme-cli`
+
+  ```sh
+  pacman -Syu nvme-cli
+  ```
+
+  Then format the nvme drive, if it fails with `-s 2` because it's not supported
+  try with `-s 1`, older drives generally do not support `-s 2`.
+
+  > This will wipe the drive completely
+
+  ```sh
+  nvme format /dev/nvme0n1 -s 2 -n 1
+  ```
+
+6. Open `cfdisk` to format said drive(s)
 
    ```sh
    cfdisk /dev/sd?
@@ -66,7 +86,7 @@ guide.
    8. Select `Write` and confirm it by typing `yes`
    9. Select `Quit`
 
-6. Format the newly created partitions
+7. Format the newly created partitions
 
    1. Inspect your new partitions and the `device` they are assigned to
 
@@ -98,7 +118,7 @@ guide.
       mkswap /dev/sdb3
       ```
 
-7. Turn on swap
+8. Turn on swap
 
    > `genfstab` will use this
 
@@ -106,7 +126,7 @@ guide.
    swapon /dev/sdb3
    ```
 
-8. Mount the partitions you want the new setup to use, into the live instance
+9. Mount the partitions you want the new setup to use, into the live instance
 
    > `genfstab` will detect every mounted partition (and swap), so you can
    > mount everything you want to be automounted by `fstab` later.
@@ -143,7 +163,7 @@ guide.
       > This will make the `home` partition be accessible from the installed
       > system as `/home`
 
-9. Install the system
+10. Install the system
 
    1. Install at least the `base`, `base-devel`, `linux`, `linux-firmware`,
       `sudo`, `git` and `networkmanager` packages using `pacstrap`.
@@ -243,7 +263,7 @@ guide.
       pacstrap /mnt git vim zsh
       ```
 
-10. If you want to include shared partitions like a dual-booted Windows
+11. If you want to include shared partitions like a dual-booted Windows
     system's `NTFS` partition you can do it now.
 
     > Make sure to have `ntfs-3g`installed in the case of mounting `NTFS`
@@ -260,19 +280,19 @@ guide.
     mount /dev/sda2 /mnt/mnt/d
     ```
 
-11. Generate the `fstab` entries to have the partitions mount on startup
+12. Generate the `fstab` entries to have the partitions mount on startup
 
     ```sh
     genfstab -U /mnt > /mnt/etc/fstab
     ```
 
-12. Step into the installed system using `chroot` to set up the bootloader
+13. Step into the installed system using `chroot` to set up the bootloader
 
     ```sh
     arch-chroot /mnt
     ```
 
-13. Set up the bootloader (Either Refind or Grub)
+14. Set up the bootloader (Either Refind or Grub)
 
   1. refind
 
@@ -330,7 +350,7 @@ guide.
     > The installation is practically done, but some configurations are needed
     > and can be done while we are `chroot`ed in the new system anyway.
 
-14. Add kernel modules
+15. Add kernel modules
 
     1. nvidia
 
@@ -352,14 +372,14 @@ guide.
       mkinitcpio -P
       ```
 
-14. Set up timezone
+16. Set up timezone
 
     ```sh
     ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime
     hwclock --systohc
     ```
 
-15. Set up locale
+17. Set up locale
 
     1. Open up the `locale.gen` file for edit
 
@@ -396,7 +416,7 @@ guide.
        echo 'KEYMAP=us' > /etc/vconsole.conf
        ```
 
-16. Set up network
+18. Set up network
 
     1. Set your `hostname`
 
@@ -422,13 +442,13 @@ guide.
        systemctl enable NetworkManager.service
        ```
 
-17. Set up root password
+19. Set up root password
 
     ```sh
     passwd
     ```
 
-18. Create users
+20. Create users
 
     1. Create an admin user for yourself
 
@@ -486,10 +506,10 @@ guide.
        userdel alarm
        ```
 
-19. Reboot into the installed system
+21. Reboot into the installed system
 
     > Keep the Live installation for emergency recoveries
 
-20. Install your dotfiles.
+22. Install your dotfiles.
 
     > If you don't have one, make one. Saves a lot of time.
