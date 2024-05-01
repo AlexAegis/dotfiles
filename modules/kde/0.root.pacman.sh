@@ -14,5 +14,5 @@ pacman -Syu --needed --noconfirm ksshaskpass
 # https://store.kde.org/ integration
 pacman -Syu --needed --noconfirm qt6-base qt6-svg qt6-declarative
 
-# Filebrowser, archive manager, disk usage utility, calculator
-pacman -Syu --needed --noconfirm dolphin ark filelight kcalc gwenview
+# Filebrowser, archive manager, disk usage utility, calculator etc
+pacman -Syu --needed --noconfirm dolphin ark filelight kcalc gwenview kcolorchooser
