@@ -4,7 +4,7 @@
 >
 > [Drivers](https://www.nvidia.com/en-us/geforce/drivers/)
 
-## On arch
+## On Arch
 
 ```sh
 sudo vim /usr/lib/modprobe.d/nvidia.conf

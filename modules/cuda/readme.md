@@ -2,6 +2,12 @@
 
 CUDA computing platform for nvidia cards
 
+## Container Toolkit
+
+> https://docs.nvidia.com/dgx/nvidia-container-runtime-upgrade/
+
+To support NVIDIA GPUs used by GPU-accelerated containers
+
 ## bitsandbytes
 
 > Assuming you have python installed
