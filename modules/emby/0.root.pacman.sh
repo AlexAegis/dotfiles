@@ -1,6 +1,6 @@
 #!/bin/sh
 
-emby_version="4.8.4.0"
+emby_version="4.8.5.0"
 emby_filename="emby-server-deb_${emby_version}_arm64.deb"
 emby_url="https://github.com/MediaBrowser/Emby.Releases/releases/download/${emby_version}/${emby_filename}"
 cache_dir="$XDG_CACHE_HOME/emby"
