@@ -1,6 +1,7 @@
 # PC
 
-Some notes specifically about my PC (AMD cpu, NVIDIA gpu)
+Some notes specifically about my PC (AMD cpu, NVIDIA gpu) mainly
+about what should be manually backed up
 
 ## /etc/mkinitcpio.conf
 
@@ -17,3 +18,15 @@ Once you modify it, don't forget to regenerate your initramfs:
 ```sh
 mkinitcpio
 ```
+
+## /etc/fstab
+
+Volume mount preferences and UUIDs
+
+## /boot/EFI/refind/*
+
+Refind config is PC specific with manual boot stanzas
+
+## /etc/samba/smb.conf
+
+Personal share locations
