@@ -12,3 +12,4 @@ rustup component add rustfmt
 cargo install cargo-tree
 cargo install cargo-edit
 cargo install cargo-expand
+cargo install cargo-make
