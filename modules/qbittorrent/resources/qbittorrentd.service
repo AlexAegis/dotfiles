@@ -1,13 +1,17 @@
 [Unit]
 Description=qBittorrent Daemon Service
-After=network.target
-ConditionPathIsMountPoint=/var/media
+After=var-media.mount
+Requires=var-media.mount
+StartLimitBurst=5
+StartLimitIntervalSec=300
 
 [Service]
 User=torrent
 Group=media
 ExecStart=/usr/bin/qbittorrent-nox
 ExecStop=/usr/bin/killall -w qbittorrent-nox
+RestartSec=5
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target

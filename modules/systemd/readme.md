@@ -15,9 +15,9 @@ sudo systemd-analyze verify every service
 
 ## Expectations
 
-If any user service changes, reload the daemon. [Partially possible]
+If any user service changes, reload the daemon. \[Partially possible]
 
-If any file that a service depends on changes, reload the service. [Handled
+If any file that a service depends on changes, reload the service. \[Handled
 by the module]
 
 ## Auto daemon reload
@@ -65,6 +65,16 @@ live.
 Path watchers watch inode changes, so changing the target of a symlink won't
 trigger it. However systemd follows sysmlinks if they are directly specified.
 
+### Generated services
+
+There are a number of services that are automatically provided by `systemd`
+for example ones that provide a requirable target for mount points to be
+present.
+
+```sh
+systemctl list-units --type=mount
+```
+
 #### Example
 
 This will trigger the path entry when you `touch` the target of `a-symlink.sh`
@@ -101,26 +111,26 @@ Wants=notify-restart@%N.service
 
 Examples:
 
-- `%h`
+* `%h`
 
   `$HOME` of the user. For root services it's always `/root`
 
-- `%E`
+* `%E`
 
   `$XDG_CONFIG_HOME` or `$HOME/.config` if not set. You can set it in
   `/etc/environment` for everyone or in a `*.conf` file inside
   `$HOME/.config/environment.d/` for a specific user.
 
-- `%s`
+* `%s`
 
   Shell of the user. Just use `/bin/sh` if you have a fast shell there.
 
-- `%n` (`%N`, no suffix)
+* `%n` (`%N`, no suffix)
 
   Full unit name. In case of `some-service@example.service`, it's
   `some-service`.
 
-- `%i` (`%I`, unescaped)
+* `%i` (`%I`, unescaped)
 
   Instance name. In case of `some-service@example.service`, it's
   `example`.
