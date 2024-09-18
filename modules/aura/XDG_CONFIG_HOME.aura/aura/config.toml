@@ -6,6 +6,10 @@ language = "en-US"
 noconfirm = false
 
 [aur]
+build = "/home/alex/.cache/aura/builds"
+cache = "/home/alex/.cache/aura/cache"
+clones = "/home/alex/.cache/aura/packages"
+hashes = "/home/alex/.cache/aura/hashes"
 chroot = []
 ignores = []
 git = true
@@ -20,4 +24,5 @@ skipdepcheck = false
 reverse = false
 
 [backups]
+snapshots = "/home/alex/.cache/aura/snapshots"
 automatic = true

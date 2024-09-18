@@ -1,0 +1,2 @@
+:aur-helper ? [ $pacman ]
+xdg

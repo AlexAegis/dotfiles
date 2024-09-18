@@ -111,3 +111,6 @@ fi
 #	&& [ -z "$TMUX" ]; then
 #	tmux a -t default || exec tmux new -s default && exit;
 #fi
+
+# bun completions
+[ -s "/home/alex/.local/share/bun/_bun" ] && source "/home/alex/.local/share/bun/_bun"

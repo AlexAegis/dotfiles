@@ -13,10 +13,10 @@ if [ "$distribution" = 'Arch Linux ARM' ]; then
 		mkdir -p "$cache_dir"
 		wget "$steamlink_url" -O "$cached_steamlink_installer"
 
-		paru -Syu --needed --noconfirm debtap
+		aura -Ayu --noconfirm debtap
 		debtap -u
 		(
-			cd "$cache_dir"
+			cd "$cache_dir" || exit
 			echo "Use the name 'steamlink'"
 			debtap "$steamlink_filename"
 			pacman -U --needed --noconfirm "${cache_dir}/"*.pkg.tar.zst
