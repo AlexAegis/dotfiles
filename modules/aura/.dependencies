@@ -1,0 +1,6 @@
+xdg
+rust
+pacman
+fd # optional, aura check checks it
+java # optional, aura check checks it
+shellcheck # optional, aura check checks it

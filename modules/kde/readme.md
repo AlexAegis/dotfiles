@@ -8,11 +8,17 @@ KDE Keychain solution
 
 ## Troubleshooting
 
-### Missing applications
+### Missing Applications
+
+```sh
+update-desktop-database ~/.local/share/applications -v
+```
+
+### Missing Applications (Older note)
 
 To regenerate the settings run these:
 
 ```sh
 cp /etc/xdg/menus/applications.menu ~/.config/menus/
-kbuildsycoca5 --noincremental
+kbuildsycoca6 --noincremental
 ```

@@ -1,5 +1,11 @@
 # Tips
 
+## KDE Plasma forgets Application folder
+
+```sh
+update-desktop-database ~/.local/share/applications -v
+```
+
 ## [Check if program exists](https://stackoverflow.com/questions/592620)
 
 > Don't forget to route it's output to `/dev/null` when using this in an

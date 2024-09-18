@@ -1,0 +1,23 @@
+[general]
+cpus = 32
+editor = "nvim"
+doas = false
+language = "en-US"
+noconfirm = false
+
+[aur]
+chroot = []
+ignores = []
+git = true
+hotedit = false
+shellcheck = true
+diff = false
+delmakedeps = false
+clean = false
+warn_unknowns = true
+nocheck = false
+skipdepcheck = false
+reverse = false
+
+[backups]
+automatic = true
