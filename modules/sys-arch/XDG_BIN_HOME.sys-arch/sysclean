@@ -9,5 +9,8 @@ pacman -Rns $(pacman -Qtdq)
 paccache -rk 1
 # remove cache of uninstalled packages
 paccache -ruk0
+
 # clear the aur cache, fully. This one is not part of the pacman hook
-yay --aur -Scc --noconfirm
+if command -v yay > /dev/null; then
+	yay --aur -Scc --noconfirm
+fi
