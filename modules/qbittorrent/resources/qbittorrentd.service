@@ -8,7 +8,7 @@ StartLimitIntervalSec=300
 [Service]
 User=torrent
 Group=media
-ExecStart=/usr/bin/qbittorrent-nox
+ExecStart=/usr/bin/qbittorrent-nox --confirm-legal-notice
 ExecStop=/usr/bin/killall -w qbittorrent-nox
 RestartSec=5
 Restart=on-failure
