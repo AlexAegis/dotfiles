@@ -9,9 +9,10 @@ rustup component add rls
 rustup component add rustfmt
 
 # Cargo extensions
-cargo install cargo-update
-cargo install cargo-tree
-cargo install cargo-edit
-cargo install cargo-expand
-cargo install cargo-make
-cargo install cargo-tarpaulin
+cargo install --locked cargo-update
+cargo install --locked cargo-tree
+cargo install --locked cargo-edit
+cargo install --locked cargo-expand
+cargo install --locked cargo-make
+cargo install --locked cargo-tarpaulin
+cargo install --locked cargo-udeps
