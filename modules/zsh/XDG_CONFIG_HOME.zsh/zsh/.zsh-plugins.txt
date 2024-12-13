@@ -14,9 +14,9 @@ robbyrussell/oh-my-zsh path:plugins/archlinux
 robbyrussell/oh-my-zsh path:plugins/bgnotify
 robbyrussell/oh-my-zsh path:plugins/rust
 robbyrussell/oh-my-zsh path:plugins/command-not-found
-robbyrussell/oh-my-zsh path:plugins/docker
-robbyrussell/oh-my-zsh path:plugins/docker-compose
-robbyrussell/oh-my-zsh path:plugins/docker-machine
+# robbyrussell/oh-my-zsh path:plugins/docker
+# robbyrussell/oh-my-zsh path:plugins/docker-compose
+# robbyrussell/oh-my-zsh path:plugins/docker-machine
 # robbyrussell/oh-my-zsh path:plugins/fzf
 robbyrussell/oh-my-zsh path:plugins/npm
 robbyrussell/oh-my-zsh path:plugins/sudo
