@@ -19,7 +19,7 @@ if [ "$distribution" = 'Arch Linux ARM' ]; then
 
 		wget "$emby_url" -O "$cached_emby_installer"
 
-		aura -Ayu --noconfirm debtap
+		aura -A --noconfirm debtap
 		debtap -u
 		(
 			cd "$cache_dir" || exit

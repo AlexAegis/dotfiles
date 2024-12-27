@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm mpv
+aura -A --noconfirm mpv

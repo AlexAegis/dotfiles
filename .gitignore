@@ -17,3 +17,5 @@ _deps
 
 # Vim
 *.un~
+
+*.profraw

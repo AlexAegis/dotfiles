@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm pipes.sh
+aura -A --noconfirm pipes.sh

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm brave-bin
+aura -A --noconfirm brave-bin

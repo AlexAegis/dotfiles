@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm dust
+aura -A --noconfirm dust

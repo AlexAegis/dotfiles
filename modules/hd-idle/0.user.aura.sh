@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm hd-idle-go
+aura -A --noconfirm hd-idle-go

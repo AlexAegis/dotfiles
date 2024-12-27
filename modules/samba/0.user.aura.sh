@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm wsdd
+aura -A --noconfirm wsdd

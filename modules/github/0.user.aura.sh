@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm act
+aura -A --noconfirm act

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm bun-bin
+aura -A --noconfirm bun-bin

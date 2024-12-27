@@ -1,5 +1,5 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm snapd
+aura -A --noconfirm snapd
 # For KDE
-# aura -Ayu --noconfirm discover-snap
+# aura -A --noconfirm discover-snap

@@ -1,4 +1,4 @@
 #!/bin/sh
 
 pip install setuptools_scm iniparse
-aura -Ayu --noconfirm python-crudini
+aura -A --noconfirm python-crudini

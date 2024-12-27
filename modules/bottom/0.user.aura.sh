@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm bottom
+aura -A --noconfirm bottom

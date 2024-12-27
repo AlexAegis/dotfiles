@@ -21,7 +21,7 @@ fi
 
 if command -v aura > /dev/null; then
     echo "Updating AUR packages using aura..."
-	${SUDO_USER:+sudo -u $SUDO_USER} aura -Ayu --noconfirm # update AUR packages
+	${SUDO_USER:+sudo -u $SUDO_USER} aura -A --noconfirm # update AUR packages
 	${SUDO_USER:+sudo -u $SUDO_USER} aura -Bc --noconfirm # remove stale snapshots
 	${SUDO_USER:+sudo -u $SUDO_USER} aura check # diagnostics
 fi

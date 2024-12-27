@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm ly-git
+aura -A --noconfirm ly-git

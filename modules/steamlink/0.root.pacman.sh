@@ -13,7 +13,7 @@ if [ "$distribution" = 'Arch Linux ARM' ]; then
 		mkdir -p "$cache_dir"
 		wget "$steamlink_url" -O "$cached_steamlink_installer"
 
-		aura -Ayu --noconfirm debtap
+		aura -A --noconfirm debtap
 		debtap -u
 		(
 			cd "$cache_dir" || exit

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm ttf-win10
+aura -A --noconfirm ttf-win10

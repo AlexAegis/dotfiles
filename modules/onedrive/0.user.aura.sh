@@ -1,4 +1,4 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm onedrive-abraunegg
+aura -A --noconfirm onedrive-abraunegg
 

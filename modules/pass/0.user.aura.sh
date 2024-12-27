@@ -1,3 +1,3 @@
 #!/bin/bash
 
-aura -Ayu --noconfirm pass-git-helper
+aura -A --noconfirm pass-git-helper

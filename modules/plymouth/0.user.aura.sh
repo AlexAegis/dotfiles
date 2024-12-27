@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm plymouth
+aura -A --noconfirm plymouth

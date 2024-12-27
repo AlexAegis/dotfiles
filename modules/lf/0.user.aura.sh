@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm lf
+aura -A --noconfirm lf

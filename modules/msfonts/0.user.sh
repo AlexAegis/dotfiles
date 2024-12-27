@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# aura -Ayu --noconfirm ttf-ms-win11-auto
+# aura -A --noconfirm ttf-ms-win11-auto
 
 package_name="ttf-ms-win11-auto"
 

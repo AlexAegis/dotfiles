@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm lemonbar-git
+aura -A --noconfirm lemonbar-git

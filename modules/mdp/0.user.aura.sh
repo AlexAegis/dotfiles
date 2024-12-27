@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm mdp
+aura -A --noconfirm mdp

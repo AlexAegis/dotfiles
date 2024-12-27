@@ -2,4 +2,4 @@
 
 # list xinit as a session
 # ? not used. Maybe with non systemd systems
-# aura -Ayu --noconfirm xinit-xsession
+# aura -A --noconfirm xinit-xsession

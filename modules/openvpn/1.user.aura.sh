@@ -2,7 +2,7 @@
 
 # For the integration with systemd
 if command -v systemctl >/dev/null; then
-	aura -Ayu --noconfirm openvpn-update-systemd-resolved
+	aura -A --noconfirm openvpn-update-systemd-resolved
 fi
 
 # Don't forget to amend the openVPN config

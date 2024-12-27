@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ay --noconfirm wonderdraft
+aura -A --noconfirm wonderdraft

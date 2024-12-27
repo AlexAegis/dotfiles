@@ -1,4 +1,4 @@
 #!/bin/sh
 
-# aura -Ayu --noconfirm deadd-notification-center-bin
-# aura -Ayu --noconfirm deadd-notification-center
+# aura -A --noconfirm deadd-notification-center-bin
+# aura -A --noconfirm deadd-notification-center

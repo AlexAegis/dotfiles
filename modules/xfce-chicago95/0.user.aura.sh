@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm xfce4-panel-profiles
+aura -A --noconfirm xfce4-panel-profiles

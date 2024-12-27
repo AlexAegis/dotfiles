@@ -1,4 +1,4 @@
 #!/bin/sh
 
-# aura -Ayu --noconfirm oomox
+# aura -A --noconfirm oomox
 # pacin  qt5-styleplugins

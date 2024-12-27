@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm fmui
+aura -A --noconfirm fmui

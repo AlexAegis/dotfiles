@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm visual-studio-code-bin
+aura -A --noconfirm visual-studio-code-bin

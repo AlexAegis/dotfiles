@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm brutal-doom
+aura -A --noconfirm brutal-doom

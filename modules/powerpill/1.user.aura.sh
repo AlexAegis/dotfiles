@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm powerpill
+aura -A --noconfirm powerpill

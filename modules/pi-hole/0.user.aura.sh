@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm pi-hole-server
+aura -A --noconfirm pi-hole-server

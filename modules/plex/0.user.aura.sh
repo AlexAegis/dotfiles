@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -Ayu --noconfirm plex-media-server
+aura -A --noconfirm plex-media-server
