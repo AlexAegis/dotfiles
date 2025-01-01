@@ -9,7 +9,7 @@ if command -v apt > /dev/null; then
 fi
 
 if command -v brew > /dev/null; then
-    echo "Updating packages using apt..."
+    echo "Updating packages using brew..."
 	${SUDO_USER:+sudo -u $SUDO_USER} brew update
 	${SUDO_USER:+sudo -u $SUDO_USER} brew upgrade
 fi
