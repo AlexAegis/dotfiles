@@ -4,3 +4,4 @@ chocolatey ? [ $windows ]
 # while this module itself does not need it
 # a lot of crates do
 gcc
+mold
