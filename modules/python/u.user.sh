@@ -23,4 +23,5 @@ pyenv global "$(pyenv versions | tail -n 1 | sed 's/^ *//g' | cut -d ' ' -f 2)"
 # Upgrade pip
 pip install --upgrade pip
 # Install common global tools
-pip install setuptools wheel pipenv poetry
+pip install setuptools wheel pipenv
+# poetry doesn't compile on 3.13
