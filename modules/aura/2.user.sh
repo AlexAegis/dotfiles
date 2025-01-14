@@ -4,5 +4,6 @@ mkdir -p "$XDG_CACHE_HOME"/aura/builds
 mkdir -p "$XDG_CACHE_HOME"/aura/cache
 mkdir -p "$XDG_CACHE_HOME"/aura/hashes
 mkdir -p "$XDG_CACHE_HOME"/aura/packages
+mkdir -p "$XDG_CACHE_HOME"/aura/snapshots
 
 aura check

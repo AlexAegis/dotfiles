@@ -3,4 +3,5 @@
 # Bug, see readme
 # aura -A --noconfirm systemd-numlockontty
 
-aura -A rate-mirrors-bin
+# fails to build
+# aura -A rate-mirrors-bin
