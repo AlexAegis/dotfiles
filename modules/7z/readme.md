@@ -8,7 +8,7 @@
 > You will be prompted for a password if not passed
 
 ```sh
-7z a -p'<optional_password>' -mem=AES256 <target>.7z <...files>
+7z a -p'<optional_password>' -mhe=on <target>.7z <...files>
 ```
 
 ## Usage
