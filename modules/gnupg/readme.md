@@ -6,6 +6,34 @@
 This module sets up the `gpg` environment, but doesn't generate anything
 on it's own.
 
+## Usage
+
+### List keys
+
+```sh
+gpg --list-secret-keys --keyid-format LONG
+```
+
+### Create key
+
+> Use the script in this module
+
+```sh
+gengpg "Name"
+```
+
+### Delete key
+
+```sh
+gpg --delete-secret-key 362D3DCBA837A105CA6756DBF18E8C8A66B4F3B6
+```
+
+### Print data for GitHub
+
+```sh
+gpg --armor --export <email>
+```
+
 ## PAM
 
 Automatic pam unlock handled by
