@@ -34,7 +34,7 @@ For example, re-signing the last 4 commits of the current branch:
 > to the commit. Leading to a whole lot of confusion.
 
 ```sh
-git rebase --exec 'git commit --amend --no-edit -n -S' -i HEAD~9
+git rebase --exec 'git commit --amend --no-edit -n -S' -i HEAD~4
 ```
 
 Verify a commits signature:
