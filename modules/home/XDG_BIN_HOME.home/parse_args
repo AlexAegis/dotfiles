@@ -1,32 +1,77 @@
 #!/bin/sh
+# MIT License
+#
+# Copyright (c) 2025 Győri Sándor (AlexAegis)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Copy from here if you want to include this function in your script instead
+# invoking this script file.
 
 expand_single_args() {
 	var="${1#-}" # cut off first, and only dash
 	while [ "$var" ]; do
 		next="${var#?}"
-		first_char="${var%$next}"
+		first_char="${var%"$next"}"
 		echo "-$first_char"
 		var="$next" # next
 	done
 }
 
-# POSIX compliant argument parser.
+
+# While parse_args is also available as its own script, having it here makes
+# copying this script a lot easier
+
+# An actually cross-platform, POSIX compliant argument parser.
+#
 # This function will parse and return a newline separated argument list. It
 # handles long arguments and checks for missing or extra values.
 # it handles both whitespace and '=' separated values
 # it also treats quoted parameters as one
 # It does NOT check for unknown variables as there is no list of allowed args
 # but those are easy to handle later
+#
+# When using in scripts
+# handle_args() {
+# 	while [ "$1" ]; do
+# 		case "$1" in
+# 			-h | --help) echo 'help' ;;
+# 			-v | --version) echo 'version' ;;
+# 			-e | --echo) echo "echo: $2"; shift ;;
+# 			* ) echo 'unknown arg' ;;
+# 		esac
+# 		shift
+# 	done
+# }
+#
+# handle_args $(parse_args "$args_with_parameters" "$@")
+
 parse_args() {
 	# first parameter is a single string, an IFS separated list of arguments
-	# that should have a single value
+	# that expects a single parameter to follow it as its value
 	with_parameters="$1"
 	shift
 	while [ "$1" ]; do
 		single_cut_with_equalparam="${1##-}"
-		single_cut="${single_cut_with_equalparam%%=*}" # = value cut pff
+		single_cut="${single_cut_with_equalparam%%=*}" # = value cut off
 		double_cut_with_equalparam="${1##--}"
-		double_cut="${double_cut_with_equalparam%%=*}" # = value cut pff
+		double_cut="${double_cut_with_equalparam%%=*}" # = value cut off
 		equalparam=${1##*=}
 		if [ "$equalparam" = "$1" ]; then
 			equalparam=''
@@ -75,20 +120,7 @@ parse_args() {
 	done
 }
 
-# When using in scripts
-# handle_args() {
-# 	while [ "$1" ]; do
-# 		case "$1" in
-# 			-h | --help) echo 'help' ;;
-# 			-v | --version) echo 'version' ;;
-# 			-e | --echo) echo "echo: $2"; shift ;;
-# 			* ) echo 'unknown arg' ;;
-# 		esac
-# 		shift
-# 	done
-# }
-#
-# handle_args $(parse_args "$args_with_parameters" "$@")
+# The rest just enables the usage of this function from this file
 
 args_with_parameters="$1"
 shift

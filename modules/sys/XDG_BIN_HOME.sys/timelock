@@ -1,6 +1,31 @@
 #!/bin/sh
 #
+# MIT License
 #
+# Copyright (c) 2025 Győri Sándor (AlexAegis)
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+
+# Check `timelock --help`
+
+
 # Timelock file format *.timelock
 # Filename = Lock Name
 # Line 1 = Lock set time
@@ -14,6 +39,8 @@ timelock_name=''
 timelock_duration_or_human_readable=''
 mode='set' # 'set' | 'remove' | 'check'
 
+TIMELOCK_ALWAYS_CLEAN_EXPIRED="${TIMELOCK_ALWAYS_CLEAN_EXPIRED:-0}"
+
 mkdir -p "$TIMELOCK_DIR"
 
 # C_RESET='\033[0m'
@@ -22,8 +49,6 @@ mkdir -p "$TIMELOCK_DIR"
 # C_YELLOW='\033[0;33m'
 # C_BLUE='\033[0;34m'
 # C_CYAN='\033[0;36m'
-
-
 
 
 log_trace() {
@@ -57,34 +82,74 @@ log_error() {
 }
 
 obfuscate_directory() {
-	if [ "${1##$HOME}" = "${1}" ]; then
+	if [ "${1##"$HOME"}" = "${1}" ]; then
 		echo "$1"
 	else
-		echo "~${1##$HOME}"
+		echo "~${1##"$HOME"}"
 	fi
 }
 
 show_help() {
-	echo "$(show_version)
+	cat <<EOF
+$(show_version)
 Usage: timelock [OPTION]... (NAME) (DURATION)
 
 This script is meant to debounce execution of other scripts. It just saves an
 expiration date to a named file.
 
 	# Debounce execution to once a minute
-	if timelock X; then
-		X
-		timelock X 60
+	if timelock LOCK_NAME; then
+		# Your code here
+		timelock LOCK_NAME 60
 	fi
 
-
-
 NAME describes the lock to operate on. If not present then it will list all
-locks and their status
-If DURATION is provided a lock will be created, expiring
-in DURATION seconds or whatever date interprets it if it's not a number.
+locks and their status:
+
+$ timelock
+> *list of locks*
+
+If NAME and DURATION is provided a lock will be created, expiring at the date
+provided, can be relative, or an absolute date, whatever "date --date=<here>"
+accepts. Plain numbers are treated as seconds.
+
+$ timelock LOCK_NAME 30
+
 If DURATION is not provided, it will check if the timelock is expired or not,
-returning 1 if NOT expired, and 0 if expired.
+returning 1 if NOT expired, and 0 if expired. And doesn't print anything.
+
+$ timelock LOCK_NAME
+>
+
+To learn when a specific lock expires, use the -p or --print options.
+
+$ timelock -p LOCK_NAME
+> *date*
+
+By default expired locks are not cleaned upon using timelock, so you can check
+later when exactly a lock expired. You can clean up expired locks with the -R
+option:
+
+$ timelock -R
+> *list of removed, expired locks*
+
+If you do want to automatically clean expired locks regardless how you invoked
+the script you can set the TIMELOCK_ALWAYS_CLEAN_EXPIRED=1 environment variable.
+
+Template:
+
+    LOCK_NAME="<choose something>"
+
+    if timelock "\$LOCK_NAME"; then
+        # Do stuff
+
+        echo "Locking Sync for 24 hours using the \$LOCK_NAME lock"
+        timelock "\$LOCK_NAME" 'tomorrow'
+    else
+        echo "The \$LOCK_NAME timelock is locked, \\
+    it unlocks at \$(timelock -p "\$LOCK_NAME")"
+    fi
+
 Locks are located in $(obfuscate_directory "$TIMELOCK_DIR")
 
 -h, --help                    -- Print information on usage and flags then
@@ -99,18 +164,99 @@ Locks are located in $(obfuscate_directory "$TIMELOCK_DIR")
                                  3, error, ERROR
                                  4, none, NONE
                                 	each option in a line mean the same thing
+-p, --print                   -- Prints out when the lock expires
 -v, --verbose                 -- log level 0 (trace)
 -q, --quiet                   -- log level 3 (error)
 -f, --force                   -- Set, even if not expired
 -r, --remove                  -- Remove the lock instead setting it
 -u, --unlock                  -- Alias for removing a lock
 -R, --remove-all-expired      -- Checks for expired locks and removed them
-"
+EOF
 	exit 0
 }
 
 show_version() {
-	echo "timelock version: 1.0.0" && exit 0
+	echo "timelock version: 1.1.0" && exit 0
+}
+
+
+expand_single_args() {
+	var="${1#-}" # cut off first, and only dash
+	while [ "$var" ]; do
+		next="${var#?}"
+		first_char="${var%"$next"}"
+		echo "-$first_char"
+		var="$next" # next
+	done
+}
+
+# While parse_args is also available as its own script, having it here makes
+# copying this script a lot easier
+
+# An actually cross-platform, POSIX compliant argument parser.
+#
+# This function will parse and return a newline separated argument list. It
+# handles long arguments and checks for missing or extra values.
+# it handles both whitespace and '=' separated values
+# it also treats quoted parameters as one
+# It does NOT check for unknown variables as there is no list of allowed args
+# but those are easy to handle later
+parse_args() {
+	# first parameter is a single string, an IFS separated list of arguments
+	# that expects a single parameter to follow it as its value
+	with_parameters="$1"
+	shift
+	while [ "$1" ]; do
+		single_cut_with_equalparam="${1##-}"
+		single_cut="${single_cut_with_equalparam%%=*}" # = value cut off
+		double_cut_with_equalparam="${1##--}"
+		double_cut="${double_cut_with_equalparam%%=*}" # = value cut off
+		equalparam=${1##*=}
+		if [ "$equalparam" = "$1" ]; then
+			equalparam=''
+		fi
+		# starts with one dash but not two
+		if ! [ "$single_cut_with_equalparam" = "$1" ] && [ "$double_cut_with_equalparam" = "$1" ]; then
+			split_args=$(expand_single_args "$single_cut")
+			shift
+			if [ -n "$equalparam" ]; then
+				set -- "$equalparam" "$@"
+			fi
+			# shellcheck disable=SC2086
+			set -- $split_args "$@"
+		# two dash
+		elif ! [ "$double_cut_with_equalparam" = "$1" ]; then
+			shift
+			if [ -n "$equalparam" ]; then
+				set -- "$equalparam" "$@"
+			fi
+			set -- "--$double_cut" "$@"
+		fi
+
+		has_parameter=''
+		for a in $with_parameters; do
+			if [ "$a" = "$1" ]; then
+				has_parameter='1'
+				break
+			fi
+		done
+
+		if [ -n "$has_parameter" ]; then
+			if [ -z "$2" ] || ! [ "${2##-}" = "$2" ]; then
+				echo "$1 is missing it's parameter!" >&2
+				exit 1
+			fi
+		# TODO: handle rest parameters
+		#else
+		#	if [ -n "$2" ] && [ "${2##-}" = "$2" ]; then
+		#		echo "$1 has a parameter ($2) when it shouldn't have one!" >&2
+		#		exit 1
+		#	fi
+		fi
+
+		printf "%s\n" "$1"
+		shift
+	done
 }
 
 interpret_args() {
@@ -130,7 +276,6 @@ interpret_args() {
 					'trace' | 'TRACE' | '0') TIMELOCK_LOG_LEVEL='0' ;;
 					'info' | 'INFO' | '1') TIMELOCK_LOG_LEVEL='1' ;;
 					'warning' | 'WARNING' | '2') TIMELOCK_LOG_LEVEL='2' ;;
-					'success' | 'SUCCESS') TIMELOCK_LOG_LEVEL='2' ;;
 					'error' | 'ERROR' | '3') TIMELOCK_LOG_LEVEL='3' ;;
 					'none' | 'NONE' | '4') TIMELOCK_LOG_LEVEL='4' ;;
 					*) log_error "Invalid loglevel: $2"; exit 1 ;;
@@ -229,7 +374,23 @@ timelock_remove() {
 }
 
 timelock_remove_all_expired() {
+	any_expired=0
 	for file in "$TIMELOCK_DIR"/*."$TIMELOCKFILE_EXTENSION"; do
+		[ -f "$file" ] || continue
+		if timelock_check "x" "$file"; then
+			any_expired=1
+		fi
+	done
+
+	# Return without bothering the user
+	if [ $any_expired = 0 ]; then
+		return;
+	fi
+
+	log_info "Cleaning all expired locks:"
+	for file in "$TIMELOCK_DIR"/*."$TIMELOCKFILE_EXTENSION"; do
+		# Skip if no files match the pattern (glob didn't expand)
+		[ -f "$file" ] || continue
 		if timelock_check "x" "$file"; then
 			timelock_remove "$file"
 		fi
@@ -238,7 +399,7 @@ timelock_remove_all_expired() {
 
 timelock_get_lockname_from_filename() {
 	filename="${1##*/}"
-	filename="${filename%%.$TIMELOCKFILE_EXTENSION}"
+	filename="${filename%%."$TIMELOCKFILE_EXTENSION"}"
 	echo "$filename"
 }
 
@@ -268,17 +429,9 @@ timelock_list() {
 
 }
 
-# Execution
-# ewline_args=''
-# hile [ "$1" ]; do
-# 	if [ "$newline_args" ]; then
-# 		newline_args="$newline_args
-# 1"
-# 	else
-# 		newline_args="$1"
-# 	fi
-# 	shift
-# one
+if [ ! "$TIMELOCK_ALWAYS_CLEAN_EXPIRED" = 0 ]; then
+	timelock_remove_all_expired
+fi
 
 # shellcheck disable=2046
 interpret_args $(parse_args "" "$@")
