@@ -4,7 +4,7 @@ CUDA computing platform for nvidia cards
 
 ## Container Toolkit
 
-> https://docs.nvidia.com/dgx/nvidia-container-runtime-upgrade/
+> <https://docs.nvidia.com/dgx/nvidia-container-runtime-upgrade/>
 
 To support NVIDIA GPUs used by GPU-accelerated containers
 
@@ -28,7 +28,7 @@ tool you're using**.
 > dotmodule as it already defines it in `17-cuda.conf`
 
 ```sh
-CUDA_VERSION=121 make cuda11x
+CUDA_VERSION=128 make cuda11x
 pip install .
 ```
 
