@@ -1,5 +1,7 @@
 # Setting up a Raspberry Pi 4 v1.4 with 64-bit Arch Linux
 
+Do not use "Arch ARM", it's not maintained. Use Manjaro ARM instead.
+
 > As of 2022-04-06, the most recent RPi4 8gb model and the most recent 64-bit
 > arch image doesn't work together so a few manual adjustments need to be made
 
@@ -21,13 +23,11 @@ You can also create a bootable Raspian SD-Card using it from any other system.
 > On some linux systems (Raspbian, Arch) you can just install the `rpi-imager`
 > package.
 
-## Create a bootable SD Card or USB device
+## Create a bootable SD Card
 
-Just use the
-[script](../../modules/pi-network-server/resources/setup-arch-aarch64-device.sh)
-I wrote. It handles sd cards and usb devices, and can set your device up with
-2 or 3 partitions complete with fstab config. If you wish to do it manually or
-you're just interested what fixes you need to make in addition to the
+> I also have a script, but read it carefully and modify if needed if you want
+> to use it: [script](../../modules/pi-network-server/resources/setup-arch-aarch64-device.sh)
+
 [arch install guide](https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-4)
 (which is not up to date, you don't need to modify your fstab like that, it is
 still mmcblk0 and not 1. But the main problem is that the tarball at
@@ -48,3 +48,8 @@ Thank you so much kyoshiro for figuring this out!
 Follow the same steps as for a [normal arch installation](./arch.md)
 
 Don't forget to update the locale, the default is `C`.
+
+```sh
+pacman-key --init
+pacman-key --populate archlinuxarm
+```
