@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm pkgfile
+pacman -Syu --needed --noconfirm pkgfile fakeroot
