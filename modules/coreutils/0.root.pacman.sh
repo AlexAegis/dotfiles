@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pacman -Syu --needed --noconfirm coreutils
+pacman -Syu --needed --noconfirm coreutils pkgconf inetutils
