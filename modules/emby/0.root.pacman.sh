@@ -19,8 +19,6 @@ if [ "$distribution" = 'Arch Linux ARM' ] || [ "$distribution" = 'Manjaro ARM' ]
 
 		wget "$emby_url" -O "$cached_emby_installer"
 
-		aura -A --noconfirm debtap
-		debtap -u
 		(
 			cd "$cache_dir" || exit
 			echo "Use the name 'emby-server'"

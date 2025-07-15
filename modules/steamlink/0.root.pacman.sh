@@ -8,13 +8,11 @@ cached_steamlink_installer="$cache_dir/$steamlink_filename"
 distribution=$(grep "^NAME" /etc/os-release 2>/dev/null | grep -oh "=.*" | \
 	tr -d '="')
 
-if [ "$distribution" = 'Arch Linux ARM' ]; then
+if [ "$distribution" = 'Arch Linux ARM' ] || [ "$distribution" = 'Manjaro ARM' ]; then
 	if [ ! -f "$cached_steamlink_installer" ]; then
 		mkdir -p "$cache_dir"
 		wget "$steamlink_url" -O "$cached_steamlink_installer"
 
-		aura -A --noconfirm debtap
-		debtap -u
 		(
 			cd "$cache_dir" || exit
 			echo "Use the name 'steamlink'"

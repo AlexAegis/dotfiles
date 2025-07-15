@@ -8,14 +8,12 @@ cached_steam_installer="$cache_dir/$steam_filename"
 distribution=$(grep "^NAME" /etc/os-release 2>/dev/null | grep -oh "=.*" | \
 	tr -d '="')
 
-if [ "$distribution" = 'Arch Linux ARM' ]; then
+if [ "$distribution" = 'Arch Linux ARM' ] || [ "$distribution" = 'Manjaro ARM' ]; then
     # ! Doesn't work. Unmet dependencies!
 	if [ ! -f "$cached_steam_installer" ]; then
 		mkdir -p "$cache_dir"
 		wget "$steam_url" -O "$cached_steam_installer"
 
-		aura -A --noconfirm debtap
-		debtap -u
 		(
 			cd "$cache_dir" || exit
 			echo "Use the name 'steam'"
