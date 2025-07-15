@@ -1,7 +1,5 @@
 [Unit]
 Description=qBittorrent Daemon Service
-After=var-media.mount
-Requires=var-media.mount
 StartLimitBurst=5
 StartLimitIntervalSec=300
 
