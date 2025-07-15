@@ -10,3 +10,6 @@ else
 		git pull
 	)
 fi
+
+# temp fix of a bug
+sed -i '/You must run at least once/c\echo "temporary bugfix"' "$DEBTAP_DIR/debtap"
