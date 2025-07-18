@@ -4,7 +4,14 @@
 
 ## WebUI
 
-The default user is `admin` and password is `adminadmin`
+The default user is `admin` and a temporary password is displayed during
+startup.
+
+> For the headless service
+
+```sh
+systemctl status qbittorrentd.service
+```
 
 ### Settings
 
