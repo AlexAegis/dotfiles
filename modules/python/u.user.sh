@@ -5,13 +5,6 @@ if [ "$mac" ]; then
 	export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
 fi
 
-# update pyenv
-(
-	cd "$PYENV_HOME" || exit 1
-	git pull
-)
-# shellcheck disable=SC1091
-. "./XDG_CONFIG_HOME.python/rc.d/pyenv.sh"
 
 # Use the install latest plugin, answer no if it asks to reinstall the same
 # version
