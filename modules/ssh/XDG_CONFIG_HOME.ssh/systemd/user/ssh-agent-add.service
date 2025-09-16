@@ -1,0 +1,12 @@
+[Unit]
+Description=Add the id key to ssh-agent
+Requires=ssh-agent.service
+After=ssh-agent.service
+
+[Service]
+Type=oneshot
+Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+ExecStart=/bin/sh -c '/usr/bin/ssh-add %h/.ssh/*_rsa'
+
+[Install]
+WantedBy=default.target
