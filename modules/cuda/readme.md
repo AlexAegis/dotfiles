@@ -28,7 +28,7 @@ tool you're using**.
 > dotmodule as it already defines it in `17-cuda.conf`
 
 ```sh
-CUDA_VERSION=128 make cuda11x
+CUDA_VERSION=130 make cuda11x
 pip install .
 ```
 
