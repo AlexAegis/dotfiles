@@ -1,0 +1,12 @@
+# custom-shader = shaders/bettercrt.glsl
+# custom-shader = shaders/retro-terminal.glsl
+
+background-opacity = 0.18
+background-blur = false
+background-opacity = 0.1
+background = #031b1a
+
+font-family = IosevkaTermNFM
+font-family-bold = IosevkaTermNFM
+font-family-italic = IosevkaTermNFM
+font-family-bold-italic = IosevkaTermNFM
