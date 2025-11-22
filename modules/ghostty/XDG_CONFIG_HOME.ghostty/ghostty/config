@@ -1,10 +1,15 @@
 # custom-shader = shaders/bettercrt.glsl
 # custom-shader = shaders/retro-terminal.glsl
 
-background-opacity = 0.18
+theme = Earthsong
+# theme = Framer
+# theme = Midnight In Mojave
+# theme = Shaman
+
+background-opacity = 0.35
 background-blur = false
-background-opacity = 0.1
-background = #031b1a
+#background = #031b1a
+background = #050a0f
 
 font-family = IosevkaTermNFM
 font-family-bold = IosevkaTermNFM
