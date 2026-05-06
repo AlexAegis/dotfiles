@@ -15,4 +15,5 @@ cargo install --locked cargo-edit
 cargo install --locked cargo-expand
 cargo install --locked cargo-make
 cargo install --locked cargo-tarpaulin
+cargo install --locked cargo-llvm-cov
 cargo install --locked cargo-udeps
