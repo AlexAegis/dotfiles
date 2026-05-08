@@ -25,3 +25,6 @@
 [submodule "modules/windows-terminal/resources/windows-terminal-shaders"]
 	path = modules/windows-terminal/resources/windows-terminal-shaders
 	url = https://www.github.com/Hammster/windows-terminal-shaders
+[submodule "modules/ai-prompts"]
+	path = modules/ai-prompts
+	url = git@github.com:AlexAegis/ai-prompts.git

@@ -1,3 +1,4 @@
 xdg
+ai-prompts ? [ -f "$PONT_MODULES_HOME/ai-prompts/.dependencies" ]
 :aur-helper ? [ $pacman ]
 chocolatey ? [ $windows ]
