@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# GTK HiDPI scaling for Xorg sessions. Do not export this through
+# environment.d; Wayland sessions should let the compositor handle scaling.
+export GDK_SCALE=1.5
+export GDK_DPI_SCALE=0.5
+
 if [ "$LAYOUT" ] && [ "$LAYOUT_USE_CONF" = "0" ]; then
 	# load layout
 	layout_file="$XDG_CONFIG_HOME/xorg/layout/$LAYOUT.layout"
