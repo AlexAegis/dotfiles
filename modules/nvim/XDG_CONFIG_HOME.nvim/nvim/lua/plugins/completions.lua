@@ -10,6 +10,7 @@ return {
   },
   {
     "saghen/blink.cmp",
+    branch = "v1",
     opts = {
       keymap = {
         preset = "enter",
