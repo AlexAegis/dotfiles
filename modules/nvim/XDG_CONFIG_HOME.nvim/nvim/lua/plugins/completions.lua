@@ -1,4 +1,5 @@
 return {
+  { "saghen/blink.lib" },
   {
     "rafamadriz/friendly-snippets",
     config = function()
