@@ -12,8 +12,10 @@ export LOADENV_RC_EXTS="sh zsh" # used by loadenv
 # TODO: The compinit file generates errors on debian buster
 
 unsetopt PROMPT_SP
-autoload -Uz promptinit && promptinit
-autoload -Uz compinit && compinit
+
+# Oh My Zsh handles promptinit/compinit after Antidote has loaded plugin paths.
+# autoload -Uz promptinit && promptinit
+# autoload -Uz compinit && compinit
 
 # Custom Compdef
 fpath=($XDG_CONFIG_HOME/zsh/compdef $fpath)
@@ -31,8 +33,8 @@ fi
 # the fzf plugin is no longer used but this is left here as reference
 # . ~/.config/environment.d/51-fzf.conf
 # Order matters so you can overwrite stuff that the plugins load
-# omzsh throws some unnecessary warnings unless comfix is disabled
-# while it's loading
+DISABLE_AUTO_UPDATE=true
+ZSH_DISABLE_COMPFIX=true
 . "$ANTIDOTE_DIR/antidote.zsh"
 . "$ZDOTDIR/.zsh-plugins.zsh"
 # ! YOUR ENVIRONMENT LOADS AT THIS POINT! ANYTHING BEFORE IT MUST WORK WITHOUT
