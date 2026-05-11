@@ -2,4 +2,4 @@
 
 > [Arch Wiki](https://wiki.archlinux.org/index.php/Java)
 
-Using [`jabba`](https://github.com/shyiko/jabba) as a version manager
+Installs the system JDK package where available.
