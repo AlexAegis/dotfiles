@@ -7,10 +7,10 @@ set -a
 
 # force xdg settings from module if available
 script_location=$(
-	cd "${0%\/*}" || exit
+	cd "${0%\/*}" 2>/dev/null || exit
 	pwd
 )
-if [ -L "$script_location/loadenv" ]; then
+if [ "$script_location" ] && [ -L "$script_location/loadenv" ]; then
 	script_link_location=$(readlink "$script_location/loadenv")
 	if ! [ "${script_link_location#\/}" = "$script_link_location" ]; then
 		# absulte link
@@ -21,7 +21,7 @@ if [ -L "$script_location/loadenv" ]; then
 	fi
 	script_location=${script_location%\/*} # cut filename
 fi
-if [ -e "$script_location/../../xdg/e.user.sh" ]; then
+if [ "$script_location" ] && [ -e "$script_location/../../xdg/e.user.sh" ]; then
 	current_pwd=$(pwd)
 	cd "$script_location/../../xdg" || exit 1
 	set -a
@@ -53,9 +53,22 @@ DIR="$XDG_CONFIG_HOME/alias.d" REGEX=".*\.alias" . "$XDG_BIN_HOME/sourcein"
 
 [ ! "$QUIET" ] && echo "Loading every" \
 	".$(echo "${LOADENV_RC_EXTS:-sh}" | sed 's@ @ .@g') rc files"
-# while earlier an advanced regex was used to read all the extensions together
-# a simple solution had to be implemented because BSD find did not support it
-for ext in $(echo "$LOADENV_RC_EXTS" | tr ' ' '\n'); do
+loadenv_rc_exts=${LOADENV_RC_EXTS:-sh}
+for ext in $(echo "$loadenv_rc_exts" | tr ' ' '\n'); do
+	loadenv_source_rc=
+	case "$ext" in
+		sh)
+			loadenv_source_rc=1
+			;;
+		bash)
+			[ "$BASH_VERSION" ] && loadenv_source_rc=1
+			;;
+		zsh)
+			[ "$ZSH_VERSION" ] && loadenv_source_rc=1
+			;;
+	esac
+	[ "$loadenv_source_rc" ] || continue
+
 	# shellcheck disable=SC1091
 	DIR="$XDG_CONFIG_HOME/rc.d" REGEX=".*\.$ext" . "$XDG_BIN_HOME/sourcein"
 done
