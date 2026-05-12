@@ -1,6 +1,3 @@
 #!/bin/sh
 
-brew update
-brew upgrade
-
 ./resources/write-brew-shellenv.sh
