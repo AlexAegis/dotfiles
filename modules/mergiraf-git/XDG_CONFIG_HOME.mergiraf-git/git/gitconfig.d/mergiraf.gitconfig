@@ -1,0 +1,10 @@
+[merge]
+	conflictStyle = "diff3"
+
+[merge "mergiraf"]
+	name = mergiraf
+	driver = mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L
+
+# Can't have multiple global gitattributes files
+#[core]
+#	attributesFile = gitconfig.d/mergiraf.gitattributes

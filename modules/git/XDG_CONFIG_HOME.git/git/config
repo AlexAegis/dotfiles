@@ -4,11 +4,16 @@
 	path = gitconfig.d/credential-helper.gitconfig
 	path = gitconfig.d/gpg-signing-key.gitconfig
 	path = gitconfig.d/kde.gitconfig
+	path = gitconfig.d/mergiraf.gitconfig
 	path = gitconfig.d/difftastic.gitconfig
 
 [core]
 	editor = nvim
 	askpass = /usr/bin/ksshaskpass
+
+[merge]
+	# Being able to see the common ancestor of current and incoming changes is a must
+	conflictStyle = "diff3"
 
 # reuse recorded resolution (when redoing a rebase it keeps older merge conflict resolutions)
 [rerere]
