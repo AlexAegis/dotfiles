@@ -33,4 +33,17 @@ if [ -e "$XDG_CONFIG_HOME/environment.d/20-zshenv.conf" ]; then
 fi
 # rest is loaded by the startup scripts in ZDOTDIR, set in 20-zshenv.conf
 # inluding the ~/.profile file (which in turn loads the entire environment)
+
+# Windsurf/VS Code IDE terminals don't support job control (setopt monitor),
+# which gitstatus requires. Disable it early to avoid a 5s timeout on init.
+if [[ -n "\$VSCODE_PID" ]]; then
+	export POWERLEVEL9K_DISABLE_GITSTATUS=true
+fi
+
+# Non-interactive shells (e.g. IDE tool runners) skip ZDOTDIR/.zshrc, so
+# loadenv never runs and tools like node/fnm/pnpm are missing from PATH.
+# For interactive shells, .zshrc already sources ~/.profile after plugins.
+if [[ ! -o interactive ]]; then
+	[ -f "\$HOME/.profile" ] && QUIET=1 . "\$HOME/.profile"
+fi
 EOF
