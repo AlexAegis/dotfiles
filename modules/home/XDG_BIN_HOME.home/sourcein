@@ -1,5 +1,8 @@
 #!/bin/sh
 # source everything in a folder
+# Save IFS so callers (e.g. sddm's wayland-session "exec $@") still
+# word-split correctly after sourcein returns.
+_sourcein_old_ifs="${IFS-__unset__}"
 IFS='
 '
 set -af
@@ -14,3 +17,9 @@ do
 	[ "$ret" != 0 ] && echo "Return value of $f is $ret"
 done
 set +af
+if [ "$_sourcein_old_ifs" = "__unset__" ]; then
+	unset IFS
+else
+	IFS="$_sourcein_old_ifs"
+fi
+unset _sourcein_old_ifs
