@@ -10,6 +10,9 @@ KDE Keychain solution
 
 ### Missing Applications
 
+These are now run automatically by the KDE module init script, but can also be
+run manually when troubleshooting a live session:
+
 ```sh
 update-desktop-database ~/.local/share/applications -v
 ```
@@ -19,6 +22,6 @@ update-desktop-database ~/.local/share/applications -v
 To regenerate the settings run these:
 
 ```sh
-cp /etc/xdg/menus/applications.menu ~/.config/menus/
+cp /etc/xdg/menus/plasma-applications.menu ~/.config/menus/applications.menu
 kbuildsycoca6 --noincremental
 ```
