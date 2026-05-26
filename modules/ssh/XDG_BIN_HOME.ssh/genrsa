@@ -6,10 +6,6 @@ NAME=${1:-"id_rsa"}
 TARGET=${2:-"$HOME/.ssh"}
 
 RSA_PRIV="$TARGET/$NAME"
-openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4086 -out "$RSA_PRIV"
-openssl pkey -in "$RSA_PRIV" -out "$RSA_PRIV.pub" -pubout
-ssh-keygen -f "$RSA_PRIV" -y >"$RSA_PRIV.pub"
-# Comment origin at the end
-sed -i "$ s/$/ $USER@$(hostname)/" "$RSA_PRIV.pub"
+ssh-keygen -t rsa -b 4096 -N "" -C "$USER@$(hostname)" -f "$RSA_PRIV"
 
 chmod 400 "$RSA_PRIV" "$RSA_PRIV.pub"
