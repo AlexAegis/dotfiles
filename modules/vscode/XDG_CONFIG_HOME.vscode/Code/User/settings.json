@@ -1,30 +1,30 @@
 {
 	"[html]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[javascript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[json]": {
-		"editor.defaultFormatter": "vscode.json-language-features",
+		"editor.defaultFormatter": "vscode.json-language-features"
 	},
 	"[jsonc]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[markdown]": {
-		"editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+		"editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
 	},
 	"[python]": {
-		"editor.defaultFormatter": "ms-python.python",
+		"editor.defaultFormatter": "ms-python.python"
 	},
 	"[rust]": {
-		"editor.defaultFormatter": "rust-lang.rust-analyzer",
+		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
 	"[svelte]": {
-		"editor.defaultFormatter": "svelte.svelte-vscode",
+		"editor.defaultFormatter": "svelte.svelte-vscode"
 	},
 	"[typescript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"debug.console.fontFamily": "InconsolataGo Nerd Font Mono, Cascadia Mono, Consolas, 'Courier New', monospace",
 	"debug.onTaskErrors": "showErrors",
@@ -34,7 +34,7 @@
 		"source.fixAll": "explicit",
 		"source.fixAll.eslint": "explicit",
 		"source.fixAll.stylelint": "explicit",
-		"source.organizeImports": "explicit",
+		"source.organizeImports": "explicit"
 	},
 	"editor.codeLensFontFamily": "Iosevka Nerd Font, PragmataPro",
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -45,19 +45,19 @@
 	"editor.quickSuggestions": {
 		"comments": false,
 		"other": true,
-		"strings": false,
+		"strings": false
 	},
 	"editor.quickSuggestionsDelay": 0,
 	"editor.renderControlCharacters": true,
 	"editor.rulers": [
 		{
 			"color": "#bdbdbd11",
-			"column": 80,
+			"column": 80
 		},
 		{
 			"color": "#6d6d6d75",
-			"column": 100,
-		},
+			"column": 100
+		}
 	],
 	// Linux only
 	"editor.selectionClipboard": false,
@@ -72,7 +72,7 @@
 	"editor.suggest.localityBonus": true,
 	"editor.useTabStops": true,
 	"explorer.autoRevealExclude": {
-		"**/node_modules": true,
+		"**/node_modules": true
 	},
 	"explorer.compactFolders": false,
 	"explorer.confirmDelete": false,
@@ -86,11 +86,11 @@
 		"*.tsx": "${capture}*",
 		".eslintrc.cjs": ".eslintignore",
 		".gitignore": ".gitattributes",
-		".prettierrc.cjs": ".prettierignore",
+		".prettierrc.cjs": ".prettierignore"
 	},
 	"files.associations": {
 		"vimrc": "viml",
-		".dependencies": "plaintext",
+		".dependencies": "plaintext"
 	},
 	"git.autofetch": true,
 	"git.autorefresh": true,
@@ -99,7 +99,6 @@
 	"git.replaceTagsWhenPull": true,
 	"git.openRepositoryInParentFolders": "never",
 	"githubPullRequests.createOnPublishBranch": "never",
-	"javascript.updateImportsOnFileMove.enabled": "always",
 	"liveServer.settings.donotShowInfoMsg": true,
 	"markdown.preview.typographer": true,
 	"material-icon-theme.files.associations": {
@@ -109,7 +108,7 @@
 		"project.json": "angular",
 		"svelte.config.mjs": "svelte",
 		"svelte.config.ts": "svelte",
-		"*.prettierignore": "prettier",
+		"*.prettierignore": "prettier"
 	},
 	"material-icon-theme.folders.associations": {
 		".benchmark": "benchmark",
@@ -136,16 +135,16 @@
 		"scope": "delta",
 		"store": "Redux-store",
 		"target": "dist",
-		"validator": "coverage",
+		"validator": "coverage"
 	},
 	"python.languageServer": "Pylance",
 	"remote.extensionKind": {
-		"ms-azuretools.vscode-docker": "workspace",
+		"ms-azuretools.vscode-docker": "workspace"
 	},
 	"remote.SSH.enableDynamicForwarding": false,
 	"remote.SSH.remotePlatform": {
 		"esero1569": "linux",
-		"pi": "linux",
+		"pi": "linux"
 	},
 	"remote.SSH.showLoginTerminal": true,
 	"rust-analyzer.debug.engine": "vadimcn.vscode-lldb",
@@ -161,24 +160,24 @@
 		"bash": {
 			"color": "terminal.ansiYellow",
 			"icon": "terminal-bash",
-			"path": "bash",
+			"path": "bash"
 		},
 		"fish": {
-			"path": "fish",
+			"path": "fish"
 		},
 		"pwsh": {
 			"icon": "terminal-powershell",
-			"path": "pwsh",
+			"path": "pwsh"
 		},
 		"tmux": {
 			"icon": "terminal-tmux",
-			"path": "tmux",
+			"path": "tmux"
 		},
 		"zsh": {
 			"color": "terminal.ansiCyan",
 			"icon": "terminal",
-			"path": "zsh",
-		},
+			"path": "zsh"
+		}
 	},
 	"terminal.integrated.shellIntegration.enabled": true,
 	"terminal.integrated.smoothScrolling": true,
@@ -187,13 +186,13 @@
 	"terminal.integrated.tabs.location": "left",
 	"terminal.integrated.tabs.showActiveTerminal": "singleTerminalOrNarrow",
 	"terminal.integrated.stickyScroll.enabled": true,
-	"typescript.preferences.importModuleSpecifier": "relative",
-	"typescript.updateImportsOnFileMove.enabled": "always",
+	"js/ts.preferences.importModuleSpecifier": "relative",
+	"js/ts.updateImportsOnFileMove.enabled": "always",
 	"window.dialogStyle": "custom",
 	"workbench.editor.decorations.badges": true,
 	"workbench.editor.wrapTabs": true,
 	"workbench.editorAssociations": {
-		"*.ipynb": "jupyter-notebook",
+		"*.ipynb": "jupyter-notebook"
 	},
 	"workbench.iconTheme": "material-icon-theme",
 	"workbench.list.smoothScrolling": true,
@@ -201,7 +200,7 @@
 	"extensions.ignoreRecommendations": true,
 	"debug.toolBarLocation": "commandCenter",
 	"[toml]": {
-		"editor.defaultFormatter": "tamasfe.even-better-toml",
+		"editor.defaultFormatter": "tamasfe.even-better-toml"
 	},
 	"powermode.enabled": false,
 	"workbench.activityBar.location": "top",
@@ -209,14 +208,14 @@
 	"scm.workingSets.enabled": true,
 	"terminal.integrated.fontSize": 16,
 	"[wgsl]": {
-		"editor.defaultFormatter": "wgsl-analyzer.wgsl-analyzer",
+		"editor.defaultFormatter": "wgsl-analyzer.wgsl-analyzer"
 	},
 	"github.copilot.enable": {
 		"*": false,
 		"plaintext": false,
 		"markdown": false,
 		"scminput": false,
-		"rust": false,
+		"rust": false
 	},
 	"window.customTitleBarVisibility": "auto",
 	"workbench.colorTheme": "Dark+ Tweaked",
@@ -262,21 +261,13 @@
 		"env": true,
 		"/usr/bin/time": true,
 		"time": true,
-		"/^zsh -fc 'zmodload zsh/datetime; start=\\$EPOCHREALTIME; env -u CONF_LOADED QUIET=1 XDG_BIN_HOME=\\$XDG_BIN_HOME XDG_CONFIG_HOME=\\$XDG_CONFIG_HOME LOADENV_RC_EXTS=\"sh zsh\" zsh -fc '\\\\''\\. \"\\$XDG_BIN_HOME/loadenv\"'\\\\''; end=\\$EPOCHREALTIME; printf \"%\\.6f\\\\n\" \\$\\(\\( end - start \\)\\)'$/": {
-			"approve": true,
-			"matchCommandLine": true,
-		},
 		"fnm": true,
 		"/opt/homebrew/bin/brew": true,
-		"/^node --version && cat /home/alex/git/@webdev/js-tooling/node_modules/\\.pnpm/svelte-preprocess@6\\.0\\.4_postcss-load-config@3\\.1\\.4_postcss@8\\.5\\.15_ts-node@10\\.9\\.2_@types\\+node@2_rqj4cme2v7q3m3iutpckrbsdde/node_modules/svelte-preprocess/package\\.json \\| grep -E '\"version\"\\|\"type\"' \\| head -5$/": {
-			"approve": true,
-			"matchCommandLine": true,
-		},
 		"set": true,
 		"mkdir": true,
 		"update-desktop-database": true,
 		"kbuildsycoca6": true,
-		"shellcheck": true,
+		"shellcheck": true
 	},
 	"chat.agent.maxRequests": 100,
 	"lldb-dap.executable-path": "/bin/lldb-dap",
@@ -290,11 +281,11 @@
 		"https://github.com/microsoft/vscode/wiki/*": true,
 		"http://localhost:5500": {
 			"approveRequest": false,
-			"approveResponse": true,
+			"approveResponse": true
 		},
 		"https://docs.rs": {
 			"approveRequest": false,
-			"approveResponse": true,
+			"approveResponse": true
 		},
 		"https://crates.io/crates/bevy_egui": true,
 		"https://crates.io/crates": true,
@@ -302,49 +293,46 @@
 		"https://crates.io/crates/bevy-inspector-egui": true,
 		"https://bevy.org": {
 			"approveRequest": false,
-			"approveResponse": true,
+			"approveResponse": true
 		},
 		"https://github.com": true,
 		"https://raw.githubusercontent.com": {
 			"approveRequest": false,
-			"approveResponse": true,
+			"approveResponse": true
 		},
 		"https://devblogs.microsoft.com": {
 			"approveRequest": false,
-			"approveResponse": true,
+			"approveResponse": true
 		},
 		"https://aka.ms": {
 			"approveRequest": false,
-			"approveResponse": true,
+			"approveResponse": true
 		},
 		"https://huggingface.co": {
 			"approveRequest": false,
-			"approveResponse": true,
+			"approveResponse": true
 		},
 		"https://dioxuslabs.com": {
 			"approveRequest": false,
-			"approveResponse": true,
-		},
+			"approveResponse": true
+		}
 	},
 	"editor.minimap.enabled": false,
 	"diffEditor.ignoreTrimWhitespace": true,
 	"chat.plugins.marketplaces": [
 		"github/copilot-plugins",
 		"github/awesome-copilot",
-		"https://github.com/ChromeDevTools/chrome-devtools-mcp",
+		"https://github.com/ChromeDevTools/chrome-devtools-mcp"
 	],
 	"chat.tips.enabled": false,
 	"chat.viewSessions.orientation": "stacked",
 	"chat.promptFilesLocations": {
-		"~/.config/copilot/agents": true,
+		"~/.config/copilot/agents": true
 	},
 	"chat.instructionsFilesLocations": {
-		"~/.config/copilot/agents": true,
-	},
-	"chat.modeFilesLocations": {
-		"~/.config/copilot/agents": true,
+		"~/.config/copilot/agents": true
 	},
 	"chat.agentFilesLocations": {
-		"~/.config/copilot/agents": true,
-	},
+		"~/.config/copilot/agents": true
+	}
 }
