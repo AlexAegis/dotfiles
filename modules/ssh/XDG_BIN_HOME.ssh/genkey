@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Generates a non-password protected Ed25519 key pair
+
+NAME=${1:-"id_key"}
+TARGET=${2:-"$HOME/.ssh"}
+
+KEY="$TARGET/$NAME"
+ssh-keygen -t ed25519 -N "" -C "$USER@$(hostname)" -f "$KEY"
+chmod 400 "$KEY" "$KEY.pub"
