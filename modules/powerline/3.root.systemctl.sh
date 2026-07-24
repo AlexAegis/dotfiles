@@ -6,7 +6,7 @@
 sh -c "echo '
 KEYMAP=us
 #KEYMAP=hu
-FONT=ter-powerline-v32n.psf.gz
+FONT=ter-powerline-v32n
 ' >/etc/vconsole.conf"
 
 # Instant reload
