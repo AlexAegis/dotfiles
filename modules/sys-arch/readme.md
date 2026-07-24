@@ -4,16 +4,16 @@ Arch Linux specific system setup
 
 ## Mirrors
 
-Using `rate-mirrors` you can automatically evaluate mirrors based on their speed.
+Using `reflector` you can automatically rank mirrors by download rate.
 
 ```sh
-rate-mirrors --protocol https arch 
+reflector --latest 20 --protocol https --sort rate
 ```
 
 Or automatically update your mirrorlist using:
 
 ```sh
-rate-mirrors --allow-root --protocol https arch | grep -v '^#' | sudo tee /etc/pacman.d/mirrorlist
+sudo reflector --latest 20 --protocol https --sort rate --save /etc/pacman.d/mirrorlist
 ```
 
 ## System package unique features
