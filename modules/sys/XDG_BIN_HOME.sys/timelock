@@ -33,7 +33,7 @@
 # Line 3 = Lock expiration time
 
 TIMELOCKFILE_EXTENSION='timelock'
-TIMELOCK_DIR="${TIMELOCK_DIR:-$XDG_CACHE_HOME/timelock}"
+TIMELOCK_DIR="${TIMELOCK_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/timelock}"
 TIMELOCK_LOG_LEVEL=1
 timelock_name=''
 timelock_duration_or_human_readable=''
@@ -330,6 +330,14 @@ timelock_check() {
 	fi
 	log_trace "Check $1 at $timelock_file"
 	expiration_date="$(sed '3q;d' "$timelock_file")" # teleport as much as you like
+
+	# A truncated or hand mangled lock file would otherwise read as locked
+	# forever, so treat anything unparseable as already expired
+	if ! test "$expiration_date" -ge 0 2>/dev/null; then
+		log_warning "Lock file has no valid expiration date, treating it as expired: $timelock_file"
+		return 0
+	fi
+
 	if [ "$print" ]; then
 		date -d@"$expiration_date"
 	fi
@@ -369,8 +377,12 @@ timelock_set() {
 }
 
 timelock_remove() {
+	if [ -z "$1" ] || [ ! -e "$1" ]; then
+		log_info "No such lock to remove: $(timelock_get_lockname_from_filename "$1")"
+		return 0
+	fi
 	log_info "Removing lock $(timelock_get_lockname_from_filename "$1")"
-	rm "$1"
+	rm -f "$1"
 }
 
 timelock_remove_all_expired() {
@@ -408,10 +420,10 @@ timelock_list() {
     while IFS= read -r file; do
 		log_trace "Listing $file"
 		set_time="$(sed '1q;d' "$file")"
-		set_time_date="$(date -d@"$set_time")"
+		set_time_date="$(date -d@"$set_time" 2>/dev/null || echo 'unknown')"
 		duration="$(sed '2q;d' "$file")"
 		expiration_time="$(sed '3q;d' "$file")"
-		expiration_time_date="$(date -d@"$expiration_time")"
+		expiration_time_date="$(date -d@"$expiration_time" 2>/dev/null || echo 'unknown')"
 		comment="$(sed '4q;d' "$file")"
 		if timelock_check "x" "$file"; then
 			expired_message="yes"
@@ -433,8 +445,20 @@ if [ ! "$TIMELOCK_ALWAYS_CLEAN_EXPIRED" = 0 ]; then
 	timelock_remove_all_expired
 fi
 
-# shellcheck disable=2046
-interpret_args $(parse_args "" "$@")
+parsed_args=$(parse_args "" "$@") || exit 1
+
+# parse_args returns one argument per line, so only newline may split it,
+# otherwise arguments containing spaces get torn apart
+old_ifs="$IFS"
+IFS='
+'
+set -f
+# shellcheck disable=2086
+set -- $parsed_args
+set +f
+IFS="$old_ifs"
+
+interpret_args "$@"
 
 if [ ! "$mode" = "remove-all-expired" ] \
 	&& [ ! "$mode" = "remove" ] \
