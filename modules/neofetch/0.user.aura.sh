@@ -1,3 +1,3 @@
 #!/bin/sh
 
-aura -A --needed --noconfirm neofetch
+aura -A --noconfirm neofetch
