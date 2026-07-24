@@ -43,9 +43,13 @@ if [ "$distribution" = 'Arch Linux ARM' ] || [ "$distribution" = 'Manjaro ARM' ]
 		cd "$cache_dir" || exit
 		# -Q so an unattended run does not stop on debtap's prompts
 		debtap -Q "$emby_filename"
-		pacman -U --needed --noconfirm \
+		# debtap writes every install hook with a lone comment as its body,
+		# which bash refuses to parse, and all of them are empty anyway
+		pacman -U --needed --noconfirm --noscriptlet \
 			"${cache_dir}/emby-server-${emby_version}-"*.pkg.tar.zst
 	)
+
+	find "$cache_dir" -type f ! -name "*${emby_version}*" -delete
 else
 	pacman -Syu --needed --noconfirm emby-server
 fi
