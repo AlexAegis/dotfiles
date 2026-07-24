@@ -260,8 +260,6 @@ parse_args() {
 }
 
 interpret_args() {
-	# Not a perfect solution on keeping the quotes intact, spaces inside it
-	# will still be crunched by getopt
 	log_trace 'interpret' "$@"
 
 	arg_pos=0
