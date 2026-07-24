@@ -6,6 +6,9 @@ sed -i 's/#Color/Color\nILoveCandy/g' /etc/pacman.conf
 
 sed -i 's|#\[multilib\]|\[multilib\]\nInclude = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 sed -i 's/#ParallelDownloads.*/ParallelDownloads = 12/g' /etc/pacman.conf
+
+# Otherwise every source built AUR package gets a `-debug` twin
+sed -i '/^OPTIONS=/ s/!\?debug/!debug/' /etc/makepkg.conf
 # Some useful scripts like `paccache`
 pacman -Syu --needed --noconfirm pacman-contrib
 
