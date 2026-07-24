@@ -1,2 +1,3 @@
 xdg
+:aur-helper ? [ "$pacman" ]
 sys-gentoo ? [ $gentoo ] # portage install
