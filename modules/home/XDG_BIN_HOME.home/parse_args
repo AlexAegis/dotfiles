@@ -60,7 +60,22 @@ expand_single_args() {
 # 	done
 # }
 #
-# handle_args $(parse_args "$args_with_parameters" "$@")
+# The output is newline separated, so only newline may split it, otherwise
+# quoted arguments get torn apart. parse_args can also only exit its own
+# subshell, so its failure has to be caught by the caller.
+#
+# parsed_args=$(parse_args "$args_with_parameters" "$@") || exit 1
+#
+# old_ifs="$IFS"
+# IFS='
+# '
+# set -f
+# # shellcheck disable=SC2086
+# set -- $parsed_args
+# set +f
+# IFS="$old_ifs"
+#
+# handle_args "$@"
 
 parse_args() {
 	# first parameter is a single string, an IFS separated list of arguments
@@ -104,7 +119,7 @@ parse_args() {
 
 		if [ -n "$has_parameter" ]; then
 			if [ -z "$2" ] || ! [ "${2##-}" = "$2" ]; then
-				echo "$1 is missing it's parameter!" >&2
+				echo "$1 is missing its parameter!" >&2
 				exit 1
 			fi
 		# TODO: handle rest parameters
