@@ -1,0 +1,13 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = kwin
+Target = kwin-x11
+
+[Action]
+Description = Rebuilding the better-blur-dx KWin effect...
+Depends = cmake
+Depends = make
+When = PostTransaction
+Exec = /usr/local/bin/kwin-better-blur-dx-rebuild

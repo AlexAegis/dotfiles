@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# Rebuilds and reinstalls the better-blur-dx KWin effect against the
+# currently installed KWin. The effect links against KWin internals, so it
+# breaks on every KWin upgrade until it is compiled again.
+
+CONF="/etc/kwin-better-blur-dx.conf"
+
+if ! [ -r "$CONF" ]; then
+	echo "kwin-better-blur-dx: no $CONF, skipping rebuild"
+	exit 0
+fi
+
+# shellcheck source=/dev/null
+. "$CONF"
+
+if [ -z "$BETTER_BLUR_DX_DIR" ] || ! [ -d "$BETTER_BLUR_DX_DIR/.git" ]; then
+	echo "kwin-better-blur-dx: no clone at '$BETTER_BLUR_DX_DIR'," \
+		"skipping rebuild"
+	exit 0
+fi
+
+if [ -z "$BETTER_BLUR_DX_USER" ]; then
+	BETTER_BLUR_DX_USER="$(stat -c '%U' "$BETTER_BLUR_DX_DIR")"
+fi
+
+echo "kwin-better-blur-dx: rebuilding in $BETTER_BLUR_DX_DIR" \
+	"as $BETTER_BLUR_DX_USER"
+
+# Pull and compile as the owning user so the tree does not end up root owned,
+# which would stop that user from ever rebuilding it by hand again.
+# shellcheck disable=SC2016
+runuser -u "$BETTER_BLUR_DX_USER" -- sh -c '
+	cd "$1" || exit 1
+	git pull || echo "kwin-better-blur-dx: git pull failed, building as is"
+	rm -rf build
+	mkdir -p build
+	cd build || exit 1
+	cmake .. -DCMAKE_INSTALL_PREFIX=/usr || exit 1
+	make -j"$(nproc)"
+' _ "$BETTER_BLUR_DX_DIR" || {
+	echo "kwin-better-blur-dx: build failed" >&2
+	exit 1
+}
+
+# cmake --install instead of make install, make would rebuild as root and
+# leave root owned artifacts in the user's tree
+cmake --install "$BETTER_BLUR_DX_DIR/build" || {
+	echo "kwin-better-blur-dx: install failed" >&2
+	exit 1
+}
+
+echo "kwin-better-blur-dx: rebuilt, log out and back in to load the effect"
