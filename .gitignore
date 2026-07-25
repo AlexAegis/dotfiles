@@ -19,3 +19,6 @@ _deps
 *.un~
 
 *.profraw
+
+# Claude Code local state (atomic-write staging, machine-local settings)
+.claude/
