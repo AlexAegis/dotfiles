@@ -1,0 +1,18 @@
+**/.claude/settings.local.json
+
+**/.claude/.cc-writes/
+
+# Claude Code's bash sandbox bind-mounts /dev/null over these paths at the root
+# of the working directory so a command cannot drop a config file there for a
+# later process to pick up. Paths that already exist are left alone, the rest
+# show up as untracked character devices. Anchored so real dotfiles tracked
+# deeper in a repo, like modules/zsh/XDG_CONFIG_HOME.zsh/zsh/.zshrc, still show.
+/.gitconfig
+/.bashrc
+/.bash_profile
+/.zshrc
+/.zprofile
+/.profile
+/.ripgreprc
+/.mcp.json
+/.idea
