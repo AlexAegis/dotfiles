@@ -1,7 +1,6 @@
 {
 	"recommendations": [
 		"editorconfig.editorconfig",
-		"mhutchie.git-graph",
 		"Gruntfuggly.todo-tree",
 		"aaron-bond.better-comments",
 		"esbenp.prettier-vscode",
