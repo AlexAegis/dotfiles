@@ -1,6 +1,6 @@
-**/.claude/settings.local.json
-
-**/.claude/.cc-writes/
+# Matches the children, so a repo's own `!.claude/skills/` negation stays
+# reachable. Git never descends into an ignored directory.
+**/.claude/*
 
 # Claude Code's bash sandbox bind-mounts /dev/null over these paths at the root
 # of the working directory so a command cannot drop a config file there for a
