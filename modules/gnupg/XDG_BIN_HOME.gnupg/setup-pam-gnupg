@@ -1,11 +1,14 @@
 #!/bin/sh
 
-# First redo the file with all the normal keygrips
+# pam-gnupg runs before the session environment is loaded, so it only finds a
+# custom GNUPGHOME from a path line placed before the keygrips
+printf '%s\n' "${GNUPGHOME:-$HOME/.gnupg}" > "$XDG_CONFIG_HOME"/pam-gnupg
+
 gpg -K --with-keygrip |
 	grep Keygrip |
-	awk '{ print $3 }' > "$XDG_CONFIG_HOME"/pam-gnupg
+	awk '{ print $3 }' >> "$XDG_CONFIG_HOME"/pam-gnupg
 
-# Then append the ssh keygrips to the end
+# Append the ssh keygrips after the gpg keygrips
 gpg-connect-agent 'keyinfo --ssh-list' /bye |
 	sed '/^OK$/d' |
 	awk '{ print $3 }' >> "$XDG_CONFIG_HOME"/pam-gnupg

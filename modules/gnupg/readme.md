@@ -39,6 +39,14 @@ gpg --armor --export <email>
 Automatic pam unlock handled by
 [pam-gnupg](https://github.com/cruegge/pam-gnupg)
 
+- The key passphrase must be the login password. Autologin cannot unlock it.
+- `setup-pam-gnupg` writes `$XDG_CONFIG_HOME/pam-gnupg`: the `GNUPGHOME` path
+  first, then the keygrips. Without that path line, pam-gnupg unlocks the agent
+  of `~/.gnupg`, and git signing still asks for the passphrase. Run it again
+  after adding or replacing a key.
+- After a login, a `1` in the seventh column of
+  `gpg-connect-agent 'keyinfo --list' /bye` marks a cached key.
+
 ### SSH
 
 You can add your ssh keys to the gnupg keys with `ssh-add`. It's pre-requisites
