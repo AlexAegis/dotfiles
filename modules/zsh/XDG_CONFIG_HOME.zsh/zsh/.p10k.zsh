@@ -25,6 +25,7 @@
   # Unset all configuration options. This allows you to apply configiguration changes without
   # restarting zsh. Edit ~/.p10k.zsh and type `source ~/.p10k.zsh`.
   unset -m 'POWERLEVEL9K_*'
+  unset my_git_conflicted
 
   autoload -Uz is-at-least && is-at-least 5.1 || return
 
@@ -235,20 +236,13 @@
   typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_{LEFT,RIGHT}_WHITESPACE=
 
   ##################################[ dir: current directory ]##################################
-  # Current directory background color.
-  # typeset -g POWERLEVEL9K_DIR_BACKGROUND=4
-  # Default current directory foreground color.
-  typeset -g POWERLEVEL9K_DIR_FOREGROUND=254
+  # Colors: see color groups.
   # If directory is too long, shorten some of its segments to the shortest possible unique
   # prefix. The shortened directory can be tab-completed to the original.
   typeset -g POWERLEVEL9K_SHORTEN_STRATEGY=truncate_to_unique
   # Replace removed segment suffixes with this symbol.
   typeset -g POWERLEVEL9K_SHORTEN_DELIMITER=
-  # Color of the shortened directory segments.
-  typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=250
-  # Color of the anchor directory segments. Anchor segments are never shortened. The first
-  # segment is always an anchor.
-  typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=255
+  # Anchor segments are never shortened. The first segment is always an anchor.
   # Display anchor directory segments in bold.
   typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
   # Don't shorten directories that contain any of these files. They are anchors.
@@ -337,12 +331,7 @@
   typeset -g POWERLEVEL9K_DIR_CLASSES=()
 
   #####################################[ vcs: git status ]######################################
-  # Version control system colors.
-  # typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND=2
-  # typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=3
-  # typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=2
-  # typeset -g POWERLEVEL9K_VCS_CONFLICTED_BACKGROUND=3
-  # typeset -g POWERLEVEL9K_VCS_LOADING_BACKGROUND=8
+  # Colors: see color groups.
 
   # Branch icon. Set this parameter to '\uF126 ' for the popular Powerline branch icon.
   typeset -g POWERLEVEL9K_VCS_BRANCH_ICON=
@@ -372,11 +361,12 @@
     fi
 
     # Styling for different parts of Git status.
-    local       meta='%7F' # white foreground
-    local      clean='%0F' # black foreground
-    local   modified='%0F' # black foreground
-    local  untracked='%0F' # black foreground
-    local conflicted='%1F' # red foreground
+    # Colors: see color groups.
+    local       meta="%F{${POWERLEVEL9K_VCS_FOREGROUND:-7}}"
+    local      clean="%F{${POWERLEVEL9K_VCS_FOREGROUND:-0}}"
+    local   modified="%F{${POWERLEVEL9K_VCS_FOREGROUND:-0}}"
+    local  untracked="%F{${POWERLEVEL9K_VCS_FOREGROUND:-0}}"
+    local conflicted="%F{${my_git_conflicted:-1}}"
 
     local res
     local where  # branch or tag
@@ -444,6 +434,7 @@
   typeset -g POWERLEVEL9K_VCS_BACKENDS=(git)
 
   ##########################[ status: exit code of the last command ]###########################
+  # Colors: see color groups.
   # Enable OK_PIPE, ERROR_PIPE and ERROR_SIGNAL status states to allow us to enable, disable and
   # style them independently from the regular OK and ERROR state.
   typeset -g POWERLEVEL9K_STATUS_EXTENDED_STATES=true
@@ -452,42 +443,30 @@
   # it will signify success by turning green.
   typeset -g POWERLEVEL9K_STATUS_OK=true
   typeset -g POWERLEVEL9K_STATUS_OK_VISUAL_IDENTIFIER_EXPANSION='✔'
-  # typeset -g POWERLEVEL9K_STATUS_OK_FOREGROUND=2
-  # typeset -g POWERLEVEL9K_STATUS_OK_BACKGROUND=0
 
   # Status when some part of a pipe command fails but the overall exit status is zero. It may look
   # like this: 1|0.
   typeset -g POWERLEVEL9K_STATUS_OK_PIPE=true
   typeset -g POWERLEVEL9K_STATUS_OK_PIPE_VISUAL_IDENTIFIER_EXPANSION='✔'
-  # typeset -g POWERLEVEL9K_STATUS_OK_PIPE_FOREGROUND=2
-  # typeset -g POWERLEVEL9K_STATUS_OK_PIPE_BACKGROUND=0
 
   # Status when it's just an error code (e.g., '1'). No need to show it if prompt_char is enabled as
   # it will signify error by turning red.
   typeset -g POWERLEVEL9K_STATUS_ERROR=true
   typeset -g POWERLEVEL9K_STATUS_ERROR_VISUAL_IDENTIFIER_EXPANSION='✘'
-  # typeset -g POWERLEVEL9K_STATUS_ERROR_FOREGROUND=3
-  # typeset -g POWERLEVEL9K_STATUS_ERROR_BACKGROUND=1
 
   # Status when the last command was terminated by a signal.
   typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL=true
   # Use terse signal names: "INT" instead of "SIGINT(2)".
   typeset -g POWERLEVEL9K_STATUS_VERBOSE_SIGNAME=false
   typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_VISUAL_IDENTIFIER_EXPANSION='✘'
-  # typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_FOREGROUND=3
-  # typeset -g POWERLEVEL9K_STATUS_ERROR_SIGNAL_BACKGROUND=1
 
   # Status when some part of a pipe command fails and the overall exit status is also non-zero.
   # It may look like this: 1|0.
   typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE=true
   typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_VISUAL_IDENTIFIER_EXPANSION='✘'
-  # typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_FOREGROUND=3
-  # typeset -g POWERLEVEL9K_STATUS_ERROR_PIPE_BACKGROUND=1
 
   ###################[ command_execution_time: duration of the last command ]###################
-  # Execution time color.
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_FOREGROUND=0
-  typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_BACKGROUND=3
+  # Colors: see color groups.
   # Show duration of the last command if takes longer than this many seconds.
   typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_THRESHOLD=3
   # Show this many fractional digits. Zero means round to seconds.
@@ -500,9 +479,7 @@
   # typeset -g POWERLEVEL9K_COMMAND_EXECUTION_TIME_PREFIX='took '
 
   #######################[ background_jobs: presence of background jobs ]#######################
-  # Background jobs color.
-  # typeset -g POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=6
-  # typeset -g POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND=0
+  # Colors: see color groups.
   # Don't show the number of background jobs.
   typeset -g POWERLEVEL9K_BACKGROUND_JOBS_VERBOSE=false
   # Custom icon.
@@ -581,20 +558,15 @@
   # typeset -g POWERLEVEL9K_DISK_USAGE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ###########[ vi_mode: vi mode (you don't need this if you've enabled prompt_char) ]###########
-  # Foreground color.
-  typeset -g POWERLEVEL9K_VI_MODE_FOREGROUND=0
-  # Text and color for normal (a.k.a. command) vi mode.
+  # Colors: see color groups.
+  # Text for normal (a.k.a. command) vi mode.
   typeset -g POWERLEVEL9K_VI_COMMAND_MODE_STRING=NORMAL
-  typeset -g POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND=2
-  # Text and color for visual vi mode.
+  # Text for visual vi mode.
   typeset -g POWERLEVEL9K_VI_VISUAL_MODE_STRING=VISUAL
-  typeset -g POWERLEVEL9K_VI_MODE_VISUAL_BACKGROUND=4
-  # Text and color for overtype (a.k.a. overwrite and replace) vi mode.
+  # Text for overtype (a.k.a. overwrite and replace) vi mode.
   typeset -g POWERLEVEL9K_VI_OVERWRITE_MODE_STRING=OVERTYPE
-  typeset -g POWERLEVEL9K_VI_MODE_OVERWRITE_BACKGROUND=3
-  # Text and color for insert vi mode.
-  typeset -g POWERLEVEL9K_VI_INSERT_MODE_STRING=
-  typeset -g POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND=8
+  # Text for insert vi mode.
+  typeset -g POWERLEVEL9K_VI_INSERT_MODE_STRING=INSERT
 
   ######################################[ ram: free RAM ]#######################################
   # RAM color.
@@ -665,15 +637,7 @@
   # typeset -g POWERLEVEL9K_TIMEWARRIOR_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   ##################################[ context: user@hostname ]##################################
-  # Context color when running with privileges.
-  typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=1
-  typeset -g POWERLEVEL9K_CONTEXT_ROOT_BACKGROUND=0
-  # Context color in SSH without privileges.
-  typeset -g POWERLEVEL9K_CONTEXT_{REMOTE,REMOTE_SUDO}_FOREGROUND=3
-  typeset -g POWERLEVEL9K_CONTEXT_{REMOTE,REMOTE_SUDO}_BACKGROUND=0
-  # Default context color (no privileges, no SSH).
-  typeset -g POWERLEVEL9K_CONTEXT_FOREGROUND=3
-  typeset -g POWERLEVEL9K_CONTEXT_BACKGROUND=0
+  # Colors: see color groups.
 
   # Context format when running with privileges: user@hostname.
   typeset -g POWERLEVEL9K_CONTEXT_ROOT_TEMPLATE='%n@%m'
@@ -893,8 +857,7 @@
       # '*prod*'  PROD    # These values are examples that are unlikely
       # '*test*'  TEST    # to match your needs. Customize them as needed.
       '*'       DEFAULT)
-  typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_FOREGROUND=4
-  typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_BACKGROUND=0
+  # Colors: see color groups.
   # typeset -g POWERLEVEL9K_TERRAFORM_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   #############[ kubecontext: current kubernetes context (https://kubernetes.io/) ]#############
@@ -933,8 +896,7 @@
       # '*prod*'  PROD    # These values are examples that are unlikely
       # '*test*'  TEST    # to match your needs. Customize them as needed.
       '*'       DEFAULT)
-  typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_FOREGROUND=7
-  typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_BACKGROUND=5
+  # Colors: see color groups.
   typeset -g POWERLEVEL9K_KUBECONTEXT_DEFAULT_VISUAL_IDENTIFIER_EXPANSION='○'
 
   # Use POWERLEVEL9K_KUBECONTEXT_CONTENT_EXPANSION to specify the content displayed by kubecontext
@@ -1208,9 +1170,7 @@
   #   /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
   ####################################[ time: current time ]####################################
-  # Current time color.
-  # typeset -g POWERLEVEL9K_TIME_FOREGROUND=0
-  # typeset -g POWERLEVEL9K_TIME_BACKGROUND=7
+  # Colors: see color groups.
   # Format for the current time: 09:51:02. See `man 3 strftime`.
   typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M:%S}'
   # If set to true, time will update when you hit enter. This way prompts for the past
@@ -1221,6 +1181,78 @@
   typeset -g POWERLEVEL9K_TIME_VISUAL_IDENTIFIER_EXPANSION=
   # Custom prefix.
   # typeset -g POWERLEVEL9K_TIME_PREFIX='at '
+
+  #######################################[ color groups ]#######################################
+  # Segment colors from color-groups, see `color-groups --help`.
+  # Without it, the p10k defaults apply.
+  local my_specs='
+# context, root
+1 darken 0.16 0.0128 85 0 d+0.14 0 0.04 0 85
+1 darken 0.16 0.0128 85 0 -60 0 0.20 0 28
+# dir and vcs, shortened dir
+2 flip 0.45 0.40 262.6 0 -65 -30 0.03 0.20 +0 0.12
+1 flip 0.45 0.40 262.6 0 -50 0 0.03 0 +0
+# time and command time, jobs
+3 darken 0.155 0.010 85 0 -45 -35 0.05 0.04 85
+# status ok, error
+3 darken 0.155 0.010 85 0 -45 -35 0.15 0.04 145
+1 flip 0.63 0.40 28 0 -55 0 0.10 0 -10
+# tools
+1 shade 0.62 0.40 304.8 0 -50 0 0.03 0 +0
+# vcs conflict
+2 flip 0.45 0.40 262.6 0 -65 -50 0.03 0.30 28 0.12
+# vi modes: normal and insert, visual, overtype
+1 flip 0.66 0.16 335 0 d-0.42 0 0.45 0 +0
+1 flip 0.78 0.16 335 0 d-0.42 0 0.45 0 +0
+1 flip 0.56 0.16 335 0 d-0.42 0 0.45 0 +0
+'
+  local -i my_count=0
+  local c seg
+  for c in ${(f)my_specs}; do
+    [[ $c == [1-9]* ]] && (( my_count += ${c%% *} ))
+  done
+  if (( $+commands[color-groups] )); then
+    local -a my_colors=("${(@f)$(color-groups <<<$my_specs 2>/dev/null)}")
+    if (( $#my_colors == my_count )); then
+      local -a bg fg
+      for c in $my_colors; do
+        bg+=("#${c%% *}")
+        fg+=("#${c#* }")
+      done
+      typeset -g POWERLEVEL9K_CONTEXT_{,REMOTE_,REMOTE_SUDO_}BACKGROUND=$bg[1]
+      typeset -g POWERLEVEL9K_CONTEXT_{,REMOTE_,REMOTE_SUDO_}FOREGROUND=$fg[1]
+      typeset -g POWERLEVEL9K_CONTEXT_ROOT_BACKGROUND=$bg[2]
+      typeset -g POWERLEVEL9K_CONTEXT_ROOT_FOREGROUND=$fg[2]
+      typeset -g POWERLEVEL9K_DIR_BACKGROUND=$bg[3]
+      typeset -g POWERLEVEL9K_DIR_{FOREGROUND,ANCHOR_FOREGROUND}=$fg[3]
+      typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=$fg[5]
+      typeset -g POWERLEVEL9K_VCS_BACKGROUND=$bg[4]
+      typeset -g POWERLEVEL9K_VCS_FOREGROUND=$fg[4]
+      typeset -g my_git_conflicted=$fg[15]
+      typeset -g POWERLEVEL9K_{TIME,COMMAND_EXECUTION_TIME}_BACKGROUND=$bg[6]
+      typeset -g POWERLEVEL9K_{TIME,COMMAND_EXECUTION_TIME}_FOREGROUND=$fg[6]
+      typeset -g POWERLEVEL9K_BACKGROUND_JOBS_BACKGROUND=$bg[7]
+      typeset -g POWERLEVEL9K_BACKGROUND_JOBS_FOREGROUND=$fg[7]
+      typeset -g POWERLEVEL9K_STATUS_{OK,OK_PIPE}_BACKGROUND=$bg[9]
+      typeset -g POWERLEVEL9K_STATUS_{OK,OK_PIPE}_FOREGROUND=$fg[9]
+      typeset -g POWERLEVEL9K_STATUS_{ERROR,ERROR_SIGNAL,ERROR_PIPE}_BACKGROUND=$bg[12]
+      typeset -g POWERLEVEL9K_STATUS_{ERROR,ERROR_SIGNAL,ERROR_PIPE}_FOREGROUND=$fg[12]
+      typeset -g POWERLEVEL9K_VI_MODE_{NORMAL,VISUAL}_BACKGROUND=$bg[6]
+      typeset -g POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND=$bg[16]
+      typeset -g POWERLEVEL9K_VI_MODE_VISUAL_FOREGROUND=$bg[17]
+      typeset -g POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND=$bg[16]
+      typeset -g POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND=$fg[16]
+      typeset -g POWERLEVEL9K_VI_MODE_OVERWRITE_BACKGROUND=$bg[18]
+      typeset -g POWERLEVEL9K_VI_MODE_OVERWRITE_FOREGROUND=$fg[18]
+      # the remaining right segments are tools
+      local -a my_own=(status command_execution_time background_jobs time
+        context vi_mode)
+      for seg in ${POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS:|my_own}; do
+        typeset -g POWERLEVEL9K_${(U)seg}_BACKGROUND=$bg[13]
+        typeset -g POWERLEVEL9K_${(U)seg}_FOREGROUND=$fg[13]
+      done
+    fi
+  fi
 
   # Example of a user-defined prompt segment. Function prompt_example will be called on every
   # prompt if `example` prompt segment is added to POWERLEVEL9K_LEFT_PROMPT_ELEMENTS or

@@ -9,4 +9,5 @@ powerline
 systemd ? [ $systemd ]
 # tmux
 runic
+color-groups # prompt segment colors
 python # some plugins need it
