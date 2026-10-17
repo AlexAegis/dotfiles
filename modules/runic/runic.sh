@@ -96,17 +96,21 @@ transform_entries() {
 }
 
 ## Execution
+# The arguments and entries are split on whitespace below; a * in them must not
+# expand to file names.
+set -f
 # shellcheck disable=SC2046
 interpret_args $(parse_args "" "$@")
 
+# shellcheck disable=SC2086
 transform_entries 'true' $entries
+set +f
 
 if [ -z "$entries" ]; then
-	while read line; do
+	while read -r line; do
 		transform_entries 'false' "$line"
 		printf '\n'
 	done
 else
 	printf '\n'
 fi
-# shellcheck disable=SC2086
