@@ -7,24 +7,22 @@ MAKEFLAGS += -j1 # explicitly run on a single thread,
 
 SHELL := /bin/sh
 
-all_lint_formats := $(addsuffix .lint, sh dash bash ksh)
+.PHONY: lint clean
 
-.PHONY: lint %.lint clean
-
-list_all_lint_formats:
-	@echo $(all_lint_formats)
-
-%.lint:
-	@git ls-tree -r master --name-only | \
-		grep -e '\.sh$$' -e '\.bash$$' -e '\.ksh$$' -e '\.bashrc$$' -e \
-		'\.bash_profile$$' -e '\.bash_login$$' -e '\.bash_logout$$' | \
-		xargs shellcheck && \
-		echo "Lint $(basename $@) successful" || \
-		echo "Lint $@ failed"
-
-lint_all: $(all_lint_formats)
-
-lint: lint_all
+# Shell files are the tracked files with a shell extension, and the ones whose
+# first line runs sh, bash, dash, or ksh. Symlinks are skipped; their tracked
+# targets are linted.
+lint:
+	@git -c core.quotePath=false ls-files | while IFS= read -r f; do \
+		[ -f "$$f" ] && [ ! -L "$$f" ] || continue; \
+		case $$f in \
+		*.sh | *.bash | *.ksh | *.bashrc | *.bash_profile | *.bash_login | \
+		*.bash_logout) ;; \
+		*) head -n 1 "$$f" | \
+			grep -qE '^#!.*[/ ](sh|bash|dash|ksh)([[:space:]]|$$)' || continue ;; \
+		esac; \
+		printf '%s\n' "$$f"; \
+	done | tr '\n' '\0' | xargs -0 shellcheck --
 	@echo "Success, all lints passed."
 
 clean:
