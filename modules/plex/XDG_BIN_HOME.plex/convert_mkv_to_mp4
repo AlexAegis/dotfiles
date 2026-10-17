@@ -8,10 +8,11 @@ while [ "$1" ]; do
 		fi
 		cd "$folder" || exit 1
 		# Process all paths
-		find -iname "*.mkv" | while read file; do
+		find . -iname "*.mkv" | while IFS= read -r file; do
 			echo "Converting $file to mp4"
-			ffmpeg -i "$file" -codec copy "${file%.*}.mp4" # copy into mp4 container
-			if [ "$?" = "0" ]; then
+			# copy into mp4 container; -nostdin stops ffmpeg from reading the
+			# file list on stdin
+			if ffmpeg -nostdin -i "$file" -codec copy "${file%.*}.mp4"; then
 				echo "Removing original file..."
 				rm "$file" # remove original if the conversion was successful
 			else
