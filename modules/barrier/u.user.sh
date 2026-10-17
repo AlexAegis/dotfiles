@@ -9,7 +9,7 @@ trusted_file="$XDG_DATA_HOME/barrier/SSL/Fingerprints/TrustedServers.txt"
 if timelock barrier_ssl; then
     if [ ! -f  "$XDG_DATA_HOME/barrier/SSL/Barrier.pem" ]; then
         (
-            cd "$XDG_DATA_HOME/barrier/SSL/"
+            cd "$XDG_DATA_HOME/barrier/SSL/" || exit 1
             openssl req -x509 -nodes -days 365 -subj /CN=Barrier -newkey rsa:4096 \
                 -keyout Barrier.pem -out Barrier.pem
         )

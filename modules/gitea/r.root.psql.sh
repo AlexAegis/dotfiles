@@ -2,7 +2,7 @@
 
 if command -v psql >/dev/null; then
 	printf "Are you sure you want to delete the 'giteadb' database and 'gitea' role from postgresql? [Y]: "
-	read confirm
+	read -r confirm
 	echo ""
 
 	if [ "$confirm" = "Y" ]; then

@@ -51,7 +51,7 @@ while [ $try -lt "$sink_count" ]; do
 	next_sink_id=${next_sink%% *}
 
 	for ignore in $IGNORED_SINKS; do
-		[ ! "${next_sink##*$ignore}" = "$next_sink" ] && continue 2
+		[ ! "${next_sink##*"$ignore"}" = "$next_sink" ] && continue 2
 	done
 
 	if pactl set-default-sink "$next_sink_id" 2>/dev/null; then

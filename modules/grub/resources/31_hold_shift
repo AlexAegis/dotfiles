@@ -28,13 +28,13 @@ datarootdir="${prefix}/share"
 export TEXTDOMAIN=grub
 export TEXTDOMAINDIR="${datarootdir}/locale"
 
-# shellcheck disable=SC1090
+# shellcheck source=/dev/null
 . "${datarootdir}/grub/grub-mkconfig_lib"
 
 # shellcheck disable=SC2034
 found_other_os=
 
-if [ "x${GRUB_HIDDEN_TIMEOUT_QUIET}" = "xtrue" ]; then
+if [ "${GRUB_HIDDEN_TIMEOUT_QUIET}" = "true" ]; then
   verbose=
 else
   verbose=" --verbose"

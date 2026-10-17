@@ -42,7 +42,7 @@ TODAY=$(date --iso-8601=date)
 if command -v 7z > /dev/null; then
 	printf "Creating password protected 7z archive, enter password: "
 	stty -echo
-	read password
+	IFS= read -r password
 	stty echo
 	printf "\\n"
 	7z a -p"${password}" -mhe=on "${HOME}"/gnupg-backup-"${TODAY}".7z "$GNUPG_BACKUP_DIR"/*

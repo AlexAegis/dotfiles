@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# shellcheck disable=SC1090
+# shellcheck source=/dev/null
 if [ -e "$XDG_CONFIG_HOME/rc.d/common.function.sh" ]; then
 	. "$XDG_CONFIG_HOME/rc.d/common.function.sh"
 fi

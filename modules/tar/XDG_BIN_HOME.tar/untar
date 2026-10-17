@@ -43,13 +43,13 @@ if ! [ -d "$TARGET" ]; then
 	mkdir -p "$TARGET"
 fi
 
-if [ ${compression_type} = 'gzip' ]; then
+if [ "${compression_type}" = 'gzip' ]; then
 	tar xfz "$SOURCE_FILE" --directory "$TARGET"
-elif [ ${compression_type} = 'bzip2' ]; then
+elif [ "${compression_type}" = 'bzip2' ]; then
 	tar xfj "$SOURCE_FILE" --directory "$TARGET"
-elif [ ${compression_type} = 'none' ]; then
+elif [ "${compression_type}" = 'none' ]; then
 	tar xf "$SOURCE_FILE" --directory "$TARGET"
-elif [ ${compression_type} = 'unknown' ]; then
+elif [ "${compression_type}" = 'unknown' ]; then
 	echo "Compression type is not known, rename file or" \
 	"provide compression type with the 3rd argument" >&2
 	exit 1

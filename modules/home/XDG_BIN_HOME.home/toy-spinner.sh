@@ -12,15 +12,15 @@ while ps -a | awk '{print $1}' | grep -q "${pid}"
 do
     c=$((i % 4))
     case ${c} in
-       0) echo "/\c" ;;
-       1) echo "-\c" ;;
-       2) echo "\\ \b\c" ;;
-       3) echo "|\c" ;;
+       0) printf '/' ;;
+       1) printf '-' ;;
+       2) printf '\\ \b' ;;
+       3) printf '|' ;;
     esac
     i=$((i + 1))
     # change the speed of the spinner by altering the 1 below
     sleep 1
-    echo "\b\c"
+    printf '\b'
 done
 
 # Collect the return code from the background process

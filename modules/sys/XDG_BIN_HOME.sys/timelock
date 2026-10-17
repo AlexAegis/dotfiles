@@ -299,7 +299,7 @@ interpret_args() {
 						timelock_duration_or_human_readable="$1";
 						if test "$timelock_duration_or_human_readable" -ge '0' 2>/dev/null; then
 							now=$(date_now)
-							timelock_end="$(( $now + $timelock_duration_or_human_readable ))";
+							timelock_end="$(( now + timelock_duration_or_human_readable ))";
 						elif timelock_end=$(date --date="$timelock_duration_or_human_readable" +%s 2>/dev/null); then
 							timelock_comment="$1"
 						else
@@ -311,7 +311,6 @@ interpret_args() {
 				esac
 				;;
 		esac
-		arg=''
 		shift
 	done
 }
@@ -366,7 +365,7 @@ timelock_set() {
 	fi
 	if [ "$force" ] || timelock_check "$1"; then
 		now=$(date_now)
-		duration=$(( $2 - $now ))
+		duration=$(( $2 - now ))
 		log_trace "creating lock"
 		printf '%s\n%s\n%s\n%s' "$now" "$duration" "$2" "$3" > "$timelock_file"
 	else

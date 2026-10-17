@@ -31,7 +31,7 @@ if [ -n "$LATEST_GNUPG_BACKUP_ARCHIVE" ]; then
     echo "Extracting archive: $LATEST_GNUPG_BACKUP_ARCHIVE..."
 	printf "Enter password: "
 	stty -echo
-	read password
+	IFS= read -r password
 	stty echo
 	printf "\\n"
 
