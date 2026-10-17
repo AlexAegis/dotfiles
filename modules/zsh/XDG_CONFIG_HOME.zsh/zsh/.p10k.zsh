@@ -565,8 +565,8 @@
   typeset -g POWERLEVEL9K_VI_VISUAL_MODE_STRING=VISUAL
   # Text for overtype (a.k.a. overwrite and replace) vi mode.
   typeset -g POWERLEVEL9K_VI_OVERWRITE_MODE_STRING=OVERTYPE
-  # Text for insert vi mode.
-  typeset -g POWERLEVEL9K_VI_INSERT_MODE_STRING=INSERT
+  # Empty text hides the segment in insert vi mode, the default mode.
+  typeset -g POWERLEVEL9K_VI_INSERT_MODE_STRING=
 
   ######################################[ ram: free RAM ]#######################################
   # RAM color.
@@ -1201,10 +1201,9 @@
 1 shade 0.62 0.40 304.8 0 -50 0 0.03 0 +0
 # vcs conflict
 2 flip 0.45 0.40 262.6 0 -65 -50 0.03 0.30 28 0.12
-# vi modes: normal and insert, visual, overtype
-1 flip 0.66 0.16 335 0 d-0.42 0 0.45 0 +0
-1 flip 0.78 0.16 335 0 d-0.42 0 0.45 0 +0
-1 flip 0.56 0.16 335 0 d-0.42 0 0.45 0 +0
+# vi modes: normal, visual and overtype
+3 darken 0.155 0.010 85 0 -35 -35 0.20 0.20 262.6
+3 darken 0.155 0.010 85 0 -55 -55 0.20 0.20 262.6
 '
   local -i my_count=0
   local c seg
@@ -1237,13 +1236,10 @@
       typeset -g POWERLEVEL9K_STATUS_{OK,OK_PIPE}_FOREGROUND=$fg[9]
       typeset -g POWERLEVEL9K_STATUS_{ERROR,ERROR_SIGNAL,ERROR_PIPE}_BACKGROUND=$bg[12]
       typeset -g POWERLEVEL9K_STATUS_{ERROR,ERROR_SIGNAL,ERROR_PIPE}_FOREGROUND=$fg[12]
-      typeset -g POWERLEVEL9K_VI_MODE_{NORMAL,VISUAL}_BACKGROUND=$bg[6]
-      typeset -g POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND=$bg[16]
-      typeset -g POWERLEVEL9K_VI_MODE_VISUAL_FOREGROUND=$bg[17]
-      typeset -g POWERLEVEL9K_VI_MODE_INSERT_BACKGROUND=$bg[16]
-      typeset -g POWERLEVEL9K_VI_MODE_INSERT_FOREGROUND=$fg[16]
-      typeset -g POWERLEVEL9K_VI_MODE_OVERWRITE_BACKGROUND=$bg[18]
-      typeset -g POWERLEVEL9K_VI_MODE_OVERWRITE_FOREGROUND=$fg[18]
+      typeset -g POWERLEVEL9K_VI_MODE_NORMAL_BACKGROUND=$bg[16]
+      typeset -g POWERLEVEL9K_VI_MODE_NORMAL_FOREGROUND=$fg[16]
+      typeset -g POWERLEVEL9K_VI_MODE_{VISUAL,OVERWRITE}_BACKGROUND=$bg[19]
+      typeset -g POWERLEVEL9K_VI_MODE_{VISUAL,OVERWRITE}_FOREGROUND=$fg[19]
       # the remaining right segments are tools
       local -a my_own=(status command_execution_time background_jobs time
         context vi_mode)
