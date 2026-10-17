@@ -79,7 +79,7 @@ or fix the origin file"
 		# And check again
 		# If it still fails the script will exit. Recover your private key and
 		# place it in `~/pass-private-key.asc` or pass it to this script
-		for i in "1 2"; do
+		for i in 1 2; do
 			if [ "$(gpg --list-keys \
 				"$(cat "$PASSWORD_STORE_DIR"/.gpg-id)" 2>/dev/null)" ]; then
 				echo "Password stores gpg key is present"
@@ -100,6 +100,10 @@ or fix the origin file"
 				fi
 				break
 			else
+				if [ "$i" = 2 ]; then
+					echo "Password stores gpg key is still missing after the import"
+					exit 1
+				fi
 				echo "Password stores gpg key isn't present. Trying to import \
 from ~/pass-private-key.asc"
 
