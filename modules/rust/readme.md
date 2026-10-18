@@ -26,7 +26,7 @@ To start sharing:
 3. Each user runs `pont -fx rust`, or `rustup_shared=1 pont -fxS rust` to only
    link the file.
 
-To stop sharing, each user runs `pont -r rust`. Once the owner has removed the
+To stop sharing, each user runs `pont -r rust`. After the owner removes the
 folder, each user runs `pont -fx rust` to use `$XDG_DATA_HOME/rustup` again.
 
 If the owner removes the folder first, the leftover link keeps `RUSTUP_HOME`
