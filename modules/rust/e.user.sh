@@ -4,7 +4,7 @@
 # shellcheck disable=SC1091
 . "./XDG_CONFIG_HOME.rust/environment.d/20-rust.conf"
 
-# ? Shared toolchains: /opt/rustup exists, or its conf link is left
+# ? Shared toolchains when /opt/rustup exists or its conf link was left behind
 if [ -d /opt/rustup ]; then
 	rustup_shared=1
 elif [ -L "$XDG_CONFIG_HOME/environment.d/21-rustup-shared.conf" ]; then
