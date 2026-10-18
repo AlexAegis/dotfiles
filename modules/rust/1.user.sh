@@ -1,11 +1,15 @@
 #!/bin/sh
 
-rustup install nightly
-rustup default stable
+if [ -e "${RUSTUP_HOME:?}" ] && ! [ -w "$RUSTUP_HOME" ]; then
+	printf '%s\n' "Skipping rustup: $RUSTUP_HOME is not writable" >&2
+else
+	rustup install nightly
+	rustup default stable
 
-rustup target install wasm32-unknown-unknown
+	rustup target install wasm32-unknown-unknown
 
-rustup component add rustfmt
+	rustup component add rustfmt
+fi
 
 # Cargo extensions
 cargo install --locked cargo-update
