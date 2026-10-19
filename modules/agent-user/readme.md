@@ -17,3 +17,10 @@ env PONT_ROOT_FLAG=0 PONT_FIX_PERMISSIONS=0 \
 	sh ~/.config/dotfiles/modules/pont/pont.sh -fx agent-user
 sh ~/.config/dotfiles/modules/pont/pont.sh -ex +agent
 ```
+
+The linked `~/.config/git/config` is read-only. The git module creates
+`~/.gitconfig` so that `git config --global` writes there. With git 2.56:
+
+- `git config --global` reads only `~/.gitconfig`.
+- Other git commands and `git config` without a scope flag read both files.
+  Values in `~/.gitconfig` take precedence.
