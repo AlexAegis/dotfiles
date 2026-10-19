@@ -1,0 +1,2 @@
+# Every script here configures the system through sudo
+[ "${PONT_ROOT_FLAG:-1}" = 1 ]

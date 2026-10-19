@@ -6,5 +6,7 @@
 # But for the repository to be easily editable, ssh is necessary
 # and this script automatically changes all mentions of the http link to the
 # ssh one.
+# A read-only copy of the dotfiles, such as the agent user's, keeps its remotes
+[ -w ../../.git ] || exit 0
 ./XDG_BIN_HOME.git/github_origin_toggle ../../ ssh
 ./XDG_BIN_HOME.git/github_origin_toggle ../pont/ ssh
