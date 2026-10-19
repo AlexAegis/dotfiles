@@ -1,0 +1,9 @@
+# A user that applies these dotfiles from a read-only copy and installs no
+# packages, such as the coding agent user. Without root scripts, pont also
+# skips the scripts whose condition is a package manager.
+PONT_ROOT_FLAG=0
+PONT_FIX_PERMISSIONS=0
+# The base modules configure the system
+PONT_NO_BASE_FLAG=1
+PONT_HASH_HOME="${XDG_STATE_HOME:-$HOME/.local/state}/pont/hashes"
+headless=1

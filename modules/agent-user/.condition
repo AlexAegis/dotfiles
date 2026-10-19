@@ -1,0 +1,2 @@
+# Only for a user whose dotfiles are read-only, so never the owner's own setup
+[ ! -w "$DOTFILES_HOME" ]

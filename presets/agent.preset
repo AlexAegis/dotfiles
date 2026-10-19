@@ -1,0 +1,33 @@
+# The user that coding agents run as. It installs no packages, so these
+# modules only link configuration and set up user level tools.
+agent-user
+home
+xdg
+pont
+pont-extra
+zsh
+bash
+dash
+git
+mergiraf
+mergiraf-git
+eza
+fd
+lf
+ripgrep
+zoxide
+bottom
+fzf
+coreutils
+sed
+tar
+zip
+7z
+wget
+curl
+shellcheck
+nvim
+rust
+node
+bun
+python
