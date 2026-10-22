@@ -1,0 +1,2 @@
+# Plasma manages GTK
+! command -v plasmashell >/dev/null
