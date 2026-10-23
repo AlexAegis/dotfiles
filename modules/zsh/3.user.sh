@@ -43,7 +43,9 @@ fi
 # Non-interactive shells (e.g. IDE tool runners) skip ZDOTDIR/.zshrc, so
 # loadenv never runs and tools like node/fnm/pnpm are missing from PATH.
 # For interactive shells, .zshrc already sources ~/.profile after plugins.
-if [[ ! -o interactive ]]; then
+# Skipping SDDM's Plasma session script.
+if [[ ! -o interactive ]] &&
+	! [[ \$ZSH_SCRIPT == */sddm/scripts/* && "\$*" == *plasma* ]]; then
 	[ -f "\$HOME/.profile" ] && QUIET=1 . "\$HOME/.profile"
 fi
 EOF
