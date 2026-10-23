@@ -8,6 +8,7 @@
 # shellcheck disable=SC1091
 . "./XDG_CONFIG_HOME.node/rc.d/50-fnm-env.sh"
 
+set -e
 fnm install lts-latest
 fnm default lts-latest
 fnm use lts-latest
