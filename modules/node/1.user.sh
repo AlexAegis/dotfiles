@@ -9,5 +9,5 @@
 . "./XDG_CONFIG_HOME.node/rc.d/50-fnm-env.sh"
 
 fnm install lts-latest
-fnm install 20
-fnm use 20
+fnm default lts-latest
+fnm use lts-latest
