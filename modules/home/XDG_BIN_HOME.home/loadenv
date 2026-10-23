@@ -69,4 +69,26 @@ for ext in $(echo "$loadenv_rc_exts" | tr ' ' '\n'); do
 	DIR="$XDG_CONFIG_HOME/rc.d" REGEX=".*\.$ext" . "$XDG_BIN_HOME/sourcein"
 done
 
+# Removes repeated and empty entries, keeping the first of each
+loadenv_dedupe() {
+	loadenv_kept=
+	loadenv_rest="$1:"
+	while [ "$loadenv_rest" ]; do
+		loadenv_entry=${loadenv_rest%%:*}
+		loadenv_rest=${loadenv_rest#*:}
+		[ "$loadenv_entry" ] || continue
+		case ":$loadenv_kept:" in
+			*":$loadenv_entry:"*) ;;
+			*)
+				loadenv_kept="${loadenv_kept:+$loadenv_kept:}$loadenv_entry"
+				;;
+		esac
+	done
+	printf '%s' "$loadenv_kept"
+}
+PATH=$(loadenv_dedupe "$PATH")
+[ -z "${LD_LIBRARY_PATH:-}" ] ||
+	LD_LIBRARY_PATH=$(loadenv_dedupe "$LD_LIBRARY_PATH")
+unset -f loadenv_dedupe
+
 set +a
