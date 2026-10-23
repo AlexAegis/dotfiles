@@ -14,7 +14,8 @@ do
 	# shellcheck disable=SC1090
 	[ -e "$f" ] && . "$f"
 	ret="$?"
-	[ "$ret" != 0 ] && echo "Return value of $f is $ret"
+	# The kde module's env.sh matches this message
+	[ "$ret" != 0 ] && printf '%s\n' "Return value of $f is $ret"
 done
 set +af
 if [ "$_sourcein_old_ifs" = "__unset__" ]; then

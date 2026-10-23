@@ -11,6 +11,9 @@ pacman -Syu --needed --noconfirm breeze-gtk kde-gtk-config
 # Askpass for wallet
 pacman -Syu --needed --noconfirm ksshaskpass
 
+# notify-send, for the login environment's notifications
+pacman -Syu --needed --noconfirm libnotify
+
 # https://store.kde.org/ integration
 pacman -Syu --needed --noconfirm qt6-base qt6-svg qt6-declarative
 
