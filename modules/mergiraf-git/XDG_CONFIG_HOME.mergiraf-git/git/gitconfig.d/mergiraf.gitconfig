@@ -3,7 +3,8 @@
 
 [merge "mergiraf"]
 	name = mergiraf
-	driver = mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L
+	# mergiraf from PATH or the cargo folder, else git merge-file
+	driver = "m=$(command -v mergiraf) || m=${CARGO_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/cargo}/bin/mergiraf; if [ -x \"$m\" ]; then \"$m\" merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L; s=$?; [ $s -le 1 ] && exit $s; echo \"mergiraf failed: status $s\" >&2; else echo \"No mergiraf at $m\" >&2; fi; exec git merge-file -L %X -L %S -L %Y --marker-size=%L %A %O %B"
 
 # Can't have multiple global gitattributes files
 #[core]
