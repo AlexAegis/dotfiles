@@ -9,6 +9,7 @@ mkdir -p "$XDG_CONFIG_HOME" \
 # Other common folders
 mkdir -p "$XDG_CONFIG_HOME/alias.d" \
 		"$XDG_CONFIG_HOME/environment.d" \
-		"$XDG_CONFIG_HOME/rc.d"
+		"$XDG_CONFIG_HOME/rc.d" \
+		"$XDG_CONFIG_HOME/user-tmpfiles.d"
 
 mkdir -p "$XDG_DATA_HOME/applications"
