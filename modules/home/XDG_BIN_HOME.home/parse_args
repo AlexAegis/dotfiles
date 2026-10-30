@@ -64,20 +64,22 @@ expand_single_args() {
 # quoted arguments get torn apart. parse_args can also only exit its own
 # subshell, so its failure has to be caught by the caller.
 #
+# case $- in *f*) caller_noglob=1 ;; *) caller_noglob= ;; esac
+# set -f
 # parsed_args=$(parse_args "$args_with_parameters" "$@") || exit 1
 #
 # old_ifs="$IFS"
 # IFS='
 # '
-# set -f
-# # shellcheck disable=SC2086
+# # shellcheck disable=SC2086 # intentional newline split, globbing off
 # set -- $parsed_args
-# set +f
 # IFS="$old_ifs"
+# [ "$caller_noglob" ] || set +f
 #
 # handle_args "$@"
 
 parse_args() {
+	set -f # only called in a subshell or as its own process
 	# first parameter is a single string, an IFS separated list of arguments
 	# that expects a single parameter to follow it as its value
 	with_parameters="$1"

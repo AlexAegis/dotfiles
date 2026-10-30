@@ -202,6 +202,7 @@ expand_single_args() {
 # It does NOT check for unknown variables as there is no list of allowed args
 # but those are easy to handle later
 parse_args() {
+	set -f # only called in a subshell
 	# first parameter is a single string, an IFS separated list of arguments
 	# that expects a single parameter to follow it as its value
 	with_parameters="$1"
@@ -442,6 +443,8 @@ if [ ! "$TIMELOCK_ALWAYS_CLEAN_EXPIRED" = 0 ]; then
 	timelock_remove_all_expired
 fi
 
+case $- in *f*) caller_noglob=1 ;; *) caller_noglob= ;; esac
+set -f
 parsed_args=$(parse_args "" "$@") || exit 1
 
 # parse_args returns one argument per line, so only newline may split it,
@@ -449,11 +452,10 @@ parsed_args=$(parse_args "" "$@") || exit 1
 old_ifs="$IFS"
 IFS='
 '
-set -f
-# shellcheck disable=2086
+# shellcheck disable=SC2086 # intentional newline split, globbing off
 set -- $parsed_args
-set +f
 IFS="$old_ifs"
+[ "$caller_noglob" ] || set +f
 
 interpret_args "$@"
 

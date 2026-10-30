@@ -98,13 +98,14 @@ transform_entries() {
 ## Execution
 # The arguments and entries are split on whitespace below; a * in them must not
 # expand to file names.
+case $- in *f*) caller_noglob=1 ;; *) caller_noglob= ;; esac
 set -f
 # shellcheck disable=SC2046
 interpret_args $(parse_args "" "$@")
 
 # shellcheck disable=SC2086
 transform_entries 'true' $entries
-set +f
+[ "$caller_noglob" ] || set +f
 
 if [ -z "$entries" ]; then
 	while read -r line; do
