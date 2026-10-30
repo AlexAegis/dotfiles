@@ -1,12 +1,12 @@
 #!/bin/sh
 
 if ! [ -d "$POWERLINE_DIR/.git" ]; then
-	git clone https://www.github.com/powerline/fonts "$POWERLINE_DIR"
+	git clone https://www.github.com/powerline/fonts "$POWERLINE_DIR" || exit 1
 else
 	(
 		cd "$POWERLINE_DIR" || exit 1
 		git pull
-	)
+	) || exit 1
 fi
 
 # shellcheck source=/dev/null

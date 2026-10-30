@@ -5,6 +5,6 @@ if [ -d "$NERDFONTS_REPOSITORY/.git" ]; then
 	. './u.user.sh'
 else
 	git clone --depth=1 https://github.com/ryanoasis/nerd-fonts \
-		"$NERDFONTS_REPOSITORY"
+		"$NERDFONTS_REPOSITORY" || exit 1
 	"$NERDFONTS_REPOSITORY/install.sh"
 fi

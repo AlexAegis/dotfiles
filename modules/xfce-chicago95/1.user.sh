@@ -3,12 +3,13 @@
 CHICAGO95_GIT_DIR="${XDG_DATA_HOME}/chicago95"
 
 if ! [ -d "${CHICAGO95_GIT_DIR}/.git" ]; then
-	git clone https://github.com/grassmunk/Chicago95.git "${CHICAGO95_GIT_DIR}"
+	git clone https://github.com/grassmunk/Chicago95.git \
+		"${CHICAGO95_GIT_DIR}" || exit 1
 else
 	(
 		cd "${CHICAGO95_GIT_DIR}" || exit 1
 		git pull
-	)
+	) || exit 1
 fi
 
 GTK_THEMES_DIR="${XDG_DATA_HOME}/themes"

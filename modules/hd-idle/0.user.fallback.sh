@@ -3,12 +3,12 @@
 HD_IDLE_DIR="$XDG_DATA_HOME/hdidle"
 
 if ! [ -d "$HD_IDLE_DIR/.git" ]; then
-	git clone https://github.com/adelolmo/hd-idle.git "$HD_IDLE_DIR"
+	git clone https://github.com/adelolmo/hd-idle.git "$HD_IDLE_DIR" || exit 1
 else
 	(
 		cd "$HD_IDLE_DIR" || exit 1
 		git pull
-	)
+	) || exit 1
 fi
 
 cd "$HD_IDLE_DIR" || exit 1

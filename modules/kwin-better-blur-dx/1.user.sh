@@ -4,12 +4,12 @@ BETTER_BLUR_DX_DIR="$XDG_DATA_HOME/kwin-effects-better-blur-dx"
 
 if ! [ -d "$BETTER_BLUR_DX_DIR/.git" ]; then
 	git clone https://github.com/xarblu/kwin-effects-better-blur-dx \
-		"$BETTER_BLUR_DX_DIR"
+		"$BETTER_BLUR_DX_DIR" || exit 1
 else
 	(
 		cd "$BETTER_BLUR_DX_DIR" || exit 1
 		git pull
-	)
+	) || exit 1
 fi
 
 cd "$BETTER_BLUR_DX_DIR" || exit 1

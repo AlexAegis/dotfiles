@@ -50,7 +50,7 @@ else
 			if [ "$ORIGIN" = "$existing_origin" ]; then
 				echo "It has the same origin as in \$ORIGIN. Skip \
 cloning, update instead."
-				pass git pull
+				pass git pull || exit 1
 			else
 				echo "Unknown store, it points to $existing_origin. Remove it \
 or fix the origin file"
@@ -58,7 +58,7 @@ or fix the origin file"
 			fi
 		else
 			echo 'Cloning origin password-store...'
-			git clone "$ORIGIN" "$PASSWORD_STORE_DIR"
+			git clone "$ORIGIN" "$PASSWORD_STORE_DIR" || exit 1
 		fi
 
 		if ! [ -e "$PASSWORD_STORE_DIR"/.gpg-id ]; then

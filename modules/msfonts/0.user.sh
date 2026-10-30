@@ -8,13 +8,12 @@ git_repo_url="https://aur.archlinux.org/${package_name}.git"
 install_dir="$XDG_CACHE_HOME/ttf-ms-win11-auto"
 
 if ! [ -d "$install_dir/.git" ]; then
-	git clone "$git_repo_url" "$install_dir"
-	git pull
+	git clone "$git_repo_url" "$install_dir" || exit 1
 else
 	(
 		cd "$install_dir" || exit 1
 		git pull
-	)
+	) || exit 1
 fi
 
 

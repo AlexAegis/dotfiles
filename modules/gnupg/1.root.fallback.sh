@@ -3,12 +3,13 @@
 pam_gnupg_git="$XDG_CACHE_HOME/pam-gnupg-git"
 
 if ! [ -d "$pam_gnupg_git/.git" ]; then
-	git clone https://www.github.com/cruegge/pam-gnupg "$pam_gnupg_git"
+	git clone https://www.github.com/cruegge/pam-gnupg \
+		"$pam_gnupg_git" || exit 1
 else
 	(
 		cd "$pam_gnupg_git" || exit 1
 		git pull
-	)
+	) || exit 1
 fi
 
 cd "$pam_gnupg_git" || exit 1

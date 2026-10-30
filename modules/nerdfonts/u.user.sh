@@ -5,11 +5,11 @@ if ! command -v pacman; then
 		(
 			cd "$NERDFONTS_REPOSITORY" || exit 1
 			hash_before=$(git rev-parse HEAD)
-			git pull
+			git pull || exit 1
 			hash_after=$(git rev-parse HEAD)
 			if [ "$hash_before" != "$hash_after" ]; then
 				"./install.sh"
 			fi
-		)
+		) || exit 1
 	fi
 fi
