@@ -1,0 +1,19 @@
+[General]
+ColorScheme=AgentWindow
+Name=Agent Window
+
+[Colors:Header]
+BackgroundNormal=25,177,104
+ForegroundNormal=201,255,218
+
+[Colors:Header][Inactive]
+BackgroundNormal=0,49,24
+ForegroundNormal=53,142,91
+
+[WM]
+activeBackground=25,177,104
+activeBlend=25,177,104
+activeForeground=201,255,218
+inactiveBackground=0,49,24
+inactiveBlend=0,49,24
+inactiveForeground=53,142,91

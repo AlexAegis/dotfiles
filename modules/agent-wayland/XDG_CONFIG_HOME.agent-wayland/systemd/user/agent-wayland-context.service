@@ -1,0 +1,43 @@
+[Unit]
+Description=KWin security context for the agent Wayland proxy
+PartOf=graphical-session.target
+After=graphical-session.target
+
+# Reads only what KWin sends. Of /run it sees the runtime folder, read-only, for
+# the KWin socket.
+[Service]
+Type=notify
+ExecStart=%D/agent-wayland/bin/agent-wayland-context
+Environment=AGENT_WAYLAND_KWIN_SOCKET=%t/agent-wayland-context/kwin-0
+Restart=on-failure
+RuntimeDirectory=agent-wayland-context
+RuntimeDirectoryMode=0700
+UMask=0077
+
+NoNewPrivileges=yes
+PrivateUsers=self
+TemporaryFileSystem=/run:ro /dev/shm:ro
+ProtectHome=tmpfs
+BindReadOnlyPaths=%D/agent-wayland/bin %t
+ProtectSystem=strict
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+ProtectProc=invisible
+ProcSubset=pid
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=

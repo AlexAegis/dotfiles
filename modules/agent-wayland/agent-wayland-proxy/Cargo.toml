@@ -1,0 +1,50 @@
+[package]
+name = "agent-wayland-proxy"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+anyhow = "1.0.104"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["fmt", "std", "tracing-log"] }
+# Only the protocols of the allowed globals, and security-context to create the
+# restricted KWin socket. The proxy drops every global it cannot parse.
+wl-proxy = { version = "0.1.5", features = [
+	"protocol-alpha_modifier_v1",
+	"protocol-color_management_v1",
+	"protocol-color_representation_v1",
+	"protocol-commit_timing_v1",
+	"protocol-content_type_v1",
+	"protocol-cursor_shape_v1",
+	"protocol-fifo_v1",
+	"protocol-fractional_scale_v1",
+	"protocol-linux_dmabuf_v1",
+	"protocol-linux_drm_syncobj_v1",
+	"protocol-pointer_constraints_unstable_v1",
+	"protocol-pointer_gestures_unstable_v1",
+	"protocol-pointer_warp_v1",
+	"protocol-presentation_time",
+	"protocol-relative_pointer_unstable_v1",
+	"protocol-security_context_v1",
+	"protocol-single_pixel_buffer_v1",
+	"protocol-tearing_control_v1",
+	"protocol-viewporter",
+	"protocol-xdg_decoration_unstable_v1",
+	"protocol-xdg_output_unstable_v1",
+	"protocol-xdg_shell",
+] }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# The library only serves the two binaries of this package
+missing_errors_doc = "allow"
+
+[dev-dependencies]
+# An agent client and a fake compositor, for the tests of a whole connection
+wayland-client = "0.31.15"
+wayland-protocols = { version = "0.32.13", features = ["client", "server"] }
+wayland-server = "0.31.14"

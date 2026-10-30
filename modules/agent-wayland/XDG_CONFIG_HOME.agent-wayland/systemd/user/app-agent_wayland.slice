@@ -1,0 +1,7 @@
+[Unit]
+Description=Wayland proxies for the clients of the agent user
+
+[Slice]
+# All proxy processes together
+MemoryMax=512M
+MemorySwapMax=0

@@ -1,0 +1,16 @@
+[Unit]
+Description=Wayland socket for the agent user
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Socket]
+# 2.root.sh creates the folder: 2750, group agent, so the socket gets group agent
+ListenStream=/run/agent-wayland/wayland-0
+SocketMode=0660
+RemoveOnStop=yes
+# A proxy process for each client
+Accept=yes
+MaxConnections=32
+
+[Install]
+WantedBy=graphical-session.target

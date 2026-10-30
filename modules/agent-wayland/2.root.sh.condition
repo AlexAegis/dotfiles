@@ -1,0 +1,7 @@
+# shellcheck shell=sh
+# pont runs 2.root.sh on status 0 and skips it on status 1
+owner=$(id -un)
+conf=/etc/tmpfiles.d/agent-wayland.conf
+[ "$(cat "$conf" 2>/dev/null)" != "d /run/agent-wayland 2750 $owner agent -" ] ||
+	[ "$(stat -c '%U:%G %a' "$conf")" != 'root:root 644' ] ||
+	[ "$(stat -c '%U:%G %a' /run/agent-wayland 2>/dev/null)" != "$owner:agent 2750" ]

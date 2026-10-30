@@ -1,0 +1,46 @@
+[Unit]
+Description=Wayland proxy for one client of the agent user
+BindsTo=agent-wayland-context.service
+After=agent-wayland-context.service
+PartOf=graphical-session.target
+CollectMode=inactive-or-failed
+
+# Parses what an agent client sends, so it sees no home, no network, and of
+# /run only the socket of the security context
+[Service]
+ExecStart=%D/agent-wayland/bin/agent-wayland-proxy
+Environment=AGENT_WAYLAND_KWIN_SOCKET=%t/agent-wayland-context/kwin-0
+# wl-proxy queues unread output and fds without a bound
+Slice=app-agent_wayland.slice
+MemoryMax=64M
+MemorySwapMax=0
+TasksMax=4
+LimitNOFILE=1024
+
+NoNewPrivileges=yes
+PrivateUsers=self
+TemporaryFileSystem=/run:ro /dev/shm:ro
+ProtectHome=tmpfs
+BindReadOnlyPaths=%D/agent-wayland/bin %t/agent-wayland-context
+ProtectSystem=strict
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+ProtectProc=invisible
+ProcSubset=pid
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+CapabilityBoundingSet=
