@@ -1,4 +1,15 @@
-#!/bin/sh
+#!/bin/zsh
+
+set -euo pipefail
+trap 'printf "paku: command failed on line %s (exit %s)\n" "$LINENO" "$?" >&2' ERR
+
+as_user() {
+    if [[ -n ${SUDO_USER:-} ]]; then
+        sudo -u "$SUDO_USER" "$@"
+    else
+        "$@"
+    fi
+}
 
 # Updates packages
 
@@ -10,8 +21,8 @@ fi
 
 if command -v brew > /dev/null; then
     echo "Updating packages using brew..."
-	${SUDO_USER:+sudo -u $SUDO_USER} brew update
-	${SUDO_USER:+sudo -u $SUDO_USER} brew upgrade
+	as_user brew update
+	as_user brew upgrade
 fi
 
 if command -v pacman > /dev/null; then
@@ -21,9 +32,17 @@ fi
 
 if command -v aura > /dev/null; then
     echo "Updating AUR packages using aura..."
-	${SUDO_USER:+sudo -u $SUDO_USER} aura -Ayu --noconfirm # update AUR packages
-	${SUDO_USER:+sudo -u $SUDO_USER} aura -Bc --noconfirm # remove stale snapshots
-	${SUDO_USER:+sudo -u $SUDO_USER} aura check # diagnostics
+    aura_log=$(mktemp)
+    trap 'rm -f -- "$aura_log"' EXIT
+    # Clean successful builds so a later release cannot reuse stale binaries.
+    as_user env LANG=en_US.UTF-8 aura -Ayu --clean --noconfirm 2>&1 | tee "$aura_log"
+    # Aura can return zero even when individual packages failed to build.
+    if grep -Eq 'Package failed to build|Calling the metadata server utterly failed' "$aura_log"; then
+        echo "paku: AUR update incomplete; see the errors above." >&2
+        exit 1
+    fi
+	as_user aura -Bc --noconfirm # remove stale snapshots
+	as_user aura check # diagnostics
 fi
 
 if command -v dnf > /dev/null; then
@@ -41,5 +60,3 @@ if command -v xbps-install > /dev/null; then
     echo "Updating packages using xbps..."
     sudo xbps-install -Su
 fi
-
-

@@ -16,3 +16,5 @@
 /.ripgreprc
 /.mcp.json
 /.idea
+
+**/.claude/.cc-writes/

@@ -7,7 +7,7 @@ theme = Earthsong
 # theme = Midnight In Mojave
 # theme = Shaman
 
-background-opacity = 0.35
+background-opacity = 0.55
 background-blur = false
 #background = #031b1a
 background = #050a0f
