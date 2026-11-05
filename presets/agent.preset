@@ -26,6 +26,7 @@ zip
 wget
 curl
 shellcheck
+shfmt
 nvim
 rust
 node
