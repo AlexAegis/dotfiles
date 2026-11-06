@@ -12,7 +12,7 @@ pacman -Syu --needed --noconfirm \
 	otf-hermit-nerd \
 	otf-monaspace-nerd \
 	otf-opendyslexic-nerd \
-	otf-overpass-nerd		 \
+	otf-overpass-nerd \
 	ttf-0xproto-nerd \
 	ttf-3270-nerd \
 	ttf-agave-nerd \

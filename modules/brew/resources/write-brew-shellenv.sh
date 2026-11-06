@@ -18,7 +18,7 @@ mkdir -p "$target_dir"
 	printf '%s\n' "# Command: $command"
 	printf '\n'
 	env SHELL=/bin/sh /opt/homebrew/bin/brew shellenv
-} > "$tmp" || {
+} >"$tmp" || {
 	rm -f "$tmp"
 	exit 1
 }

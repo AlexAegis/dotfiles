@@ -8,5 +8,5 @@ if [ ! -e "${WALLPAPER}" ] || [ "${WALLPAPER_FORCE_LAST}" ]; then
 	WALLPAPER="$(last_modified_image "${WALLPAPERS_DIR}")"
 fi
 
-echo "feh: setting wallpaper to: $WALLPAPER"  | systemd-cat -p info
+echo "feh: setting wallpaper to: $WALLPAPER" | systemd-cat -p info
 feh --no-fehbg --bg-fill "$WALLPAPER"

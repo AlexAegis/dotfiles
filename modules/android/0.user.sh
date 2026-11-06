@@ -12,7 +12,7 @@ fi
 
 if [ ! -f "$ANDROID_HOME/cmdline-tools/latest" ]; then
 	mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
-	mv "$ANDROID_HOME"/cmdline-tools/* "$ANDROID_HOME/cmdline-tools/latest" 2> /dev/null
+	mv "$ANDROID_HOME"/cmdline-tools/* "$ANDROID_HOME/cmdline-tools/latest" 2>/dev/null
 fi
 
 # shellcheck disable=SC1091

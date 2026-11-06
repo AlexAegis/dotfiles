@@ -9,4 +9,4 @@ locale-gen
 # Set the local as english as the default
 # Other tools can later switch between locales
 echo 'LANG=en_US.UTF-8
-LC_ALL=en_US.UTF-8' > /etc/locale.conf
+LC_ALL=en_US.UTF-8' >/etc/locale.conf

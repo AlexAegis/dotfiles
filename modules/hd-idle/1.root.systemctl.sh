@@ -1,6 +1,6 @@
 #!/bin/sh
 
-crudini --merge /etc/default/hd-idle << EOF
+crudini --merge /etc/default/hd-idle <<EOF
 START_HD_IDLE=true
 EOF
 

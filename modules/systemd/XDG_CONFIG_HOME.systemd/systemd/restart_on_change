@@ -56,11 +56,12 @@ for arg in $(parse_args "$@"); do
 			fi
 			shift 2
 			;;
-		--)	;;
+		--) ;;
 		-?*) printf 'Unknown option (ignored): %s\n' "$1" >&2 ;;
 		*)
 			printf 'wat option (ignored): %s\n' "$@" >&2
-			break ;;
+			break
+			;;
 	esac
 done
 

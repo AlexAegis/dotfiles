@@ -12,7 +12,7 @@ if [ -z "$emby_version" ]; then
 	echo "Could not reach the Emby release api, falling back to v${emby_version}"
 fi
 
-installed_version=$(pacman -Q emby-server 2>/dev/null | cut -d' ' -f2 | \
+installed_version=$(pacman -Q emby-server 2>/dev/null | cut -d' ' -f2 |
 	cut -d- -f1)
 
 if [ "$installed_version" = "$emby_version" ]; then
@@ -25,11 +25,10 @@ emby_url="https://github.com/MediaBrowser/Emby.Releases/releases/download/${emby
 cache_dir="$XDG_CACHE_HOME/emby"
 cached_emby_installer="$cache_dir/$emby_filename"
 
-
 # if it fails you might want to delete the entire cache_dir
 # rm -rf "$cache_dir"
 
-distribution=$(grep "^NAME" /etc/os-release 2>/dev/null | grep -oh "=.*" | \
+distribution=$(grep "^NAME" /etc/os-release 2>/dev/null | grep -oh "=.*" |
 	tr -d '="')
 
 if [ "$distribution" = 'Arch Linux ARM' ] || [ "$distribution" = 'Manjaro ARM' ]; then

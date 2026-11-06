@@ -22,9 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 # Check `timelock --help`
-
 
 # Timelock file format *.timelock
 # Filename = Lock Name
@@ -50,34 +48,33 @@ mkdir -p "$TIMELOCK_DIR"
 # C_BLUE='\033[0;34m'
 # C_CYAN='\033[0;36m'
 
-
 log_trace() {
 	# Visible at and under log level 0
-	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 0 ] && \
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 0 ] &&
 		echo "${C_CYAN}[  Trace  ]: $*${C_RESET}" >&2
 }
 
 log_info() {
 	# Visible at and under log level 1
-	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 1 ] && \
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 1 ] &&
 		echo "${C_BLUE}[  Info   ]: $*${C_RESET}" >&2
 }
 
 log_warning() {
 	# Visible at and under log level 2
-	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 2 ] && \
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 2 ] &&
 		echo "${C_YELLOW}[ Warning ]: $*${C_RESET}" >&2
 }
 
 log_success() {
 	# Visible at and under log level 2, same as warning but green
-	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 2 ] && \
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 2 ] &&
 		echo "${C_GREEN}[ Success ]: $*${C_RESET}" >&2
 }
 
 log_error() {
 	# Visible at and under log level 3
-	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 3 ] && \
+	[ "${TIMELOCK_LOG_LEVEL:-1}" -le 3 ] &&
 		echo "${C_RED}[  Error  ]: $*${C_RESET}" >&2
 }
 
@@ -179,7 +176,6 @@ show_version() {
 	echo "timelock version: 1.1.0" && exit 0
 }
 
-
 expand_single_args() {
 	var="${1#-}" # cut off first, and only dash
 	while [ "$var" ]; do
@@ -277,30 +273,33 @@ interpret_args() {
 					'warning' | 'WARNING' | '2') TIMELOCK_LOG_LEVEL='2' ;;
 					'error' | 'ERROR' | '3') TIMELOCK_LOG_LEVEL='3' ;;
 					'none' | 'NONE' | '4') TIMELOCK_LOG_LEVEL='4' ;;
-					*) log_error "Invalid loglevel: $2"; exit 1 ;;
+					*)
+						log_error "Invalid loglevel: $2"
+						exit 1
+						;;
 				esac
 				shift
 				;;
-			-v | --verbose)	TIMELOCK_LOG_LEVEL=0 ;; # Log level trace
-			-q | --quiet) TIMELOCK_LOG_LEVEL=3 ;; # Log level error
+			-v | --verbose) TIMELOCK_LOG_LEVEL=0 ;; # Log level trace
+			-q | --quiet) TIMELOCK_LOG_LEVEL=3 ;;   # Log level error
 			-r | --remove | -u | --unlock) mode='remove' ;;
 			-R | --remove-all-expired) mode='remove-all-expired' ;;
 			-f | --force) force='1' ;;
 			-p | --print) print='1' ;;
-			--)	;;
-			-?*) log_error "Unknown option (ignored): $1";;
+			--) ;;
+			-?*) log_error "Unknown option (ignored): $1" ;;
 			*) # The rest are positional arguments
-				arg_pos=$(( arg_pos + 1 ))
+				arg_pos=$((arg_pos + 1))
 				case $arg_pos in
 					1)
-						timelock_name=$1;
+						timelock_name=$1
 						timelock_file="$TIMELOCK_DIR/$1.$TIMELOCKFILE_EXTENSION"
 						;;
 					2)
-						timelock_duration_or_human_readable="$1";
+						timelock_duration_or_human_readable="$1"
 						if test "$timelock_duration_or_human_readable" -ge '0' 2>/dev/null; then
 							now=$(date_now)
-							timelock_end="$(( now + timelock_duration_or_human_readable ))";
+							timelock_end="$((now + timelock_duration_or_human_readable))"
 						elif timelock_end=$(date --date="$timelock_duration_or_human_readable" +%s 2>/dev/null); then
 							timelock_comment="$1"
 						else
@@ -308,7 +307,10 @@ interpret_args() {
 							exit 1
 						fi
 						;;
-					*) log_error 'Excess positional arguments'; exit 1;;
+					*)
+						log_error 'Excess positional arguments'
+						exit 1
+						;;
 				esac
 				;;
 		esac
@@ -366,11 +368,12 @@ timelock_set() {
 	fi
 	if [ "$force" ] || timelock_check "$1"; then
 		now=$(date_now)
-		duration=$(( $2 - now ))
+		duration=$(($2 - now))
 		log_trace "creating lock"
-		printf '%s\n%s\n%s\n%s' "$now" "$duration" "$2" "$3" > "$timelock_file"
+		printf '%s\n%s\n%s\n%s' "$now" "$duration" "$2" "$3" >"$timelock_file"
 	else
-		log_error "Can't set non-expired lock unless forced."; exit 1
+		log_error "Can't set non-expired lock unless forced."
+		exit 1
 	fi
 }
 
@@ -394,7 +397,7 @@ timelock_remove_all_expired() {
 
 	# Return without bothering the user
 	if [ $any_expired = 0 ]; then
-		return;
+		return
 	fi
 
 	log_info "Cleaning all expired locks:"
@@ -414,28 +417,28 @@ timelock_get_lockname_from_filename() {
 }
 
 timelock_list() {
-	find "$TIMELOCK_DIR" -mindepth 0 -maxdepth 1 -type f  -name "*.$TIMELOCKFILE_EXTENSION" |
-    while IFS= read -r file; do
-		log_trace "Listing $file"
-		set_time="$(sed '1q;d' "$file")"
-		set_time_date="$(date -d@"$set_time" 2>/dev/null || echo 'unknown')"
-		duration="$(sed '2q;d' "$file")"
-		expiration_time="$(sed '3q;d' "$file")"
-		expiration_time_date="$(date -d@"$expiration_time" 2>/dev/null || echo 'unknown')"
-		comment="$(sed '4q;d' "$file")"
-		if timelock_check "x" "$file"; then
-			expired_message="yes"
-		else
-			expired_message="no"
-		fi
-		printf "%s\texpired? %s\texpiration date: %s\tduration: %s\tset date: %s\t%s\n" \
-			"$(timelock_get_lockname_from_filename "$file")" \
-			"$expired_message" \
-			"$expiration_time_date" \
-			"$duration" \
-			"$set_time_date" \
-			"$comment"
-	done
+	find "$TIMELOCK_DIR" -mindepth 0 -maxdepth 1 -type f -name "*.$TIMELOCKFILE_EXTENSION" |
+		while IFS= read -r file; do
+			log_trace "Listing $file"
+			set_time="$(sed '1q;d' "$file")"
+			set_time_date="$(date -d@"$set_time" 2>/dev/null || echo 'unknown')"
+			duration="$(sed '2q;d' "$file")"
+			expiration_time="$(sed '3q;d' "$file")"
+			expiration_time_date="$(date -d@"$expiration_time" 2>/dev/null || echo 'unknown')"
+			comment="$(sed '4q;d' "$file")"
+			if timelock_check "x" "$file"; then
+				expired_message="yes"
+			else
+				expired_message="no"
+			fi
+			printf "%s\texpired? %s\texpiration date: %s\tduration: %s\tset date: %s\t%s\n" \
+				"$(timelock_get_lockname_from_filename "$file")" \
+				"$expired_message" \
+				"$expiration_time_date" \
+				"$duration" \
+				"$set_time_date" \
+				"$comment"
+		done
 
 }
 
@@ -459,10 +462,10 @@ IFS="$old_ifs"
 
 interpret_args "$@"
 
-if [ ! "$mode" = "remove-all-expired" ] \
-	&& [ ! "$mode" = "remove" ] \
-	&& [ "$timelock_name" ] \
-	&& [ ! "$timelock_duration_or_human_readable" ]; then
+if [ ! "$mode" = "remove-all-expired" ] &&
+	[ ! "$mode" = "remove" ] &&
+	[ "$timelock_name" ] &&
+	[ ! "$timelock_duration_or_human_readable" ]; then
 	mode='check'
 fi
 

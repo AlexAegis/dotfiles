@@ -24,15 +24,16 @@ interpret_args() {
 			-h | -\? | --help) show_help ;;
 			-v | --version) show_version ;;
 			-s | --script)
-				if [ "$2" = 'nordic' ] ||  [ "$2" = 'hungarian' ]; then
+				if [ "$2" = 'nordic' ] || [ "$2" = 'hungarian' ]; then
 					script="$2"
 				else
-					echo "Invalid script: $2"; exit 1
+					echo "Invalid script: $2"
+					exit 1
 				fi
 				shift
 				;;
-			--)	;;
-			-?*) echo "Unknown option (ignored): $1" b;;
+			--) ;;
+			-?*) echo "Unknown option (ignored): $1" b ;;
 			*)
 				if [ "$1" ]; then
 					if [ "$entries" ]; then

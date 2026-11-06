@@ -6,5 +6,5 @@ if [ -e "${RUSTUP_HOME:?}" ] && ! [ -w "$RUSTUP_HOME" ]; then
 fi
 
 # non interactive rustup
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-	| sh -s -- -y --no-modify-path
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs |
+	sh -s -- -y --no-modify-path

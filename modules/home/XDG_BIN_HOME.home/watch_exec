@@ -50,7 +50,7 @@ $2"
 			fi
 			shift 2
 			;;
-		--)	;;
+		--) ;;
 		-?*)
 			printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
 			;;
@@ -60,22 +60,20 @@ $2"
 	esac
 done
 
-
 wait_notification() {
 	/usr/bin/inotifywait -q \
-	-e delete \
-	-e delete_self \
-	-e move \
-	-e moved_to \
-	-e moved_from \
-	-e modify \
-	-e attrib \
-	"$@"
+		-e delete \
+		-e delete_self \
+		-e move \
+		-e moved_to \
+		-e moved_from \
+		-e modify \
+		-e attrib \
+		"$@"
 }
 
 # symlink is added
 #shellcheck disable=SC2086
-
 
 # for lists with elements with spaces
 IFS='

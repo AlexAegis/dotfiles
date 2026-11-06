@@ -5,7 +5,7 @@ steamlink_url="https://media.steampowered.com/steamlink/rpi/latest/steamlink.deb
 cache_dir="$XDG_CACHE_HOME/steamlink"
 cached_steamlink_installer="$cache_dir/$steamlink_filename"
 
-distribution=$(grep "^NAME" /etc/os-release 2>/dev/null | grep -oh "=.*" | \
+distribution=$(grep "^NAME" /etc/os-release 2>/dev/null | grep -oh "=.*" |
 	tr -d '="')
 
 if [ "$distribution" = 'Arch Linux ARM' ] || [ "$distribution" = 'Manjaro ARM' ]; then
@@ -23,6 +23,5 @@ if [ "$distribution" = 'Arch Linux ARM' ] || [ "$distribution" = 'Manjaro ARM' ]
 		echo "steamlink already installed!"
 	fi
 else
-    pacman -Syu --needed --noconfirm steamlink
+	pacman -Syu --needed --noconfirm steamlink
 fi
-

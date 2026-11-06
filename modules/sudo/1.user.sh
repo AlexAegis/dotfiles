@@ -6,7 +6,7 @@ command="groupadd --force wheel && \
 		 usermod -aG wheel $USER && \
 		 ./resources/install-sudoer ./resources/10-wheel"
 
-if  [ ! "$mac" ]; then
+if [ ! "$mac" ]; then
 	if command -v sudo >/dev/null; then
 		sudo sh -c "$command"
 	else

@@ -34,10 +34,10 @@ is_image() {
 	# argument that its an image or not
 	while read -r input; do
 		abs_path="$(to_absolute "$1")/$input"
-      	if file -b "$abs_path" | grep image > /dev/null; then
+		if file -b "$abs_path" | grep image >/dev/null; then
 			echo "$abs_path"
 		fi
-  	done
+	done
 }
 
 last_modified_image() {

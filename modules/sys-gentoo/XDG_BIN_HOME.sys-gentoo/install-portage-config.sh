@@ -20,5 +20,3 @@ fi
 	mkdir -p "$target_folder"
 	cp --recursive --update --parents --backup=numbered "." "$target_folder"
 )
-
-

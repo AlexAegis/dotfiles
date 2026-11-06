@@ -4,19 +4,19 @@ root_pid=1
 
 while :; do
 	case $1 in
-	-sdu | -\? | --systemd-user)
-		root_pid=$(pidof systemd)
-		;;
-	*)
-		break
-		;;
+		-sdu | -\? | --systemd-user)
+			root_pid=$(pidof systemd)
+			;;
+		*)
+			break
+			;;
 	esac
 
 	shift
 done
 
 if [ ! "$1" ]; then
-	row=$(pstree -p "$root_pid" | fzf | \
+	row=$(pstree -p "$root_pid" | fzf |
 		grep -o -E '\{?\(?[a-zA-Z]+[-]*[a-zA-Z]+\)?\}?\([0-9]+\)')
 
 	[ "$(echo "$row" | wc -l)" != 1 ] && pid="$(echo "$row" | fzf)"
@@ -29,4 +29,4 @@ else
 	pid=$(pidof "$1")
 fi
 
-tr '\0' '\n' < "/proc/$pid/environ"
+tr '\0' '\n' <"/proc/$pid/environ"

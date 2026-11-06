@@ -8,4 +8,3 @@
 emaint add jorgicio
 emaint sync -r jorgicio
 emerge -u app-editors/vscode-bin
-

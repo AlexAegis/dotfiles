@@ -2,4 +2,3 @@
 
 # Removes leading whitespace in a file for every line
 sed -i 's/^\s*//' "$1"
-

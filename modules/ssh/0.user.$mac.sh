@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 # ssh itself is preinstalled but you might need `connect`, which is not
 # netcat is available though, but it fails in some cases
 brew install connect

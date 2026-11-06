@@ -5,8 +5,7 @@ PID=$!
 i=1
 sp="/-\|"
 echo -n ' '
-while [ -d /proc/$PID ]
-do
-        sleep 0.2
-    printf "\b%s" ${sp:i++%${#sp}:1}
+while [ -d /proc/$PID ]; do
+	sleep 0.2
+	printf "\b%s" ${sp:i++%${#sp}:1}
 done

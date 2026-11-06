@@ -73,9 +73,9 @@ else
 	' sh "$plasma_env_file" "${DBUS_SESSION_BUS_ADDRESS-}" "${XDG_RUNTIME_DIR-}" \
 		"${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 	case $? in
-	0) ;;
-	2) plasma_env_error="The profile exited early." ;;
-	*) plasma_env_error="The profile broke PATH, XDG_DATA_DIRS, D-Bus or XDG_RUNTIME_DIR." ;;
+		0) ;;
+		2) plasma_env_error="The profile exited early." ;;
+		*) plasma_env_error="The profile broke PATH, XDG_DATA_DIRS, D-Bus or XDG_RUNTIME_DIR." ;;
 	esac
 fi
 

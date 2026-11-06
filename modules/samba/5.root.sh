@@ -6,7 +6,7 @@
 # clients can read and write the library without needing that membership.
 
 if ! grep -q "^\[media\]" /etc/samba/smb.conf; then
-	cat >> /etc/samba/smb.conf << 'EOF'
+	cat >>/etc/samba/smb.conf <<'EOF'
 
 [media]
 	path = /var/media

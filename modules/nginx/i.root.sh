@@ -6,4 +6,4 @@ mkdir -p \
 	/etc/nginx/modules-enabled/ \
 	/etc/nginx/sites-available/ \
 	/etc/nginx/sites-enabled/ \
-	/etc/nginx/snippets/ \
+	/etc/nginx/snippets/

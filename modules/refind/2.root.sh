@@ -19,4 +19,3 @@ else
 	echo "No refind installation detected, mount it under /boot/EFI or " \
 		"/mnt/refind/boot/EFI"
 fi
-

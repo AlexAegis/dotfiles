@@ -17,4 +17,3 @@ fi
 systemctl --user --now enable pipewire
 systemctl --user --now enable pipewire-pulse
 systemctl --user --now enable wireplumber
-

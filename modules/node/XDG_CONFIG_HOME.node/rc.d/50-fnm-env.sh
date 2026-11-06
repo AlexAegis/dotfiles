@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if command -v fnm > /dev/null; then
+if command -v fnm >/dev/null; then
 	_fnm_cache="${XDG_CACHE_HOME:-$HOME/.cache}/loadenv/fnm-env.posix.sh"
 	_fnm_link=
 	# In a subshell, so a stale link stays out of PATH
@@ -13,7 +13,7 @@ if command -v fnm > /dev/null; then
 	if [ ! -L "$_fnm_link" ] || [ "$(find "$_fnm_cache" -mtime +0 2>/dev/null)" ]; then
 		mkdir -p "${_fnm_cache%/*}"
 		_fnm_new=$(mktemp "$_fnm_cache.XXXXXX") &&
-			fnm env --shell bash > "$_fnm_new" 2>/dev/null &&
+			fnm env --shell bash >"$_fnm_new" 2>/dev/null &&
 			mv -f "$_fnm_new" "$_fnm_cache"
 		rm -f "${_fnm_new:-}"
 	fi

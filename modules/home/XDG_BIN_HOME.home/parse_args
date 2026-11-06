@@ -34,7 +34,6 @@ expand_single_args() {
 	done
 }
 
-
 # While parse_args is also available as its own script, having it here makes
 # copying this script a lot easier
 

@@ -5,7 +5,6 @@ if [ "$mac" ]; then
 	export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
 fi
 
-
 # Use the install latest plugin, answer no if it asks to reinstall the same
 # version
 echo n | pyenv install-latest

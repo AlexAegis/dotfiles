@@ -36,24 +36,24 @@ EOF
 
 check=0
 case $# in
-0) ;;
-1)
-	case $1 in
-	--check) check=1 ;;
-	-h | --help)
-		usage
-		exit 0
+	0) ;;
+	1)
+		case $1 in
+			--check) check=1 ;;
+			-h | --help)
+				usage
+				exit 0
+				;;
+			*)
+				usage >&2
+				exit 2
+				;;
+		esac
 		;;
 	*)
 		usage >&2
 		exit 2
 		;;
-	esac
-	;;
-*)
-	usage >&2
-	exit 2
-	;;
 esac
 
 # The C locale keeps the decimal point a period.

@@ -11,6 +11,6 @@ paccache -rk 1
 paccache -ruk0
 
 # clear the aur cache, fully. This one is not part of the pacman hook
-if command -v yay > /dev/null; then
+if command -v yay >/dev/null; then
 	yay --aur -Scc --noconfirm
 fi

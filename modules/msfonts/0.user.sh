@@ -16,12 +16,9 @@ else
 	) || exit 1
 fi
 
-
 (
 	cd "$install_dir" || exit 1
 	rm "${package_name}"*.pkg.tar.zst
 	makepkg -si
 	sudo pacman -U --noconfirm "${package_name}"*.pkg.tar.zst
 )
-
-

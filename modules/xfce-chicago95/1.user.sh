@@ -28,13 +28,11 @@ cp -r "${CHICAGO95_GIT_DIR}/Icons/Chicago95" "${CHICAGO95_ICONS_DIR}"
 cp -r "${CHICAGO95_GIT_DIR}/Icons/Chicago95-tux" "${CHICAGO95TUX_ICONS_DIR}"
 cp -r "${CHICAGO95_GIT_DIR}/Extras/override/gtk-3.24/gtk.css" "${XDG_CONFIG_HOME}/gtk-3.0/chicago.css"
 
-
 # bitmap fonts
 cp -r "${CHICAGO95_GIT_DIR}/Fonts/bitmap/cronyx-cyrillic/" "${XDG_DATA_HOME}/fonts/"
 cp -r "${CHICAGO95_GIT_DIR}/Fonts/vga_font/MorePerfectDOSVGA.ttf" "${XDG_DATA_HOME}/fonts/"
 
 xfce4-panel-profiles load "${CHICAGO95_GIT_DIR}/Extras/Chicago95_Panel_Preferences.tar.bz2"
-
 
 # switch to hidpi theme https://github.com/grassmunk/Chicago95/blob/master/INSTALL.md#hidpi
 if ! [ -d "${CHICAGO95_THEME_DIR}/xfwm4_lodpi" ]; then

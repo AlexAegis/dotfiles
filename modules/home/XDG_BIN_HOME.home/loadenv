@@ -31,7 +31,6 @@ if [ "$script_location" ] && [ -e "$script_location/../../xdg/e.user.sh" ]; then
 	cd "$current_pwd" || exit 1
 fi
 
-
 # shellcheck source=/dev/null
 DIR="$XDG_CONFIG_HOME" REGEX=".*\.env" . "$XDG_BIN_HOME/sourcein"
 # shellcheck source=/dev/null

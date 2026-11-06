@@ -1,5 +1,5 @@
 #!/bin/sh
-set -f  # Disable globbing
+set -f # Disable globbing
 oifs=$IFS
 nl='
 '
@@ -10,7 +10,10 @@ nl='
 
 get_data() {
 	# shellcheck disable=SC1004
-	{ pactl info; pactl list sinks; } | awk '
+	{
+		pactl info
+		pactl list sinks
+	} | awk '
 		/^Default Sink: /		{ default_sink=$3 }
 		/^Sink #[0-9]+$/		{ id=substr($2, 2) }
 		$1 == "Name:"			{
@@ -30,10 +33,10 @@ list_inputs() {
 }
 
 advance_target_sink() {
-    advance=$((default_sink_index % $#))
-    shift $advance
-    next_sink=$1
-    default_sink_index=$((advance + 1))
+	advance=$((default_sink_index % $#))
+	shift $advance
+	next_sink=$1
+	default_sink_index=$((advance + 1))
 }
 
 IFS=$nl

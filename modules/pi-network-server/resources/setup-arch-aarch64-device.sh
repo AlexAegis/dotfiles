@@ -74,7 +74,6 @@ echo "Now the tool will create a 256M partition for /boot and an ext4 " \
 printf "Do you want a third partition? (y/n) "
 read -r use_third_partition
 
-
 if [ -n "$use_third_partition" ]; then
 	printf "Enter the size of the second (/root) partition, the rest will be formatted as the third partition (16G): "
 	read -r second_partition_size
@@ -90,7 +89,6 @@ if [ -n "$use_third_partition" ]; then
 	fi
 fi
 
-
 sfdisk_script="
 label: dos
 label-id: 0x4b70f675
@@ -103,7 +101,7 @@ ${device}2 : start=                526336, size= ${second_partition_size}, type=
 "
 
 if [ -n "${second_partition_size}" ]; then
-sfdisk_script="${sfdisk_script}
+	sfdisk_script="${sfdisk_script}
 ${device}3 : start=                      , size=                      , type=83
 "
 fi
@@ -111,7 +109,7 @@ fi
 echo "Proceed using this sfdisk script:
 ${sfdisk_script}"
 
-sfdisk "${1}" << EOF
+sfdisk "${1}" <<EOF
 ${sfdisk_script}
 EOF
 
@@ -144,8 +142,8 @@ install() {
 
 apply_fixes() {
 	echo "!!! The root partition has to be hardcoded as of 2022-04-06 " \
-		 "On the rpi4 the sd-cards second partition would be found at " \
-		 "/dev/mmcblk0p2 while a USB devices would be at /dev/sda2"
+		"On the rpi4 the sd-cards second partition would be found at " \
+		"/dev/mmcblk0p2 while a USB devices would be at /dev/sda2"
 	printf "Is this device an sd-card? (y/n) "
 	read -r is_sd_card
 
@@ -195,14 +193,14 @@ ${device_at_pi}3		${third_partition_mount_point}		ext4		defaults		0	2
 	fi
 
 	echo "Writing patched boot.txt to ${MOUNT_DIR}/boot/boot.txt"
-	echo "${boottxt}" > "${MOUNT_DIR}/boot/boot.txt"
+	echo "${boottxt}" >"${MOUNT_DIR}/boot/boot.txt"
 	echo "Regenerating boot.scr..."
 	(
 		cd "${MOUNT_DIR}/boot"
 		./mkscr
 	)
 	echo "Writing fstab to ${MOUNT_DIR}/etc/fstab"
-	echo "${fstab}" > "${MOUNT_DIR}/etc/fstab"
+	echo "${fstab}" >"${MOUNT_DIR}/etc/fstab"
 }
 
 install "${device}"

@@ -17,10 +17,9 @@ if [ -z "${target_dir}" ]; then
 fi
 
 # only back it up if its not already a symlink
-if [ -d "${emby_dir}" ] && \
-   [ -d "${target_dir}" ] && \
-   [ ! -L "${emby_dir}" ]
-then
+if [ -d "${emby_dir}" ] &&
+	[ -d "${target_dir}" ] &&
+	[ ! -L "${emby_dir}" ]; then
 	bak_date="$(date +'%Y-%M-%d-%H:%M:%S')"
 	mv "${emby_dir}" "${target_dir}/prev-server-backup-${bak_date}"
 fi

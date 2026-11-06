@@ -10,7 +10,7 @@ if [ ! -e "$stateFile" ]; then
 	mkdir -p "${XDG_CACHE_HOME:-$HOME/.cache}"/redshift/
 	echo 'REDSHIFT=on
 REDSHIFT_TEMP=6500
-' > "$stateFile"
+' >"$stateFile"
 fi
 
 # shellcheck disable=SC1090
@@ -23,18 +23,16 @@ changeMode() {
 }
 
 changeTemp() {
-	if [ "$2" -gt 1000 ] && [ "$2" -lt 25000 ]
-	then
+	if [ "$2" -gt 1000 ] && [ "$2" -lt 25000 ]; then
 		sed -i "s/REDSHIFT_TEMP=$1/REDSHIFT_TEMP=$2/g" "$stateFile"
 		redshift -x
-		redshift -O $((REDSHIFT_TEMP+changeValue))
+		redshift -O $((REDSHIFT_TEMP + changeValue))
 	fi
 }
 
 case $1 in
 	toggle)
-		if [ "$REDSHIFT" = on ];
-		then
+		if [ "$REDSHIFT" = on ]; then
 			changeMode "$REDSHIFT" off
 			redshift -x
 		else
@@ -43,19 +41,19 @@ case $1 in
 		fi
 		;;
 	increase)
-		changeTemp $((REDSHIFT_TEMP)) $((REDSHIFT_TEMP+changeValue))
+		changeTemp $((REDSHIFT_TEMP)) $((REDSHIFT_TEMP + changeValue))
 		;;
 	decrease)
-		changeTemp $((REDSHIFT_TEMP)) $((REDSHIFT_TEMP-changeValue));
+		changeTemp $((REDSHIFT_TEMP)) $((REDSHIFT_TEMP - changeValue))
 		;;
 	temperature)
 		case $REDSHIFT in
-		  on)
-			printf "%dK" "$REDSHIFT_TEMP"
-			;;
-		  off)
-			printf "off"
-			;;
+			on)
+				printf "%dK" "$REDSHIFT_TEMP"
+				;;
+			off)
+				printf "off"
+				;;
 		esac
 		;;
 esac

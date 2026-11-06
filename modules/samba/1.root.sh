@@ -5,7 +5,7 @@ mkdir -p /etc/samba
 touch /etc/samba/smb.conf
 
 ini-unindent /etc/samba/smb.conf
-crudini --merge /etc/samba/smb.conf << EOF
+crudini --merge /etc/samba/smb.conf <<EOF
 [global]
 security = user
 log file = /var/log/samba/%m.log

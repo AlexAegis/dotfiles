@@ -6,9 +6,9 @@ xdpyinfo || exit 1
 # sets grub resolution to the primary screens resolution
 # warning, grub only supports a handful of resolutions
 # if your monitor has some weird resolution then it will be ignored
-primary_res=$(xrandr |  \
-grep -oP 'connected primary\s+\K\S+' |  \
-grep -Eo '[0-9]*x[0-9]*')
+primary_res=$(xrandr |
+	grep -oP 'connected primary\s+\K\S+' |
+	grep -Eo '[0-9]*x[0-9]*')
 
 # which will be then picked up by arch for the ttys
 
