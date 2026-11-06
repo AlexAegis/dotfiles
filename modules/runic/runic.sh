@@ -33,7 +33,7 @@ interpret_args() {
 				shift
 				;;
 			--) ;;
-			-?*) echo "Unknown option (ignored): $1" b ;;
+			-?*) printf 'Unknown option (ignored): %s\n' "$1" >&2 ;;
 			*)
 				if [ "$1" ]; then
 					if [ "$entries" ]; then
@@ -97,12 +97,20 @@ transform_entries() {
 }
 
 ## Execution
-# The arguments and entries are split on whitespace below; a * in them must not
+# The arguments and entries are split on newlines below. A * in them must not
 # expand to file names.
 case $- in *f*) caller_noglob=1 ;; *) caller_noglob= ;; esac
 set -f
-# shellcheck disable=SC2046
-interpret_args $(parse_args "" "$@")
+parsed_args=$(parse_args "" "$@") || exit 1
+
+old_ifs="$IFS"
+IFS='
+'
+# shellcheck disable=SC2086 # intentional newline split, globbing off
+set -- $parsed_args
+IFS="$old_ifs"
+
+interpret_args "$@"
 
 # shellcheck disable=SC2086
 transform_entries 'true' $entries
