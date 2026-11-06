@@ -16,12 +16,17 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 1
-      - name: Install shellcheck
+      - name: Install shellcheck and shfmt
         uses: taiki-e/install-action@v2
         with:
-          tool: shellcheck
+          tool: shellcheck,shfmt
           fallback: none
-      - name: Check shellcheck version
-        run: shellcheck --version
+      - name: Check the tool versions
+        run: |
+          shellcheck --version
+          shfmt --version
       - name: Lint
         run: make lint
+      - name: Check the shell formatting
+        if: ${{ !cancelled() }}
+        run: make format-check
