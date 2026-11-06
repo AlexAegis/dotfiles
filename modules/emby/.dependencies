@@ -1,5 +1,4 @@
 xdg
 sys # because of the service user script
-:aur ? [ $arch ]
 ufw
 debtap
