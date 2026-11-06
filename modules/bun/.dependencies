@@ -1,4 +1,3 @@
-:aur-helper ? [ $pacman ]
 bash ? [ ! $pacman ]
 xdg
 brew ? [ $mac ]
