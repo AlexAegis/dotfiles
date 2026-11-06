@@ -30,3 +30,11 @@ jobs:
       - name: Check the shell formatting
         if: ${{ !cancelled() }}
         run: make format-check
+      - name: Install inotify-tools for the tests
+        if: ${{ !cancelled() }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends inotify-tools
+      - name: Test
+        if: ${{ !cancelled() }}
+        run: make test
