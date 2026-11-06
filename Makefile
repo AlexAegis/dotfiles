@@ -1,13 +1,14 @@
-# To run a single test: `make test/1.test`
+# To run a single test: `make test/argument-parsing.test`
 # To run all tests: `make test`
 
 MAKEFLAGS += -k # keep running on failure
-MAKEFLAGS += -j1 # explicitly run on a single thread,
-# more would cause problems on coverage report merging
+MAKEFLAGS += -j1 # explicitly run on a single thread
 
 SHELL := /bin/sh
 
-.PHONY: lint format format-check clean
+all_tests := $(basename $(wildcard test/*.test.sh))
+
+.PHONY: lint format format-check test $(all_tests) clean
 
 # Prints the shell files, one on each line: the tracked files with a shell
 # extension, and the ones whose first line runs sh, bash, dash or ksh. Symlinks
@@ -42,6 +43,13 @@ format:
 format-check:
 	@$(on_shell_files) shfmt -d --apply-ignore --
 	@echo "Success, all shell files are formatted."
+
+test: $(all_tests)
+	@[ -n "$(all_tests)" ] || { echo 'No tests listed' >&2; exit 1; }
+	@echo "Success, all tests passed."
+
+$(all_tests): %.test: %.test.sh
+	@$(SHELL) $<
 
 clean:
 	@echo "Clean"
