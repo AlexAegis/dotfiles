@@ -1,7 +1,9 @@
 #!/bin/sh
 
 systemctl --user daemon-reload || exit 1
-systemctl --user reset-failed agent-open.socket
+# Clears a start limit that earlier failed starts reached. At the first install,
+# systemd has not loaded the unit yet and reports it.
+systemctl --user reset-failed agent-open.socket 2>/dev/null
 systemctl --user enable agent-open.socket || exit 1
 
 # Outside a desktop session, the socket starts at the next login

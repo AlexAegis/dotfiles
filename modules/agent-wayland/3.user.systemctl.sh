@@ -1,8 +1,10 @@
 #!/bin/sh
 
 systemctl --user daemon-reload || exit 1
-# Clears a start limit that earlier failed starts reached
-systemctl --user reset-failed agent-wayland-proxy.socket agent-wayland-context.service
+# Clears a start limit that earlier failed starts reached. At the first install,
+# systemd has not loaded the units yet and reports them.
+systemctl --user reset-failed agent-wayland-proxy.socket \
+	agent-wayland-context.service 2>/dev/null
 systemctl --user enable agent-wayland-proxy.socket || exit 1
 
 # Outside a desktop session, the services have no WAYLAND_DISPLAY. The session
