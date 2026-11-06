@@ -1,0 +1,22 @@
+[package]
+name = "agent-open"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+anyhow = "1.0.104"
+serde = { version = "1.0.229", features = ["derive"] }
+toml = "1.2.0"
+url = "2.5.8"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# The library only serves the binary of this package
+missing_errors_doc = "allow"
+
+[dev-dependencies]
+tempfile = "3.27.0"

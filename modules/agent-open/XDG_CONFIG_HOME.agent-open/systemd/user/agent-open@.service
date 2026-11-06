@@ -1,0 +1,45 @@
+[Unit]
+Description=Opens one request of the agent user
+CollectMode=inactive-or-failed
+
+# Parses what the agent sends, so it sees:
+# - all home folders read-only, to resolve paths
+# - no network
+# - of /run only the private socket of the user manager, for systemd-run
+[Service]
+ExecStart=%D/agent-open/bin/agent-open
+Environment=AGENT_OPEN_CONFIG=%E/agent-open/config.toml
+RuntimeMaxSec=30
+MemoryMax=32M
+MemorySwapMax=0
+TasksMax=8
+LimitNOFILE=256
+
+NoNewPrivileges=yes
+PrivateUsers=self
+TemporaryFileSystem=/run:ro /dev/shm:ro
+BindReadOnlyPaths=%t/systemd/private
+ProtectHome=read-only
+ProtectSystem=strict
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+ProtectProc=invisible
+ProcSubset=pid
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+SystemCallErrorNumber=EPERM
+CapabilityBoundingSet=

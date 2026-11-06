@@ -1,0 +1,32 @@
+# What the agent user may open, read at each request
+
+# Pages of https URLs: pull requests, issues and Actions runs of a repository,
+# and gists. Tokens of a path pattern, each one path segment:
+# - *: any segment that is not empty
+# - {n}: decimal digits
+# - {hex}: hexadecimal digits
+# - **, only last: the rest of the path, also none
+url_pages = [
+	{ host = "github.com", paths = [
+		"/*/*/pull/{n}/**",
+		"/*/*/pulls/**",
+		"/*/*/issues",
+		"/*/*/issues/{n}/**",
+		"/*/*/actions/runs/{n}/**",
+	] },
+	{ host = "gist.github.com", paths = ["/{hex}/**", "/*/{hex}/**"] },
+]
+# http and https URLs of localhost, 127.0.0.1 and [::1]
+allow_loopback = true
+
+# Folders whose files and subfolders the editor may open. Before adding a
+# folder of the agent user, read Limits in the readme.
+editor_roots = ["~/git"]
+# The read-only view of the agent opens the owner's folder that it shows
+path_views = [{ agent = "/srv/alex/git", owner = "~/git" }]
+
+browser = ["xdg-open"]
+# Loopback URLs can show pages that the agent serves. They open in a browser
+# profile without the owner's logins.
+loopback_browser = ["brave", "--user-data-dir=/home/alex/.local/share/agent-open/browser"]
+editor = ["code"]

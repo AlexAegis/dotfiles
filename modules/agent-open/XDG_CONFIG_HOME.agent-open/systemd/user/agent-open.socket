@@ -1,0 +1,16 @@
+[Unit]
+Description=Socket for requests of the agent user to open a URL or a path
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Socket]
+# 2.root.sh creates the folder: 2750, group agent, so the socket gets group agent
+ListenStream=/run/agent-open/open.sock
+SocketMode=0660
+RemoveOnStop=yes
+# A service process for each request
+Accept=yes
+MaxConnections=4
+
+[Install]
+WantedBy=graphical-session.target

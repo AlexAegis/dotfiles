@@ -1,0 +1,3 @@
+# The owner's own setup, on a systemd machine with KWin and the agent user
+[ "$systemd" ] && [ -w "$DOTFILES_HOME" ] && command -v kwin_wayland >/dev/null &&
+	getent group agent >/dev/null
