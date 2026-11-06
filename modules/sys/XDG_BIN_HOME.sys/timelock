@@ -181,7 +181,8 @@ expand_single_args() {
 	while [ "$var" ]; do
 		next="${var#?}"
 		first_char="${var%"$next"}"
-		echo "-$first_char"
+		# printf: echo takes -n (in bash also -e and -E) as an option
+		printf '%s\n' "-$first_char"
 		var="$next" # next
 	done
 }
@@ -240,7 +241,7 @@ parse_args() {
 
 		if [ -n "$has_parameter" ]; then
 			if [ -z "$2" ] || ! [ "${2##-}" = "$2" ]; then
-				echo "$1 is missing it's parameter!" >&2
+				echo "$1 is missing its parameter!" >&2
 				exit 1
 			fi
 		# TODO: handle rest parameters

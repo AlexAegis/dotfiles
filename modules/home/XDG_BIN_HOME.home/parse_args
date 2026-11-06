@@ -29,7 +29,8 @@ expand_single_args() {
 	while [ "$var" ]; do
 		next="${var#?}"
 		first_char="${var%"$next"}"
-		echo "-$first_char"
+		# printf: echo takes -n (in bash also -e and -E) as an option
+		printf '%s\n' "-$first_char"
 		var="$next" # next
 	done
 }
