@@ -1,0 +1,4 @@
+# Services on the owner's desktop for the user that coding agents run as. The
+# agent preset sets up that user itself.
+agent-open
+agent-wayland
