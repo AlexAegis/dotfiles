@@ -1,1 +1,2 @@
 xdg
+home # because of parse_args and watch_exec

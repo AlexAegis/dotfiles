@@ -1,70 +1,80 @@
 #!/bin/sh
 
 # Uses systemctl $COMMAND (restart by default) on every -s service when any of
-# the -d directories change. Also follows symlinks!
+# the -t directories change. Also follows symlinks!
 
-# for argument parsing
-IFS=' '
-
-parse_args() {
-	/usr/bin/getopt -o "sturd" -l "service,target,user,root,delay" -- "$@" || exit 1
-}
-
-TARGET=
-SERVICE=
-USER='--user'
+SCOPE='--user'
 COMMAND='restart'
+SERVICES=
+# arguments of watch_exec, one per line
+TARGET=
 DELAY=
 
-for arg in $(parse_args "$@"); do
-	case $arg in
-		-u | --user) USER='--user' ;;
-		-r | --root) USER='' ;;
+args_with_parameters='-c
+--command
+-t
+--target
+-d
+--delay
+-s
+--service'
+
+# globbing stays off: the lists below are split on newlines
+set -f
+parsed_args=$(parse_args "$args_with_parameters" "$@") || exit 1
+
+IFS='
+'
+# shellcheck disable=SC2086 # intentional newline split, globbing off
+set -- $parsed_args
+
+while [ $# -gt 0 ]; do
+	case $1 in
+		-u | --user) SCOPE='--user' ;;
+		-r | --root) SCOPE='' ;;
 		-c | --command)
-			if [ "$2" ]; then
-				COMMAND="$2"
-			else
-				echo "${C_RED} Invalid command: $2${C_RESET}"
-				exit 1
-			fi
-			shift 2
+			COMMAND="$2"
+			shift
 			;;
 		-t | --target)
 			if [ -d "$2" ]; then
-				TARGET="$TARGET -t $2"
+				TARGET="$TARGET
+-t
+$2"
 			else
 				echo "${C_RED} Invalid target: $2${C_RESET}"
 				exit 1
 			fi
-			shift 2
+			shift
 			;;
 		-d | --delay)
-			if [ "$2" ]; then
-				DELAY="-d $2"
-			else
-				echo "${C_RED} Invalid target: $2${C_RESET}"
-				exit 1
-			fi
-			shift 2
+			DELAY="-d
+$2"
+			shift
 			;;
 		-s | --service)
-			if [ "$2" ]; then
-				SERVICE="$SERVICE -e '/usr/bin/systemctl $USER $COMMAND $2'"
-			else
-				echo "${C_RED} Invalid service: $2${C_RESET}"
-				exit 1
-			fi
-			shift 2
+			SERVICES="$SERVICES
+$2"
+			shift
 			;;
 		--) ;;
 		-?*) printf 'Unknown option (ignored): %s\n' "$1" >&2 ;;
 		*)
-			printf 'wat option (ignored): %s\n' "$@" >&2
+			printf 'Unknown argument (ignored): %s\n' "$@" >&2
 			break
 			;;
 	esac
+	shift
 done
 
-eval "$XDG_BIN_HOME/watch_exec $TARGET $SERVICE $DELAY"
+EXEC=
+for service in $SERVICES; do
+	EXEC="$EXEC
+-e
+/usr/bin/systemctl $SCOPE $COMMAND $service"
+done
+
+# shellcheck disable=SC2086 # intentional newline split, globbing off
+"$XDG_BIN_HOME/watch_exec" $TARGET $EXEC $DELAY
 
 echo "Restart on change terminated"
