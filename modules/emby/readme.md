@@ -13,5 +13,5 @@ To see the available releases visit
 
 ## Moving the Emby database
 
-The installed `link_empy_database.sh` script can move and link the emby data
+The installed `link_emby_database.sh` script can move and link the emby data
 directory anywhere. By default it does it to `/var/media/emby`
