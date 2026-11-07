@@ -41,6 +41,7 @@ pub struct FakeCompositor {
 pub struct ReceivedRequests {
     pub titles: Vec<String>,
     pub app_ids: Vec<String>,
+    pub bound_interfaces: Vec<String>,
     pub disconnected_clients: usize,
 }
 
@@ -92,6 +93,10 @@ impl FakeCompositor {
     pub fn add_output_global(&self) -> GlobalId {
         self.handle
             .create_global::<CompositorState, WlOutput, ()>(4, ())
+    }
+
+    pub fn disable_global(&self, global: GlobalId) {
+        self.handle.disable_global::<CompositorState>(global);
     }
 
     pub fn remove_global(&self, global: GlobalId) {
@@ -169,13 +174,18 @@ where
     CompositorState: Dispatch<I, ()>,
 {
     fn bind(
-        _state: &mut Self,
+        state: &mut Self,
         _handle: &DisplayHandle,
         _client: &Client,
         resource: New<I>,
         _global_data: &(),
         data_init: &mut DataInit<'_, Self>,
     ) {
+        state.record(|received| {
+            received
+                .bound_interfaces
+                .push(I::interface().name.to_owned());
+        });
         data_init.init(resource, ());
     }
 }

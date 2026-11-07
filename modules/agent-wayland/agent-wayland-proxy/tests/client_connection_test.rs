@@ -2,7 +2,9 @@ mod support;
 
 use agent_wayland_proxy::client_connection::UnofferedBind;
 use support::{AgentClient, FakeCompositor};
-use wayland_client::protocol::{wl_data_device_manager::WlDataDeviceManager, wl_shm::WlShm};
+use wayland_client::protocol::{
+    wl_data_device_manager::WlDataDeviceManager, wl_output::WlOutput, wl_shm::WlShm,
+};
 
 #[test]
 fn should_offer_the_globals_for_windows_and_input_but_not_the_clipboard() {
@@ -85,6 +87,27 @@ fn should_forward_the_removal_of_an_offered_global() {
     client.roundtrip().expect("a roundtrip");
     let names: Vec<u32> = client.offered().into_iter().map(|(name, _)| name).collect();
     assert_eq!(names, [1, 2, 3, 4]);
+    client.disconnect().expect("a clean end");
+}
+
+#[test]
+fn should_forward_a_bind_of_a_removed_global_that_the_compositor_still_holds() {
+    let compositor = FakeCompositor::start();
+    let mut client = AgentClient::connect(&compositor);
+    let output = compositor.add_output_global();
+    client.roundtrip().expect("a roundtrip");
+    let name = client.offered_name_of("wl_output");
+    compositor.disable_global(output);
+    client.roundtrip().expect("a roundtrip");
+    assert!(
+        client
+            .offered()
+            .iter()
+            .all(|(_, interface)| interface != "wl_output")
+    );
+    let _: WlOutput = client.bind(name, 4);
+    client.roundtrip().expect("an accepted bind");
+    assert_eq!(compositor.received().bound_interfaces, ["wl_output"]);
     client.disconnect().expect("a clean end");
 }
 

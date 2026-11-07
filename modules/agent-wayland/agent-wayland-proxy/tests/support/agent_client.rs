@@ -14,7 +14,8 @@ use wayland_client::{
     globals::{GlobalList, GlobalListContents, registry_queue_init},
     protocol::{
         wl_compositor::WlCompositor, wl_data_device_manager::WlDataDeviceManager,
-        wl_registry::WlRegistry, wl_seat::WlSeat, wl_shm::WlShm, wl_surface::WlSurface,
+        wl_output::WlOutput, wl_registry::WlRegistry, wl_seat::WlSeat, wl_shm::WlShm,
+        wl_surface::WlSurface,
     },
 };
 use wayland_protocols::xdg::shell::client::{
@@ -156,6 +157,7 @@ delegate_noop!(ClientState: ignore WlSurface);
 delegate_noop!(ClientState: ignore WlShm);
 delegate_noop!(ClientState: ignore WlSeat);
 delegate_noop!(ClientState: ignore WlDataDeviceManager);
+delegate_noop!(ClientState: ignore WlOutput);
 delegate_noop!(ClientState: ignore XdgWmBase);
 delegate_noop!(ClientState: ignore XdgSurface);
 delegate_noop!(ClientState: ignore XdgToplevel);

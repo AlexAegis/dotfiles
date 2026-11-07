@@ -47,6 +47,7 @@ impl WlRegistryHandler for RegistryFilter {
         }
     }
 
+    // The name stays in `advertised`: libwayland accepts a bind until the global is destroyed.
     fn handle_global_remove(&mut self, registry: &Rc<WlRegistry>, name: u32) {
         self.mapper.forward_global_remove(registry, name);
     }
