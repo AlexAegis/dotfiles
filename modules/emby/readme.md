@@ -13,5 +13,11 @@ To see the available releases visit
 
 ## Moving the Emby database
 
-The installed `link_emby_database.sh` script can move and link the emby data
-directory anywhere. By default it does it to `/var/media/emby`
+The installed `link_emby_database.sh` script links `/var/lib/emby` to the
+folder that its argument names. `1.root.sh` runs it with `/var/media/emby`.
+
+- `/var/lib/emby` is a link: only the link changes, the data stays in the old
+  folder
+- new folder does not exist: the data moves there
+- new folder exists: the data moves into it as `prev-server-backup-<date>`.
+  Emby then uses the files already in the new folder.
