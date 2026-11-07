@@ -21,3 +21,8 @@ folder that its argument names. `1.root.sh` runs it with `/var/media/emby`.
 - new folder does not exist: the data moves there
 - new folder exists: the data moves into it as `prev-server-backup-<date>`.
   Emby then uses the files already in the new folder.
+
+On x86, the `emby-server` package of Arch runs the service with
+`DynamicUser=true` and `StateDirectory=emby`. systemd then requires
+`/var/lib/emby` to be a link to `private/emby`, so the service does not start
+after the script links it to another folder.
