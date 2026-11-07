@@ -1,4 +1,3 @@
 +arch ? [ $arch ]
-+void ? [ $void ]
 bspwm
 rofi
