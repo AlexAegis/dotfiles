@@ -19,19 +19,13 @@ indent_size = 2
 [*.txt]
 insert_final_newline = false
 
-# shfmt reads these, also for scripts with a shebang and no extension
 [[shell]]
 indent_style = tab
 switch_case_indent = true
 
-# Copied from grub-holdshift, kept as upstream wrote it
 [modules/grub/resources/31_hold_shift]
 ignore = true
 
-# shfmt 3.14 changes the meaning of some zsh expansions, such as $((...))
-# inside ${${(M)...}}. A shfmt walk of the tree also finds zsh scripts without
-# an extension: add each one to the list below. The make targets list only sh,
-# bash, dash and ksh scripts.
 [*.zsh]
 ignore = true
 
