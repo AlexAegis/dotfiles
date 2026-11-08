@@ -4,4 +4,4 @@
 # files that are present in the module and in the .ssh folder
 # would cause conflicts.
 mkdir -p "$HOME/.ssh/config.d"
-[ -e "$HOME/.ssh/config" ] && rm "$HOME/.ssh/config"
+[ ! -e "$HOME/.ssh/config" ] || rm "$HOME/.ssh/config"
