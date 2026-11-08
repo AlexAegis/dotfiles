@@ -1,4 +1,3 @@
 xdg
 systemd ? [ $systemd ]
 pont # for the dotfiles directory location
-sys-gentoo ? [ $gentoo ] # portage install
