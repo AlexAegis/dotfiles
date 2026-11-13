@@ -17,7 +17,13 @@ impl Fixture {
     fn new(allow_loopback: bool) -> Self {
         let folder = TempDir::new().unwrap();
         let base = folder.path();
-        for path in ["home/git/repo", "view", "outside"] {
+        for path in [
+            "home/git/repo",
+            "other/git/repo",
+            "other/gitx",
+            "view",
+            "outside",
+        ] {
             fs::create_dir_all(base.join(path)).unwrap();
         }
         fs::write(base.join("home/git/repo/main.rs"), "").unwrap();
@@ -29,12 +35,13 @@ url_pages = [
     {{ host = "gist.github.com", paths = ["/*/*"] }},
 ]
 allow_loopback = {allow_loopback}
-editor_roots = ["~/git"]
+editor_roots = ["~/git", "{other}"]
 path_views = [{{ agent = "{view}", owner = "~/git" }}]
 browser = ["xdg-open"]
 loopback_browser = ["brave", "--user-data-dir=/tmp/profile"]
 editor = ["code", "--reuse-window"]
 "#,
+            other = base.join("other/git").display(),
             view = base.join("view").display(),
         );
         let config = Config::parse(&text, &base.join("home")).unwrap();
@@ -148,6 +155,39 @@ fn should_resolve_files_and_folders_under_an_editor_root() {
             .unwrap();
         let expected = fs::canonicalize(fixture.path(relative)).unwrap();
         assert_eq!(request, Request::Edit(expected));
+    }
+}
+
+#[test]
+fn should_resolve_paths_under_the_second_editor_root() {
+    let fixture = Fixture::new(false);
+    symlink(
+        fixture.path("home/git/repo"),
+        fixture.path("other/git/first"),
+    )
+    .unwrap();
+    for (path, target) in [
+        ("other/git", "other/git"),
+        ("other/git/repo", "other/git/repo"),
+        ("other/git/first/main.rs", "home/git/repo/main.rs"),
+    ] {
+        let request = fixture
+            .check(&format!("edit {}", fixture.path(path)))
+            .unwrap();
+        let expected = fs::canonicalize(fixture.path(target)).unwrap();
+        assert_eq!(request, Request::Edit(expected), "{path}");
+    }
+}
+
+#[test]
+fn should_refuse_paths_that_leave_the_second_editor_root() {
+    let fixture = Fixture::new(false);
+    symlink(fixture.path("outside"), fixture.path("other/git/link")).unwrap();
+    for path in ["other/gitx", "other", "other/git/link/secret"] {
+        let error = fixture
+            .check(&format!("edit {}", fixture.path(path)))
+            .unwrap_err();
+        assert_eq!(error.to_string(), PATH_REFUSAL, "{path}");
     }
 }
 

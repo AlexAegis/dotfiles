@@ -19,9 +19,9 @@ url_pages = [
 # http and https URLs of localhost, 127.0.0.1 and [::1]
 allow_loopback = true
 
-# Folders whose files and subfolders the editor may open. Before adding a
-# folder of the agent user, read Limits in the readme.
-editor_roots = ["~/git"]
+# Folders whose files and subfolders the editor may open. For a folder of the
+# agent user, such as /home/agent/git, read Limits in the readme.
+editor_roots = ["~/git", "/home/agent/git"]
 # The read-only view of the agent opens the owner's folder that it shows
 path_views = [{ agent = "/srv/alex/git", owner = "~/git" }]
 

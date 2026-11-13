@@ -103,6 +103,9 @@ fn should_parse_the_config_of_the_module_with_the_owners_pages() {
     ] {
         assert_eq!(request::check_url(url, &config).is_ok(), allowed, "{url}");
     }
-    assert_eq!(config.editor_roots, [Path::new("/home/alex/git")]);
+    assert_eq!(
+        config.editor_roots,
+        [Path::new("/home/alex/git"), Path::new("/home/agent/git")]
+    );
     assert!(config.loopback_browser.is_some());
 }

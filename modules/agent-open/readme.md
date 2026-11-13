@@ -78,14 +78,20 @@ client of `agent`, and makes it the handler of `http` and `https` links.
 - In an editor root that `agent` can write, `agent` can change the files
   between the check and the start of the editor, such as by replacing a folder
   with a symlink. The editor can then open another path that the owner can
-  read.
-- The config of the module allows no folder of `agent`, such as
-  `/home/agent/git`. The owner's Git refuses a repository there, because
-  `agent` owns it. VS Code then offers to add it to `safe.directory`. After
-  that, the owner's Git runs the commands that `agent` writes into the
-  configuration of that repository, such as `core.fsmonitor`. If you add such
-  a folder, keep its repositories out of `safe.directory`. Also keep the folder
-  untrusted in the editor's workspace trust.
+  read. `/home/agent/git` is such a root.
+- The config of the module allows one folder of `agent`, `/home/agent/git`, so
+  that the owner can read the work of `agent` in place. The owner's Git refuses
+  a repository there, because `agent` owns it. VS Code then offers to add it to
+  `safe.directory`. After that, the owner's Git runs the commands that `agent`
+  writes into the configuration of that repository, such as `core.fsmonitor`.
+  Keep the repositories of a folder of `agent` out of `safe.directory`. Also
+  keep that folder untrusted in the editor's workspace trust.
+- With the VS Code setting `security.workspace.trust.untrustedFiles` at `open`,
+  workspace trust does not cover a single file of `agent`. Such a file opens
+  in an open window without a question, also in a trusted workspace. A coding
+  agent in that window can then read text that `agent` wrote and act on it
+  with its tool permissions. The value `newWindow` opens such a file in a new
+  window in Restricted Mode.
 - The socket accepts 4 requests at a time, with no limit per minute.
 - A request longer than 4096 bytes gets an error reply, then the connection
   resets.
