@@ -9,7 +9,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use wl_proxy::{
-    client::ClientHandler,
+    client::{Client, ClientHandler},
     protocols::wayland::{
         wl_display::{WlDisplay, WlDisplayHandler},
         wl_registry::WlRegistry,
@@ -50,23 +50,33 @@ pub fn serve(client: UnixStream, compositor: UnixStream) -> Result<()> {
             .dispatch_blocking()
             .map_err(|error| state_error::describe(&error))?;
         if violation.get() {
-            return Err(UnofferedBind.into());
+            return Err(UnofferedName.into());
         }
     }
     Ok(())
 }
 
-/// Ends the connection of a client that bound a global outside what it was offered.
+/// Ends the connection of a client that bound or acknowledged a global name outside what it
+/// was offered.
 #[derive(Debug)]
-pub struct UnofferedBind;
+pub struct UnofferedName;
 
-impl fmt::Display for UnofferedBind {
+impl fmt::Display for UnofferedName {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str("Client bound a global that it was not offered")
+        formatter.write_str("Client used a global name that it was not offered")
     }
 }
 
-impl Error for UnofferedBind {}
+impl Error for UnofferedName {}
+
+/// Stops reading the requests of the client, so that [`serve`] ends the connection with
+/// [`UnofferedName`].
+pub fn refuse_unoffered_name(client: Option<Rc<Client>>, violation: &Cell<bool>) {
+    violation.set(true);
+    if let Some(client) = client {
+        client.set_suspended(true);
+    }
+}
 
 struct DestroyOnDisconnect(
     #[expect(dead_code, reason = "dropping it destroys the state")] Destructor,

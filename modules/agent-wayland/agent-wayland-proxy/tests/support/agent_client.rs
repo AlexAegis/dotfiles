@@ -14,8 +14,8 @@ use wayland_client::{
     globals::{GlobalList, GlobalListContents, registry_queue_init},
     protocol::{
         wl_compositor::WlCompositor, wl_data_device_manager::WlDataDeviceManager,
-        wl_output::WlOutput, wl_registry::WlRegistry, wl_seat::WlSeat, wl_shm::WlShm,
-        wl_surface::WlSurface,
+        wl_fixes::WlFixes, wl_output::WlOutput, wl_registry::WlRegistry, wl_seat::WlSeat,
+        wl_shm::WlShm, wl_surface::WlSurface,
     },
 };
 use wayland_protocols::xdg::shell::client::{
@@ -81,6 +81,16 @@ impl AgentClient {
         self.globals
             .registry()
             .bind(name, version, &self.queue.handle(), ())
+    }
+
+    pub fn get_another_registry(&self) -> WlRegistry {
+        self.connection
+            .display()
+            .get_registry(&self.queue.handle(), ())
+    }
+
+    pub fn acknowledge_removal(&self, fixes: &WlFixes, name: u32) {
+        fixes.ack_global_remove(self.globals.registry(), name);
     }
 
     pub fn open_window(&self) -> XdgToplevel {
@@ -157,6 +167,8 @@ delegate_noop!(ClientState: ignore WlSurface);
 delegate_noop!(ClientState: ignore WlShm);
 delegate_noop!(ClientState: ignore WlSeat);
 delegate_noop!(ClientState: ignore WlDataDeviceManager);
+delegate_noop!(ClientState: ignore WlFixes);
+delegate_noop!(ClientState: ignore WlRegistry);
 delegate_noop!(ClientState: ignore WlOutput);
 delegate_noop!(ClientState: ignore XdgWmBase);
 delegate_noop!(ClientState: ignore XdgSurface);

@@ -9,6 +9,7 @@ use std::{
     time::{Duration, Instant},
 };
 
+use wayland_client::{Connection, globals::registry_queue_init};
 use wayland_protocols::xdg::shell::server::{
     xdg_surface::{self, XdgSurface},
     xdg_toplevel::{self, XdgToplevel},
@@ -16,16 +17,19 @@ use wayland_protocols::xdg::shell::server::{
 };
 use wayland_server::{
     Client, DataInit, Dispatch, Display, DisplayHandle, GlobalDispatch, New, Resource,
-    backend::{ClientData, ClientId, DisconnectReason, GlobalId},
+    backend::{ClientData, ClientId, DisconnectReason, GlobalId, ObjectId},
     protocol::{
         wl_compositor::{self, WlCompositor},
         wl_data_device_manager::WlDataDeviceManager,
+        wl_fixes::{self, WlFixes},
         wl_output::WlOutput,
         wl_seat::WlSeat,
         wl_shm::WlShm,
         wl_surface::WlSurface,
     },
 };
+
+use super::agent_client::ClientState;
 
 const POLL_INTERVAL: Duration = Duration::from_millis(1);
 const WAIT_LIMIT: Duration = Duration::from_secs(5);
@@ -42,6 +46,9 @@ pub struct ReceivedRequests {
     pub titles: Vec<String>,
     pub app_ids: Vec<String>,
     pub bound_interfaces: Vec<String>,
+    pub acknowledged_removals: Vec<u32>,
+    pub acknowledged_removals_on_destroyed_registries: Vec<u32>,
+    pub destroyed_registries: usize,
     pub disconnected_clients: usize,
 }
 
@@ -57,6 +64,7 @@ impl FakeCompositor {
         let received = Arc::new(Mutex::new(ReceivedRequests::default()));
         let state = CompositorState {
             received: received.clone(),
+            destroyed_registries: Vec::new(),
         };
         let stop = Arc::new(AtomicBool::new(false));
         let thread = thread::spawn({
@@ -95,6 +103,31 @@ impl FakeCompositor {
             .create_global::<CompositorState, WlOutput, ()>(4, ())
     }
 
+    pub fn add_fixes_global(&self, version: u32) -> GlobalId {
+        self.handle
+            .create_global::<CompositorState, WlFixes, ()>(version, ())
+    }
+
+    /// Returns the name of the newest global of the interface, as a client that connects
+    /// to the compositor directly sees it.
+    pub fn compositor_name_of(&self, interface: &str) -> u32 {
+        let (observer_end, compositor_end) = UnixStream::pair().expect("a socket pair");
+        self.handle
+            .clone()
+            .insert_client(compositor_end, Arc::new(Observer))
+            .expect("an inserted observer");
+        let connection = Connection::from_socket(observer_end).expect("an observer connection");
+        let (globals, _queue) =
+            registry_queue_init::<ClientState>(&connection).expect("the globals of the compositor");
+        globals
+            .contents()
+            .clone_list()
+            .into_iter()
+            .rev()
+            .find_map(|global| (global.interface == interface).then_some(global.name))
+            .expect("a global of that interface")
+    }
+
     pub fn disable_global(&self, global: GlobalId) {
         self.handle.disable_global::<CompositorState>(global);
     }
@@ -108,15 +141,31 @@ impl FakeCompositor {
     }
 
     pub fn received_after_disconnect(&self) -> ReceivedRequests {
+        self.received_when("a client disconnected", |received| {
+            received.disconnected_clients > 0
+        })
+    }
+
+    pub fn received_after_acknowledged_removal(&self) -> ReceivedRequests {
+        self.received_when("a removal was acknowledged", |received| {
+            !received.acknowledged_removals.is_empty()
+        })
+    }
+
+    fn received_when(
+        &self,
+        event: &str,
+        happened: impl Fn(&ReceivedRequests) -> bool,
+    ) -> ReceivedRequests {
         let deadline = Instant::now() + WAIT_LIMIT;
         loop {
             let received = self.received();
-            if received.disconnected_clients > 0 {
+            if happened(&received) {
                 return received;
             }
             assert!(
                 Instant::now() < deadline,
-                "no client disconnected within {WAIT_LIMIT:?}"
+                "no sign within {WAIT_LIMIT:?} that {event}"
             );
             thread::sleep(POLL_INTERVAL);
         }
@@ -158,8 +207,15 @@ impl ClientData for TestClient {
     }
 }
 
+struct Observer;
+
+impl ClientData for Observer {}
+
 struct CompositorState {
     received: Arc<Mutex<ReceivedRequests>>,
+    /// Kept alive, as a compositor does for the events that it queued before it read the
+    /// destruction.
+    destroyed_registries: Vec<ObjectId>,
 }
 
 impl CompositorState {
@@ -254,6 +310,38 @@ impl Dispatch<XdgToplevel, ()> for CompositorState {
             }
             xdg_toplevel::Request::SetAppId { app_id } => {
                 state.record(|received| received.app_ids.push(app_id));
+            }
+            _ => {}
+        }
+    }
+}
+
+impl Dispatch<WlFixes, ()> for CompositorState {
+    fn request(
+        state: &mut Self,
+        _client: &Client,
+        _fixes: &WlFixes,
+        request: wl_fixes::Request,
+        _data: &(),
+        _handle: &DisplayHandle,
+        _data_init: &mut DataInit<'_, Self>,
+    ) {
+        match request {
+            wl_fixes::Request::DestroyRegistry { registry } => {
+                state.destroyed_registries.push(registry.id());
+                state.record(|received| received.destroyed_registries += 1);
+            }
+            wl_fixes::Request::AckGlobalRemove { registry, name } => {
+                let destroyed = state.destroyed_registries.contains(&registry.id());
+                state.record(|received| {
+                    if destroyed {
+                        received
+                            .acknowledged_removals_on_destroyed_registries
+                            .push(name);
+                    } else {
+                        received.acknowledged_removals.push(name);
+                    }
+                });
             }
             _ => {}
         }

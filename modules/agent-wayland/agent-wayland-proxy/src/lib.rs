@@ -2,6 +2,7 @@ pub mod allowed_globals;
 pub mod client_connection;
 pub mod logging;
 pub mod registry_filter;
+pub mod removal_ack_translator;
 pub mod security_context;
 pub mod socket_activation;
 pub mod state_error;

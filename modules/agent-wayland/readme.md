@@ -24,7 +24,12 @@ agent client -> /run/agent-wayland/wayland-0 -> agent-wayland-proxy -> KWin secu
   the primary selection, drag and drop, layer shell, input methods, idle state,
   and output control stay hidden.
 - It gives forwarded globals new names, so a client cannot address a hidden
-  one. A client that binds a name it was not offered loses its connection.
+  one. A client that binds a name it was not offered, or acknowledges the
+  removal of such a name, loses its connection.
+- It translates the global name in a client's acknowledgment of a removal
+  (`wl_fixes.ack_global_remove`) to the name that the compositor uses. When the
+  compositor offers `wl_fixes` version 2, the proxy acknowledges the removal of
+  a hidden global itself.
 - It prefixes window titles with `[agent]` and app ids with `agent.`. The KWin
   rule of `4.user.kwriteconfig6.sh` matches those app ids. It forces
   server-side decorations, the emerald `AgentWindow` title bar, and the extreme
@@ -54,6 +59,10 @@ applies only to writable dotfiles on a systemd machine with KWin, where the
   sandbox.
 - Many clients that each stay below the limit of their proxy can together reach
   the limit of the slice. The kernel then stops the largest proxy in the slice.
+- The proxy does not see the globals of a protocol that it does not parse, such
+  as `xdg_system_bell_v1` and the KDE protocols, so it acknowledges no removal
+  of them. KWin keeps such a removed global until the client disconnects, or for
+  at most a day.
 
 ## Check
 
