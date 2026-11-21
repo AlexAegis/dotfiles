@@ -1,0 +1,2 @@
+# The owner's own setup, on a systemd machine with the agent user
+[ "$systemd" ] && [ -w "$DOTFILES_HOME" ] && getent group agent >/dev/null

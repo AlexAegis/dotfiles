@@ -2,3 +2,4 @@
 # agent preset sets up that user itself.
 agent-open
 agent-wayland
+approval-queue

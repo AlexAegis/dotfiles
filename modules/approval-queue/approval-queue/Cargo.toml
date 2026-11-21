@@ -1,0 +1,28 @@
+[package]
+name = "approval-queue"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+anyhow = "1.0.104"
+# unstable-rendered-line-info: Paragraph::line_count, for the count of the
+# lines below the pane of the selected prompt
+ratatui = { version = "0.30.2", default-features = false, features = [
+    "crossterm",
+    "unstable-rendered-line-info",
+] }
+rustix = { version = "1.1.6", features = ["net", "process"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# The library only serves the binaries of this package
+missing_errors_doc = "allow"
+
+[dev-dependencies]
+tempfile = "3.27.0"
