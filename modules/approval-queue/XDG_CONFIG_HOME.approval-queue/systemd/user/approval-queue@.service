@@ -1,0 +1,53 @@
+[Unit]
+Description=Waits for the answer to one permission prompt
+CollectMode=inactive-or-failed
+
+# Parses what a session of any user in the agent group sends, so it sees:
+# - of the home folders only the folder of its binary
+# - no network
+# - of /run only the folder of the queue
+[Service]
+ExecStart=%D/approval-queue/bin/approval-queue-serve
+# The connection, as for an inetd service. The journal gets the log lines.
+StandardInput=socket
+StandardOutput=journal
+StandardError=journal
+RuntimeDirectory=approval-queue
+RuntimeDirectoryMode=0700
+# The folder belongs to every service process and to the list
+RuntimeDirectoryPreserve=yes
+# Above the longest wait of the service, which then ends by itself
+RuntimeMaxSec=26h
+MemoryMax=32M
+MemorySwapMax=0
+TasksMax=4
+LimitNOFILE=64
+
+NoNewPrivileges=yes
+PrivateUsers=self
+TemporaryFileSystem=/run:ro /dev/shm:ro
+ProtectHome=tmpfs
+BindReadOnlyPaths=%D/approval-queue/bin
+ProtectSystem=strict
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+ProtectProc=invisible
+ProcSubset=pid
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+SystemCallErrorNumber=EPERM
+CapabilityBoundingSet=

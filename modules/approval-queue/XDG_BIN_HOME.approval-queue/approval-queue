@@ -1,0 +1,4 @@
+#!/bin/sh
+# Lists the waiting permission prompts of the coding agent sessions
+
+exec "${XDG_DATA_HOME:?}/approval-queue/bin/approval-queue" "$@"
