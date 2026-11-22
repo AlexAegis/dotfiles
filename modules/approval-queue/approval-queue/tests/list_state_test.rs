@@ -236,12 +236,11 @@ fn should_start_the_quiet_time_at_each_key_outside_a_message() {
         (Key::Enter, "1-1"),
         (Key::Escape, "1-1"),
         (Key::Backspace, "1-1"),
-        (Key::Other, "1-1"),
+        (Key::Other("Tab".to_owned()), "1-1"),
     ] {
-        for refused in ['a', 'd', 'm', 'q'] {
+        for refused in ['a', 'd', 'm', 'q', 's', 'S', 'u'] {
             let mut state = state_with(&["1-1", "2-1"], start);
-            assert_eq!(state.press(key, later), None);
-            assert_eq!(state.notice(), None);
+            assert_eq!(state.press(key.clone(), later), None);
             assert_eq!(
                 state.press(Key::Character(refused), later + milliseconds(999)),
                 None,
@@ -664,4 +663,76 @@ fn should_scroll_no_further_than_the_last_line_of_the_selected_entry() {
     assert_eq!(state.scroll(), 25);
     state.limit_scroll(7);
     assert_eq!(state.scroll(), 7);
+}
+
+#[test]
+fn should_mute_and_unmute_the_pings_after_the_quiet_time() {
+    let start = Instant::now();
+    let later = start + milliseconds(5000);
+    for (key, action) in [
+        ('s', Action::MutePings(Duration::from_secs(600))),
+        ('S', Action::MutePings(Duration::from_secs(3600))),
+        ('u', Action::UnmutePings),
+    ] {
+        let mut state = state_with(&["1-1"], start);
+        assert_eq!(state.press(Key::Character(key), later), Some(action));
+        assert_eq!(state.notice(), None);
+        assert_eq!(
+            state.press(Key::Character(key), later + milliseconds(999)),
+            None
+        );
+        assert_eq!(
+            state.notice(),
+            Some("Too early. Press the key after 1 second without a key.")
+        );
+    }
+}
+
+#[test]
+fn should_mute_the_pings_while_no_prompt_waits() {
+    let start = Instant::now();
+    let mut state = state_with(&[], start);
+    assert_eq!(
+        state.press(Key::Character('s'), start),
+        Some(Action::MutePings(Duration::from_secs(600)))
+    );
+}
+
+#[test]
+fn should_name_a_key_without_a_function() {
+    let start = Instant::now();
+    let mut state = state_with(&["1-1"], start);
+    for (key, notice) in [
+        (Key::Character('x'), "Key x has no function"),
+        (Key::Character('A'), "Key A has no function"),
+        (Key::Character(' '), "Key space has no function"),
+        (Key::Enter, "Key Enter has no function"),
+        (Key::Escape, "Key Esc has no function"),
+        (Key::Backspace, "Key Backspace has no function"),
+        (Key::Other("Alt+a".to_owned()), "Key Alt+a has no function"),
+    ] {
+        state.press(key, start);
+        assert_eq!(state.notice(), Some(notice));
+    }
+    state.press(Key::Down, start);
+    assert_eq!(state.notice(), None);
+}
+
+#[test]
+fn should_start_the_quiet_time_when_the_window_gets_the_focus() {
+    let start = Instant::now();
+    let later = start + milliseconds(5000);
+    let mut state = state_with(&["1-1"], start);
+    state.gain_focus(later);
+    assert_eq!(
+        state.press(Key::Character('a'), later + milliseconds(999)),
+        None
+    );
+    let mut state = state_with(&["1-1"], start);
+    state.gain_focus(later);
+    assert_answers(
+        state.press(Key::Character('a'), later + milliseconds(1000)),
+        "1-1",
+        Answer::Allow,
+    );
 }

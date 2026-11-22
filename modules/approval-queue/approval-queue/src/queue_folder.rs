@@ -26,6 +26,7 @@ pub struct QueueFolder {
     entries: PathBuf,
     answers: PathBuf,
     lists: PathBuf,
+    mute: PathBuf,
 }
 
 impl QueueFolder {
@@ -37,6 +38,7 @@ impl QueueFolder {
             entries: root.join("entries"),
             answers: root.join("answers"),
             lists: root.join("lists"),
+            mute: root.join("pings-muted-until"),
         }
     }
 
@@ -119,6 +121,38 @@ impl QueueFolder {
             .collect();
         ids.sort();
         Ok(ids)
+    }
+
+    /// Mutes the pings until the time. A later call replaces the time.
+    pub fn mute_pings_until(&self, until: SystemTime) -> Result<()> {
+        let seconds = until
+            .duration_since(UNIX_EPOCH)
+            .context("Time is before 1970")?
+            .as_secs();
+        let temporary = self.mute.with_extension(format!("{}.tmp", process::id()));
+        let stored = fs::write(&temporary, seconds.to_string())
+            .and_then(|()| fs::rename(&temporary, &self.mute));
+        if stored.is_err() {
+            let _ = fs::remove_file(&temporary);
+        }
+        stored.with_context(|| format!("Mute {} not stored", self.mute.display()))
+    }
+
+    pub fn unmute_pings(&self) -> Result<()> {
+        match fs::remove_file(&self.mute) {
+            Err(error) if error.kind() != ErrorKind::NotFound => {
+                Err(error).with_context(|| format!("Mute {} not removed", self.mute.display()))
+            }
+            _ => Ok(()),
+        }
+    }
+
+    /// The time until which the pings are muted. `None` without a mute, and
+    /// for a stored time that is not a count of seconds.
+    #[must_use]
+    pub fn pings_muted_until(&self) -> Option<SystemTime> {
+        let seconds = fs::read_to_string(&self.mute).ok()?.trim().parse().ok()?;
+        UNIX_EPOCH.checked_add(Duration::from_secs(seconds))
     }
 
     /// Stores the owner's answer for the service process of the entry.

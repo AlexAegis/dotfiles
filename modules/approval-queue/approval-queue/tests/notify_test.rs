@@ -4,7 +4,7 @@ use std::{
     path::Path,
     process::{Child, Command, Stdio},
     thread,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime},
 };
 
 use approval_queue::{entry::Entry, queue_folder::QueueFolder};
@@ -178,5 +178,30 @@ fn should_ping_for_an_entry_whose_content_is_no_request() {
         .unwrap()
         .path();
     fs::write(path, "[").unwrap();
+    assert_eq!(notify.calls_after(4).len(), 4);
+}
+
+#[test]
+fn should_not_ping_while_the_pings_are_muted_and_ping_after_the_unmute() {
+    let notify = Notify::start("i 3");
+    let queue = notify.queue();
+    queue
+        .mute_pings_until(SystemTime::now() + Duration::from_secs(600))
+        .unwrap();
+    let _waiting = queue.add(&entry()).unwrap();
+    thread::sleep(Duration::from_millis(1500));
+    assert_eq!(notify.calls_after(0), Vec::<String>::new());
+    queue.unmute_pings().unwrap();
+    assert_eq!(notify.calls_after(4).len(), 4);
+}
+
+#[test]
+fn should_ping_when_the_time_of_the_mute_is_over() {
+    let notify = Notify::start("i 3");
+    let queue = notify.queue();
+    queue
+        .mute_pings_until(SystemTime::now() - Duration::from_secs(1))
+        .unwrap();
+    let _waiting = queue.add(&entry()).unwrap();
     assert_eq!(notify.calls_after(4).len(), 4);
 }

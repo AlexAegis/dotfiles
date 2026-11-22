@@ -38,18 +38,31 @@ lines above and below it.
 | `m`              | denies it with a message, which the agent reads |
 | `j`, `k`, arrows | select                                          |
 | PgUp, PgDn       | scroll the selected prompt                      |
+| `s`              | mutes the pings for 10 minutes                  |
+| `S`              | mutes the pings for 1 hour                      |
+| `u`              | ends the mute                                   |
 | `q`, Ctrl-C      | quit                                            |
 
 - An answer names its entry by ID. The selection stays on its entry while other
   entries come and go.
 - When the selected entry leaves, the oldest entry gets the selection.
-- The list takes `a`, `d`, `m` and `q` only after 1 second without a key press,
-  pasted text or a new selection by the list. A key that the list does not use
-  counts as a key press too. A key meant for the entry that left then does not
-  answer the next one. Of text typed into the list without a pause of 1 second,
-  only the first key can act. An `a` or `d` there answers one prompt. An `m`
-  there opens a message with the rest of the text, which Enter sends as a
-  denial.
+- The list takes `a`, `d`, `m`, `s`, `S`, `u` and `q` only after 1 second
+  without a key press, pasted text, a new selection by the list or a new focus
+  of its window. A key that the list does not use counts as a key press too. A
+  key meant for the entry that left then does not answer the next one. Of text
+  typed into the list without a pause of 1 second, only the first key can act.
+  An `a` or `d` there answers one prompt. An `s` or `S` there mutes the pings.
+  An `m` there opens a message with the rest of the text, which Enter sends as
+  a denial.
+- A ping gives the window of the list the focus. Keys that the owner types for
+  another window in the second after that answer no prompt, open no message,
+  change no mute and do not quit with `q`. An open message then takes a key or
+  pasted text only after 1 second without either. The keys that select and
+  scroll, and Ctrl-C, act at once. A terminal that does not report the focus
+  gives no such second.
+- A key without a function gets a notice with its name, such as
+  `Key Alt+a has no function`.
+- With Caps Lock on, `s` arrives as `S` and mutes for 1 hour.
 - After `m`, each key is text of the message, also when the prompt leaves the
   queue in that time. Esc closes the message.
 - A key with Ctrl or Alt is not its plain key: Ctrl-D is no `d`. Ctrl-C quits.
@@ -106,6 +119,12 @@ screen.
 
 The cadence counts the time that the machine runs, without the time of a
 suspend.
+
+`s` and `S` in the list mute the pings. The upper border of the list shows the
+minutes left. A later `s` or `S` sets a new time. While the mute lasts, no ping
+comes and no list opens. The prompts keep their wait: when the mute ends, one
+ping comes for those that still wait for theirs. A mute ends at a clock time:
+the time of a suspend counts. It also lasts after the list quits.
 
 On a desktop without KWin, step 1 fails and the journal has the reason. Step 2
 still runs:
@@ -176,6 +195,7 @@ request states.
   service process and `approval-queue-notify` remove a mark that no process
   locks.
 - `focus-list.js`: the KWin script of the last ping.
+- `pings-muted-until`: the end of a mute, in seconds since 1970.
 
 ## Install
 
@@ -218,7 +238,8 @@ The second command waits. Its request shows in `approval-queue`. An answer there
 prints the reply and ends the command. `cargo test` in `approval-queue` tests
 the request form, the files of the queue, whole connections, the keys of the
 list and what the list draws. The tests give the list its terminal events
-directly. No test runs a real terminal, so none covers its bracketed paste mode.
+directly. No test runs a real terminal, so none covers its bracketed paste and
+focus reporting modes.
 The tests of `approval-queue-notify` run it with stand-ins for `busctl` and
 `systemd-run`. No test runs KWin, `ghostty` or `focus_list.js`.
 

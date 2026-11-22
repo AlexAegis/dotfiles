@@ -1,6 +1,6 @@
 use std::{
     collections::HashMap,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime},
 };
 
 use crate::{
@@ -8,13 +8,16 @@ use crate::{
     message_draft::MessageDraft,
 };
 
-/// The list takes a key that answers, opens a message or quits only after
-/// this time without a key press, pasted text or a new selection by the list.
+/// The list takes a key that answers, opens a message, mutes or unmutes the
+/// pings or quits only after this time without a key press, pasted text, a
+/// new selection by the list or a new focus of its window.
 /// A key that the owner pressed for an entry that left then does not answer
 /// the next one. Of text that someone types into the list without such a
 /// pause, only the first key can act.
 const QUIET_TIME: Duration = Duration::from_secs(1);
 const SCROLL_STEP: u16 = 10;
+const SHORT_MUTE: Duration = Duration::from_mins(10);
+const LONG_MUTE: Duration = Duration::from_hours(1);
 const NOT_QUIET: &str = "Too early. Press the key after 1 second without a key.";
 const ANSWERED: &str = "The prompt has its answer";
 const NO_PROMPT: &str = "No prompt waits";
@@ -28,11 +31,15 @@ pub struct ListState {
     entries: Vec<ListedEntry>,
     selected: Option<String>,
     quiet_from: Option<Instant>,
+    /// The end of the quiet time after the window got the focus. An open
+    /// message takes no key before it.
+    focus_quiet_from: Option<Instant>,
     answered: HashMap<String, Answer>,
     draft: Option<MessageDraft>,
     scroll: u16,
     scroll_limit: u16,
     notice: Option<String>,
+    pings_muted_until: Option<SystemTime>,
 }
 
 impl ListState {
@@ -63,7 +70,10 @@ impl ListState {
         }
         self.notice = None;
         if self.draft.is_some() {
-            return self.press_in_message(key, now);
+            if self.refuses_after_new_focus(now) {
+                return None;
+            }
+            return self.press_in_message(&key, now);
         }
         let is_quiet = self.is_quiet(now);
         self.start_quiet_time(now);
@@ -93,15 +103,61 @@ impl ListState {
                 }
                 self.notice = Some(NOT_QUIET.to_owned());
             }
-            _ => {}
+            Key::Character(character @ ('s' | 'S' | 'u')) => {
+                if is_quiet {
+                    return Some(match character {
+                        's' => Action::MutePings(SHORT_MUTE),
+                        'S' => Action::MutePings(LONG_MUTE),
+                        _ => Action::UnmutePings,
+                    });
+                }
+                self.notice = Some(NOT_QUIET.to_owned());
+            }
+            Key::Character(' ') => self.name_unused_key("space"),
+            Key::Character(character) => self.name_unused_key(&character.to_string()),
+            Key::Enter => self.name_unused_key("Enter"),
+            Key::Escape => self.name_unused_key("Esc"),
+            Key::Backspace => self.name_unused_key("Backspace"),
+            Key::Other(name) => self.name_unused_key(&name),
+            Key::Interrupt => {}
         }
         None
+    }
+
+    /// The window of the list got the focus.
+    pub fn gain_focus(&mut self, now: Instant) {
+        self.start_quiet_time(now);
+        self.focus_quiet_from = Some(now + QUIET_TIME);
+    }
+
+    /// Shows a failure that is no refused answer.
+    pub fn report(&mut self, failure: &str) {
+        self.notice = Some(failure.to_owned());
+    }
+
+    /// True while the quiet time after a new focus lasts. An open message
+    /// then takes no key and no pasted text, and the quiet time starts again.
+    fn refuses_after_new_focus(&mut self, now: Instant) -> bool {
+        let refuses = self.focus_quiet_from.is_some_and(|from| now < from);
+        if refuses {
+            self.focus_quiet_from = Some(now + QUIET_TIME);
+            self.notice = Some(NOT_QUIET.to_owned());
+        }
+        refuses
+    }
+
+    fn name_unused_key(&mut self, name: &str) {
+        self.notice = Some(format!("Key {name} has no function"));
     }
 
     /// Takes text that the terminal marks as pasted: text of the message, and
     /// never keys of the list. A line break becomes a space.
     pub fn paste(&mut self, text: &str, now: Instant) {
+        if self.draft.is_some() && self.refuses_after_new_focus(now) {
+            return;
+        }
         if let Some(draft) = &mut self.draft {
+            self.notice = None;
             for character in text.chars() {
                 draft.push(if character.is_control() {
                     ' '
@@ -120,6 +176,16 @@ impl ListState {
     pub fn report_refused_answer(&mut self, id: &str, reason: &str) {
         self.answered.remove(id);
         self.notice = Some(reason.to_owned());
+    }
+
+    /// Takes the time until which the pings are muted, for the title.
+    pub fn show_mute(&mut self, until: Option<SystemTime>) {
+        self.pings_muted_until = until;
+    }
+
+    #[must_use]
+    pub fn pings_muted_until(&self) -> Option<SystemTime> {
+        self.pings_muted_until
     }
 
     /// Takes the count of the lines that the selected entry has below its
@@ -160,7 +226,7 @@ impl ListState {
 
     #[must_use]
     pub fn notice(&self) -> Option<&str> {
-        if self.draft_entry_left() {
+        if self.draft_entry_left() && self.notice.as_deref() != Some(NOT_QUIET) {
             Some(DRAFT_ENTRY_LEFT)
         } else {
             self.notice.as_deref()
@@ -172,9 +238,9 @@ impl ListState {
         self.scroll
     }
 
-    fn press_in_message(&mut self, key: Key, now: Instant) -> Option<Action> {
+    fn press_in_message(&mut self, key: &Key, now: Instant) -> Option<Action> {
         match key {
-            Key::Character(character) => self.draft.as_mut()?.push(character),
+            Key::Character(character) => self.draft.as_mut()?.push(*character),
             Key::Backspace => {
                 self.draft.as_mut()?.text.pop();
             }

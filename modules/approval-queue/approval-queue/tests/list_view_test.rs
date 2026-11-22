@@ -42,7 +42,11 @@ fn screen(state: &ListState, seconds_after: u64) -> Vec<String> {
 }
 
 fn drawn(state: &ListState, seconds_after: u64) -> (Vec<String>, u16) {
-    let mut terminal = Terminal::new(TestBackend::new(110, 24)).unwrap();
+    drawn_at_width(state, seconds_after, 110)
+}
+
+fn drawn_at_width(state: &ListState, seconds_after: u64, width: u16) -> (Vec<String>, u16) {
+    let mut terminal = Terminal::new(TestBackend::new(width, 24)).unwrap();
     let now = UNIX_EPOCH + Duration::from_secs(RECEIVED + seconds_after);
     let mut scroll_limit = 0;
     terminal
@@ -129,7 +133,8 @@ fn should_show_the_selected_prompt_in_full() {
         "tool Bash",
         "command: git push origin 1a2b:master",
         "timeout: 5000",
-        "a allow   d deny   m deny with a message   j/k select   PgUp/PgDn scroll   q quit",
+        "a allow   d deny   m deny with a message   j/k select   PgUp/PgDn scroll",
+        "s mute pings 10 min   S mute pings 1 hour   u unmute   q quit",
     ] {
         assert_shows(&lines, part);
     }
@@ -248,10 +253,11 @@ fn should_show_the_notice_above_the_keys() {
     state.press(Key::Character('a'), start);
     let lines = screen(&state, 5);
     assert_eq!(
-        lines[22],
+        lines[21],
         "Too early. Press the key after 1 second without a key."
     );
-    assert!(lines[23].starts_with("a allow"));
+    assert!(lines[22].starts_with("a allow"));
+    assert!(lines[23].starts_with("s mute"));
 }
 
 #[test]
@@ -270,19 +276,19 @@ fn should_show_the_later_lines_of_the_selected_prompt_after_a_scroll() {
 #[test]
 fn should_count_the_lines_above_and_below_the_pane_of_the_selected_prompt() {
     let (mut state, later) = state_with(vec![long_command()]);
-    assert_eq!(drawn(&state, 5).1, 28);
+    assert_eq!(drawn(&state, 5).1, 29);
     let top = screen_as_the_list_draws_it(&mut state);
-    assert_shows(&top, " lines below: 28, PgDn ");
+    assert_shows(&top, " lines below: 29, PgDn ");
     assert!(!top.iter().any(|line| line.contains("lines above")));
     state.press(Key::PageDown, later);
     state.press(Key::PageDown, later);
     let middle = screen_as_the_list_draws_it(&mut state);
     assert_shows(&middle, " lines above: 20, PgUp ");
-    assert_shows(&middle, " lines below: 8, PgDn ");
+    assert_shows(&middle, " lines below: 9, PgDn ");
     state.press(Key::PageDown, later);
     state.press(Key::PageDown, later);
     let end = screen_as_the_list_draws_it(&mut state);
-    assert_shows(&end, " lines above: 28, PgUp ");
+    assert_shows(&end, " lines above: 29, PgUp ");
     assert_shows(&end, "│  line 40");
     assert!(!end.iter().any(|line| line.contains("lines below")));
 }
@@ -327,7 +333,7 @@ fn should_show_the_last_lines_of_a_prompt_for_a_scroll_past_its_end() {
         state.press(Key::PageDown, later);
     }
     let lines = screen(&state, 5);
-    assert_shows(&lines, " lines above: 28, PgUp ");
+    assert_shows(&lines, " lines above: 29, PgUp ");
     assert_shows(&lines, "│  line 40");
 }
 
@@ -361,9 +367,9 @@ fn should_show_the_notice_below_the_message_while_the_owner_types_it() {
     state.press(Key::Character('x'), later);
     state.refresh(Vec::new(), later);
     let lines = screen(&state, 5);
-    assert_eq!(lines[22], "Message of the denial: x_");
+    assert_eq!(lines[21], "Message of the denial: x_");
     assert_eq!(
-        lines[23],
+        lines[22],
         "The prompt left the queue. Esc closes the message."
     );
 }
@@ -376,4 +382,38 @@ fn should_show_the_start_of_a_long_session_id_in_the_row_and_the_whole_id_below(
     let lines = screen(&state, 5);
     assert_shows(&lines, "agent        0a1b2c3d Bash");
     assert_shows(&lines, "session 0a1b2c3d-0000-4000-8000-000000000001");
+}
+
+#[test]
+fn should_show_in_the_title_how_long_the_pings_are_muted() {
+    let (mut state, _) = state_with(vec![push()]);
+    state.show_mute(Some(UNIX_EPOCH + Duration::from_secs(RECEIVED + 5 + 541)));
+    assert_shows(
+        &screen(&state, 5),
+        " approval-queue: 1 waiting, pings muted for 10 min ",
+    );
+    assert_shows(
+        &screen(&state, 5 + 481),
+        " approval-queue: 1 waiting, pings muted for 1 min ",
+    );
+    assert_shows(&screen(&state, 5 + 542), " approval-queue: 1 waiting ");
+}
+
+#[test]
+fn should_show_each_key_in_a_terminal_of_80_columns() {
+    let (state, _) = state_with(vec![push()]);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    for key in [
+        "a allow",
+        "d deny",
+        "m deny with a message",
+        "j/k select",
+        "PgUp/PgDn scroll",
+        "s mute pings 10 min",
+        "S mute pings 1 hour",
+        "u unmute",
+        "q quit",
+    ] {
+        assert_shows(&lines, key);
+    }
 }

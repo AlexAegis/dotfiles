@@ -7,13 +7,16 @@ use std::{
 
 use anyhow::{Context, Result, ensure};
 use approval_queue::{
-    action::Action, list_state::ListState, list_view, list_window, queue_folder::QueueFolder,
+    list_actions, list_state::ListState, list_view, list_window, queue_folder::QueueFolder,
     terminal_event::take_event,
 };
 use ratatui::{
     DefaultTerminal,
     crossterm::{
-        event::{self, DisableBracketedPaste, EnableBracketedPaste},
+        event::{
+            self, DisableBracketedPaste, DisableFocusChange, EnableBracketedPaste,
+            EnableFocusChange,
+        },
         execute,
         terminal::SetTitle,
     },
@@ -41,16 +44,36 @@ fn run() -> Result<()> {
     queue.create()?;
     let _open_list = queue.open_list()?;
     let mut terminal = ratatui::try_init().context("Terminal not usable")?;
-    // A terminal without this mode sends pasted text as keys
-    let _ = execute!(io::stdout(), EnableBracketedPaste);
-    // The window title by which approval-queue-notify finds the list
-    let _ = execute!(io::stdout(), SetTitle(list_window::TITLE));
+    let modes = ListModes::turn_on();
     let result = show(&mut terminal, &queue);
-    let _ = execute!(io::stdout(), DisableBracketedPaste);
-    // A shell that sets no title of its own would keep the title of the list
-    let _ = execute!(io::stdout(), SetTitle(""));
+    drop(modes);
     ratatui::restore();
     result
+}
+
+/// The terminal modes of the list. They end with the value, also when the
+/// list panics.
+struct ListModes;
+
+impl ListModes {
+    fn turn_on() -> Self {
+        // A terminal without this mode sends pasted text as keys
+        let _ = execute!(io::stdout(), EnableBracketedPaste);
+        // The list starts its quiet time when its window gets the focus
+        let _ = execute!(io::stdout(), EnableFocusChange);
+        // The window title by which approval-queue-notify finds the list
+        let _ = execute!(io::stdout(), SetTitle(list_window::TITLE));
+        Self
+    }
+}
+
+impl Drop for ListModes {
+    fn drop(&mut self) {
+        let _ = execute!(io::stdout(), DisableFocusChange);
+        let _ = execute!(io::stdout(), DisableBracketedPaste);
+        // A shell that sets no title of its own would keep the title of the list
+        let _ = execute!(io::stdout(), SetTitle(""));
+    }
 }
 
 fn show(terminal: &mut DefaultTerminal, queue: &QueueFolder) -> Result<()> {
@@ -58,20 +81,17 @@ fn show(terminal: &mut DefaultTerminal, queue: &QueueFolder) -> Result<()> {
     loop {
         queue.remove_answers_without_entry()?;
         state.refresh(queue.waiting()?, Instant::now());
+        state.show_mute(queue.pings_muted_until());
         let mut scroll_limit = 0;
         terminal.draw(|frame| scroll_limit = list_view::draw(frame, &state, SystemTime::now()))?;
         state.limit_scroll(scroll_limit);
         if !event::poll(REFRESH_INTERVAL)? {
             continue;
         }
-        match take_event(&mut state, event::read()?, Instant::now()) {
-            Some(Action::Quit) => return Ok(()),
-            Some(Action::Answer { id, answer }) => {
-                if let Err(error) = queue.answer(&id, &answer) {
-                    state.report_refused_answer(&id, &error.to_string());
-                }
-            }
-            None => {}
+        if let Some(action) = take_event(&mut state, event::read()?, Instant::now())
+            && list_actions::carry_out(action, queue, &mut state, SystemTime::now())
+        {
+            return Ok(());
         }
     }
 }

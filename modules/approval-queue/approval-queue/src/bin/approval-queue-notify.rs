@@ -4,7 +4,7 @@ use std::{
     process::ExitCode,
     sync::mpsc,
     thread,
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime},
 };
 
 use anyhow::{Context, Result};
@@ -43,8 +43,11 @@ fn run() -> Result<()> {
     let mut forget_script_at = None;
     loop {
         let now = Instant::now();
+        let is_muted = queue
+            .pings_muted_until()
+            .is_some_and(|until| SystemTime::now() < until);
         match queue.waiting_ids() {
-            Ok(waiting) => watch.refresh(waiting, now),
+            Ok(waiting) => watch.refresh(waiting, now, is_muted),
             Err(error) => eprintln!("Queue unreadable: {error:#}"),
         }
         if let Ok(prompt_count) = pings.try_recv() {

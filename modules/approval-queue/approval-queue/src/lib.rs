@@ -3,6 +3,7 @@ pub mod answer;
 pub mod display_text;
 pub mod entry;
 pub mod key;
+pub mod list_actions;
 pub mod list_state;
 pub mod list_view;
 pub mod list_window;

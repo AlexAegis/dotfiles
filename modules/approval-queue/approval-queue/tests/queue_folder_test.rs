@@ -365,3 +365,32 @@ fn should_list_the_ids_of_the_waiting_entries_without_their_content() {
     );
     assert_eq!(fs::read_dir(entries(&runtime_folder)).unwrap().count(), 2);
 }
+
+#[test]
+fn should_store_the_time_until_which_the_pings_are_muted() {
+    let (_runtime_folder, queue) = queue();
+    assert_eq!(queue.pings_muted_until(), None);
+    let until = SystemTime::UNIX_EPOCH + Duration::from_secs(1_795_000_600);
+    queue.mute_pings_until(until).unwrap();
+    assert_eq!(queue.pings_muted_until(), Some(until));
+    let later = until + Duration::from_mins(50);
+    queue.mute_pings_until(later).unwrap();
+    assert_eq!(queue.pings_muted_until(), Some(later));
+    queue.unmute_pings().unwrap();
+    assert_eq!(queue.pings_muted_until(), None);
+    queue.unmute_pings().unwrap();
+}
+
+#[test]
+fn should_read_a_mute_file_without_a_count_of_seconds_as_no_mute() {
+    let (runtime_folder, queue) = queue();
+    let path = runtime_folder
+        .path()
+        .join("approval-queue/pings-muted-until");
+    for content in ["", "soon", "-5", "1e9", "99999999999999999999999999"] {
+        fs::write(&path, content).unwrap();
+        assert_eq!(queue.pings_muted_until(), None, "{content}");
+    }
+    fs::write(&path, format!("{}", u64::MAX)).unwrap();
+    assert_eq!(queue.pings_muted_until(), None);
+}

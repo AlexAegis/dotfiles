@@ -17,25 +17,30 @@ fn should_name_each_key_of_the_list() {
     }
     assert_eq!(
         key_of(KeyEvent::new(KeyCode::Tab, KeyModifiers::NONE)),
-        Some(Key::Other)
+        Some(Key::Other("Tab".to_owned()))
     );
 }
 
 #[test]
 fn should_take_a_key_with_ctrl_or_alt_as_no_plain_key() {
-    for modifiers in [
-        KeyModifiers::CONTROL,
-        KeyModifiers::ALT,
-        KeyModifiers::SUPER,
-        KeyModifiers::CONTROL | KeyModifiers::SHIFT,
+    for (modifiers, prefix) in [
+        (KeyModifiers::CONTROL, "Ctrl+"),
+        (KeyModifiers::ALT, "Alt+"),
+        (KeyModifiers::SUPER, "Super+"),
+        (KeyModifiers::CONTROL | KeyModifiers::SHIFT, "Ctrl+"),
+        (KeyModifiers::CONTROL | KeyModifiers::ALT, "Ctrl+Alt+"),
     ] {
-        for code in [
-            KeyCode::Char('a'),
-            KeyCode::Char('d'),
-            KeyCode::Char('j'),
-            KeyCode::Enter,
+        for (code, name) in [
+            (KeyCode::Char('a'), "a"),
+            (KeyCode::Char('d'), "d"),
+            (KeyCode::Char(' '), "space"),
+            (KeyCode::Enter, "Enter"),
+            (KeyCode::F(5), "F5"),
         ] {
-            assert_eq!(key_of(KeyEvent::new(code, modifiers)), Some(Key::Other));
+            assert_eq!(
+                key_of(KeyEvent::new(code, modifiers)),
+                Some(Key::Other(format!("{prefix}{name}")))
+            );
         }
     }
 }
@@ -56,7 +61,7 @@ fn should_take_ctrl_c_as_the_interrupt_key() {
     );
     assert_eq!(
         key_of(KeyEvent::new(KeyCode::Char('c'), KeyModifiers::ALT)),
-        Some(Key::Other)
+        Some(Key::Other("Alt+c".to_owned()))
     );
 }
 

@@ -1,5 +1,5 @@
 /// A key press of the list, without the terminal library.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Key {
     Up,
     Down,
@@ -11,6 +11,7 @@ pub enum Key {
     /// Ctrl-C.
     Interrupt,
     Character(char),
-    /// A key that the list does not use, such as Tab or Ctrl-D.
-    Other,
+    /// A key that the list does not use, with its name for a notice, such as
+    /// `Tab` or `Ctrl+d`.
+    Other(String),
 }

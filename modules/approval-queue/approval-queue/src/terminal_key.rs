@@ -15,7 +15,7 @@ pub fn key_of(event: KeyEvent) -> Option<Key> {
         return Some(Key::Interrupt);
     }
     if !modifiers.is_empty() {
-        return Some(Key::Other);
+        return Some(Key::Other(name(event.code, modifiers)));
     }
     Some(match event.code {
         KeyCode::Up => Key::Up,
@@ -26,6 +26,28 @@ pub fn key_of(event: KeyEvent) -> Option<Key> {
         KeyCode::Esc => Key::Escape,
         KeyCode::Backspace => Key::Backspace,
         KeyCode::Char(character) => Key::Character(character),
-        _ => Key::Other,
+        code => Key::Other(name(code, modifiers)),
     })
+}
+
+/// The name of a key for a notice: its modifiers, then its code.
+fn name(code: KeyCode, modifiers: KeyModifiers) -> String {
+    let modifiers: String = [
+        (KeyModifiers::CONTROL, "Ctrl+"),
+        (KeyModifiers::ALT, "Alt+"),
+        (KeyModifiers::SUPER, "Super+"),
+        (KeyModifiers::HYPER, "Hyper+"),
+        (KeyModifiers::META, "Meta+"),
+    ]
+    .into_iter()
+    .filter(|(modifier, _)| modifiers.contains(*modifier))
+    .map(|(_, text)| text)
+    .collect();
+    let code = match code {
+        KeyCode::Char(' ') => "space".to_owned(),
+        KeyCode::Char(character) => character.to_string(),
+        KeyCode::F(number) => format!("F{number}"),
+        code => format!("{code:?}"),
+    };
+    format!("{modifiers}{code}")
 }

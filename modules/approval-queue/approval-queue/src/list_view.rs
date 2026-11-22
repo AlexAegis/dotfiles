@@ -17,8 +17,8 @@ use crate::{
     listed_entry::ListedEntry,
 };
 
-const KEYS: &str =
-    "a allow   d deny   m deny with a message   j/k select   PgUp/PgDn scroll   q quit";
+const KEYS: &str = "a allow   d deny   m deny with a message   j/k select   PgUp/PgDn scroll";
+const MORE_KEYS: &str = "s mute pings 10 min   S mute pings 1 hour   u unmute   q quit";
 const MESSAGE_KEYS: &str = "Enter send   Esc cancel";
 const LIST_ONLY: &str = "only in this list: its terminal shows the prompt when no list is open";
 /// The width of the session column, which shows the start of the ID.
@@ -28,6 +28,12 @@ const SESSION_START: u16 = 8;
 /// Returns how far the pane of the selected prompt scrolls: the count of its
 /// lines below the pane.
 pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
+    let mute = state
+        .pings_muted_until()
+        .and_then(|until| until.duration_since(now).ok())
+        .map_or_else(String::new, |left| {
+            format!(", pings muted for {} min", left.as_secs().div_ceil(60))
+        });
     let now = now
         .duration_since(UNIX_EPOCH)
         .map_or(0, |since| since.as_secs());
@@ -39,7 +45,7 @@ pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
     let [table_area, detail_area, footer_area] = Layout::vertical([
         Constraint::Length(table_height),
         Constraint::Min(3),
-        Constraint::Length(2),
+        Constraint::Length(3),
     ])
     .areas(frame.area());
 
@@ -59,7 +65,7 @@ pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
         "waits", "user", "session", "tool", "folder", "prompt",
     ]))
     .row_highlight_style(Style::new().add_modifier(Modifier::REVERSED))
-    .block(Block::bordered().title(format!(" approval-queue: {count} waiting ")));
+    .block(Block::bordered().title(format!(" approval-queue: {count} waiting{mute} ")));
     let mut table_state = TableState::new().with_selected(state.selected_index());
     frame.render_stateful_widget(table, table_area, &mut table_state);
 
@@ -83,15 +89,19 @@ pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
     frame.render_widget(detail.scroll((scroll, 0)).block(pane), detail_area);
 
     let notice = state.notice().map(visible_line);
-    let (status, keys) = match state.message() {
-        Some(message) => (
+    let footer = match state.message() {
+        Some(message) => vec![
             format!("Message of the denial: {}_", visible_line(message)),
             notice.unwrap_or_else(|| MESSAGE_KEYS.to_owned()),
-        ),
-        None => (notice.unwrap_or_default(), KEYS.to_owned()),
+        ],
+        None => vec![
+            notice.unwrap_or_default(),
+            KEYS.to_owned(),
+            MORE_KEYS.to_owned(),
+        ],
     };
     frame.render_widget(
-        Paragraph::new(vec![Line::from(status), Line::from(keys)]),
+        Paragraph::new(footer.into_iter().map(Line::from).collect::<Vec<_>>()),
         footer_area,
     );
     scroll_limit

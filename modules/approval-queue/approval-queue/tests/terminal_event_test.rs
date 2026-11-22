@@ -149,3 +149,108 @@ fn should_take_no_key_from_another_event() {
     }
     assert_eq!(state.notice(), None);
 }
+
+#[test]
+fn should_take_no_answer_right_after_the_window_got_the_focus() {
+    let (mut state, now) = list_with_2_entries_and_a_time_after_its_quiet_time();
+    assert_eq!(take_event(&mut state, Event::FocusGained, now), None);
+    assert_eq!(
+        take_event(&mut state, plain('a'), now + Duration::from_millis(999)),
+        None
+    );
+    let (mut state, now) = list_with_2_entries_and_a_time_after_its_quiet_time();
+    take_event(&mut state, Event::FocusGained, now);
+    assert_eq!(
+        take_event(&mut state, plain('a'), now + Duration::from_millis(1000)),
+        Some(Action::Answer {
+            id: "1-1".to_owned(),
+            answer: Answer::Allow
+        })
+    );
+}
+
+#[test]
+fn should_keep_the_quiet_time_when_the_window_loses_the_focus() {
+    let (mut state, now) = list_with_2_entries_and_a_time_after_its_quiet_time();
+    assert_eq!(take_event(&mut state, Event::FocusLost, now), None);
+    assert!(take_event(&mut state, plain('a'), now).is_some());
+}
+
+#[test]
+fn should_take_no_key_into_an_open_message_right_after_the_window_got_the_focus() {
+    let (mut state, now) = list_with_2_entries_and_a_time_after_its_quiet_time();
+    take_event(&mut state, plain('m'), now);
+    take_event(&mut state, plain('x'), now);
+    take_event(&mut state, Event::FocusGained, now);
+    let enter = key(KeyCode::Enter, KeyModifiers::NONE);
+    for (event, after) in [(plain('l'), 10), (plain('s'), 500), (enter.clone(), 1400)] {
+        assert_eq!(
+            take_event(&mut state, event, now + Duration::from_millis(after)),
+            None
+        );
+        assert_eq!(state.message(), Some("x"));
+        assert_eq!(
+            state.notice(),
+            Some("Too early. Press the key after 1 second without a key.")
+        );
+    }
+    take_event(&mut state, plain('y'), now + Duration::from_millis(2400));
+    assert_eq!(state.message(), Some("xy"));
+    assert_eq!(
+        take_event(&mut state, enter, now + Duration::from_millis(2500)),
+        Some(Action::Answer {
+            id: "1-1".to_owned(),
+            answer: Answer::Deny {
+                message: Some("xy".to_owned())
+            }
+        })
+    );
+}
+
+#[test]
+fn should_take_the_keys_of_a_message_at_once_without_a_new_focus() {
+    let (mut state, now) = list_with_2_entries_and_a_time_after_its_quiet_time();
+    take_event(&mut state, plain('m'), now);
+    take_event(&mut state, plain('x'), now);
+    take_event(&mut state, plain('y'), now);
+    assert_eq!(state.message(), Some("xy"));
+}
+
+#[test]
+fn should_take_no_pasted_text_into_an_open_message_right_after_the_window_got_the_focus() {
+    let (mut state, now) = list_with_2_entries_and_a_time_after_its_quiet_time();
+    take_event(&mut state, plain('m'), now);
+    take_event(&mut state, plain('x'), now);
+    take_event(&mut state, Event::FocusGained, now);
+    let paste = Event::Paste("rm -r build".to_owned());
+    take_event(&mut state, paste.clone(), now + Duration::from_millis(500));
+    assert_eq!(state.message(), Some("x"));
+    assert_eq!(
+        state.notice(),
+        Some("Too early. Press the key after 1 second without a key.")
+    );
+    take_event(&mut state, paste, now + Duration::from_millis(1500));
+    assert_eq!(state.message(), Some("xrm -r build"));
+    assert_eq!(state.notice(), None);
+}
+
+#[test]
+fn should_say_too_early_for_esc_right_after_a_new_focus_when_the_prompt_of_the_message_left() {
+    let (mut state, now) = list_with_2_entries_and_a_time_after_its_quiet_time();
+    take_event(&mut state, plain('m'), now);
+    state.refresh(vec![listed("2-1")], now);
+    assert_eq!(
+        state.notice(),
+        Some("The prompt left the queue. Esc closes the message.")
+    );
+    take_event(&mut state, Event::FocusGained, now);
+    let escape = key(KeyCode::Esc, KeyModifiers::NONE);
+    take_event(&mut state, escape.clone(), now + Duration::from_millis(10));
+    assert_eq!(state.message(), Some(""));
+    assert_eq!(
+        state.notice(),
+        Some("Too early. Press the key after 1 second without a key.")
+    );
+    take_event(&mut state, escape, now + Duration::from_millis(1010));
+    assert_eq!(state.message(), None);
+}
