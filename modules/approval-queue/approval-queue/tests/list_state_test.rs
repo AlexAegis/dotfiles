@@ -239,7 +239,7 @@ fn should_start_the_quiet_time_at_each_key_outside_a_message() {
         (Key::Backspace, "1-1"),
         (Key::Other("Tab".to_owned()), "1-1"),
     ] {
-        for refused in ['a', 'd', 'm', 'q', 's', 'S', 'u'] {
+        for refused in ['a', 'd', 'q', 's', 'S', 'u'] {
             let mut state = state_with(&["1-1", "2-1"], start);
             assert_eq!(state.press(key.clone(), later), None);
             assert_eq!(
@@ -286,15 +286,15 @@ fn should_take_no_answer_for_another_entry_right_after_an_answer() {
 }
 
 #[test]
-fn should_take_no_key_of_text_typed_at_5_keys_per_second() {
+fn should_send_no_answer_from_text_typed_at_5_keys_per_second() {
     let start = Instant::now();
     let later = start + milliseconds(5000);
-    for text in [
-        "read the docs and add a test",
-        "remember me, a madam\n",
-        "the queue",
-        "ja, ja, da da da",
-        "kjkjkjkjkja",
+    for (text, kept) in [
+        ("read the docs and add a test", None),
+        ("remember me, a madam\n", Some("ember me, a madam")),
+        ("the queue", None),
+        ("ja, ja, da da da", None),
+        ("kjkjkjkjkja", None),
     ] {
         let mut waiting = vec!["1-1", "2-1", "3-1"];
         let mut state = state_with(&waiting, start);
@@ -306,11 +306,15 @@ fn should_take_no_key_of_text_typed_at_5_keys_per_second() {
             None,
             "{text}"
         );
+        assert_eq!(state.kept_message(), kept, "{text}");
         let selected = selected_id(&state).map(str::to_owned);
         assert_answers(
             state.press(Key::Character('a'), last + milliseconds(1999)),
             selected.as_deref().unwrap_or_default(),
-            Answer::ALLOW,
+            Answer::Allow {
+                answers: None,
+                message: kept.map(str::to_owned),
+            },
         );
     }
 }
@@ -319,11 +323,16 @@ fn should_take_no_key_of_text_typed_at_5_keys_per_second() {
 fn should_answer_one_prompt_at_most_from_text_that_starts_with_a_key_of_the_list() {
     let start = Instant::now();
     let later = start + milliseconds(5000);
-    for (text, answered, answer) in [
-        ("add a test and add a doc", "1-1", Answer::ALLOW),
-        ("do a dance, madam", "1-1", Answer::Deny { message: None }),
-        ("ajkjkjkjkjkja", "1-1", Answer::ALLOW),
-        ("dada", "1-1", Answer::Deny { message: None }),
+    for (text, answered, answer, open_message) in [
+        ("add a test and add a doc", "1-1", Answer::ALLOW, None),
+        (
+            "do a dance, madam",
+            "1-1",
+            Answer::Deny { message: None },
+            Some("adam"),
+        ),
+        ("ajkjkjkjkjkja", "1-1", Answer::ALLOW, None),
+        ("dada", "1-1", Answer::Deny { message: None }, None),
     ] {
         let mut waiting = vec!["1-1", "2-1", "3-1"];
         let mut state = state_with(&waiting, start);
@@ -336,12 +345,12 @@ fn should_answer_one_prompt_at_most_from_text_that_starts_with_a_key_of_the_list
             }],
             "{text}"
         );
-        assert_eq!(state.message(), None, "{text}");
+        assert_eq!(state.message(), open_message, "{text}");
     }
 }
 
 #[test]
-fn should_take_no_key_of_text_that_starts_on_an_empty_queue() {
+fn should_send_no_answer_from_text_that_starts_on_an_empty_queue() {
     let start = Instant::now();
     let mut state = state_with(&[], start);
     assert_eq!(state.press(Key::Character('m'), start), None);
@@ -356,10 +365,14 @@ fn should_take_no_key_of_text_that_starts_on_an_empty_queue() {
     );
     assert_eq!(actions, []);
     assert_eq!(state.message(), None);
+    assert_eq!(state.kept_message(), Some("adamadam"));
     assert_answers(
         state.press(Key::Character('a'), last + milliseconds(1000)),
         "1-1",
-        Answer::ALLOW,
+        Answer::Allow {
+            answers: None,
+            message: Some("adamadam".to_owned()),
+        },
     );
 }
 
@@ -430,7 +443,7 @@ fn should_forget_the_answer_of_an_entry_that_left() {
 }
 
 #[test]
-fn should_deny_with_the_message_that_the_owner_types() {
+fn should_deny_with_the_message_that_the_owner_typed_and_kept() {
     let start = Instant::now();
     let later = start + milliseconds(5000);
     let mut state = state_with(&["1-1"], start);
@@ -440,72 +453,65 @@ fn should_deny_with_the_message_that_the_owner_types() {
     assert_eq!(state.press(Key::Backspace, later), None);
     assert_eq!(state.press(Key::Backspace, later), None);
     assert_eq!(state.message(), Some(" Use a branch, qadm"));
+    assert_eq!(state.press(Key::Enter, later), None);
+    assert_eq!(state.message(), None);
+    assert_eq!(state.kept_message(), Some("Use a branch, qadm"));
+    assert_eq!(state.answer_of("1-1"), None);
     assert_answers(
-        state.press(Key::Enter, later),
+        state.press(Key::Character('d'), later + milliseconds(1000)),
         "1-1",
         Answer::Deny {
             message: Some("Use a branch, qadm".to_owned()),
         },
     );
-    assert_eq!(state.message(), None);
 }
 
 #[test]
-fn should_deny_without_a_message_when_the_typed_text_is_blank() {
+fn should_keep_no_message_when_the_typed_text_is_blank() {
     let start = Instant::now();
     let later = start + milliseconds(5000);
     let mut state = state_with(&["1-1"], start);
     state.press(Key::Character('m'), later);
     typed(&mut state, "  ", later);
+    assert_eq!(state.press(Key::Enter, later), None);
+    assert_eq!(state.kept_message(), None);
     assert_answers(
-        state.press(Key::Enter, later),
+        state.press(Key::Character('d'), later + milliseconds(1000)),
         "1-1",
         Answer::Deny { message: None },
     );
 }
 
 #[test]
-fn should_open_no_message_within_the_quiet_time() {
+fn should_open_the_message_at_once() {
     let start = Instant::now();
     let mut state = state_with(&["1-1", "2-1"], start);
-    assert_eq!(
-        state.press(Key::Character('m'), start + milliseconds(999)),
-        None
-    );
-    assert_eq!(state.message(), None);
-    assert_eq!(
-        state.notice(),
-        Some("Too early. Press the key after 1 second without a key.")
-    );
-    assert_eq!(
-        state.press(Key::Character('m'), start + milliseconds(1999)),
-        None
-    );
+    assert_eq!(state.press(Key::Character('m'), start), None);
+    assert_eq!(state.notice(), None);
     assert_eq!(state.message(), Some(""));
 }
 
 #[test]
-fn should_take_no_answer_right_after_a_sent_message() {
+fn should_take_no_answer_right_after_a_closed_message() {
     let start = Instant::now();
     let later = start + milliseconds(5000);
-    let sent = later + milliseconds(2000);
+    let closed = later + milliseconds(2000);
     let mut state = state_with(&["1-1", "2-1"], start);
     state.press(Key::Character('m'), later);
     typed(&mut state, "no, read ", later);
-    assert_answers(
-        state.press(Key::Enter, sent),
-        "1-1",
-        Answer::Deny {
-            message: Some("no, read".to_owned()),
-        },
-    );
+    assert_eq!(state.press(Key::Enter, closed), None);
     assert_eq!(
-        state.press(Key::Character('q'), sent + milliseconds(999)),
+        state.press(Key::Character('a'), closed + milliseconds(999)),
         None
     );
-    assert_eq!(
-        state.press(Key::Character('q'), sent + milliseconds(1999)),
-        Some(Action::Quit)
+    assert_eq!(state.answer_of("1-1"), None);
+    assert_answers(
+        state.press(Key::Character('a'), closed + milliseconds(1999)),
+        "1-1",
+        Answer::Allow {
+            answers: None,
+            message: Some("no, read".to_owned()),
+        },
     );
 }
 
@@ -546,23 +552,21 @@ fn should_take_pasted_text_outside_a_message_as_no_key() {
 }
 
 #[test]
-fn should_cancel_the_message_with_escape() {
+fn should_close_the_message_with_escape_and_keep_its_text() {
     let start = Instant::now();
     let later = start + milliseconds(5000);
     let closed = later + milliseconds(2000);
-    let mut state = state_with(&["1-1"], start);
+    let mut state = state_with(&["1-1", "2-1"], start);
     state.press(Key::Character('m'), later);
     typed(&mut state, "x", later);
     assert_eq!(state.press(Key::Escape, closed), None);
     assert_eq!(state.message(), None);
-    assert_eq!(
-        state.press(Key::Character('a'), closed + milliseconds(999)),
-        None
-    );
-    assert_eq!(state.answer_of("1-1"), None);
+    assert_eq!(state.kept_message(), Some("x"));
+    assert_eq!(state.press(Key::Down, closed), None);
+    assert_eq!(state.kept_message(), None);
     assert_answers(
-        state.press(Key::Character('a'), closed + milliseconds(1999)),
-        "1-1",
+        state.press(Key::Character('a'), closed + milliseconds(1000)),
+        "2-1",
         Answer::ALLOW,
     );
 }

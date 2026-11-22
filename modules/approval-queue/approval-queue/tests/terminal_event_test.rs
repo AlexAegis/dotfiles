@@ -199,6 +199,11 @@ fn should_take_no_key_into_an_open_message_right_after_the_window_got_the_focus(
     assert_eq!(state.message(), Some("xy"));
     assert_eq!(
         take_event(&mut state, enter, now + Duration::from_millis(2500)),
+        None
+    );
+    assert_eq!(state.kept_message(), Some("xy"));
+    assert_eq!(
+        take_event(&mut state, plain('d'), now + Duration::from_millis(3500)),
         Some(Action::Answer {
             id: "1-1".to_owned(),
             answer: Answer::Deny {

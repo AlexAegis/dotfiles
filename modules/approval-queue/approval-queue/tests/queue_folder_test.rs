@@ -451,6 +451,7 @@ fn should_store_the_answers_to_the_questions_of_a_prompt() {
         .collect();
     let answer = Answer::Allow {
         answers: Some(answers),
+        message: Some("b".to_owned()),
     };
     queue.answer(waiting.id(), &answer).unwrap();
     assert_eq!(queue.answer_for(waiting.id()).unwrap(), Some(answer));
@@ -458,6 +459,7 @@ fn should_store_the_answers_to_the_questions_of_a_prompt() {
     let waiting = queue.add(&entry("AskUserQuestion")).unwrap();
     let empty = Answer::Allow {
         answers: Some([("Why?".to_owned(), String::new())].into_iter().collect()),
+        message: None,
     };
     assert!(queue.answer(waiting.id(), &empty).is_err());
     assert_eq!(queue.answer_for(waiting.id()).unwrap(), None);

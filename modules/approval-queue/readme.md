@@ -62,7 +62,7 @@ above the right one.
 | ---------------- | ----------------------------------------------- |
 | `a`              | approves the selected prompt                    |
 | `d`              | declines it                                     |
-| `m`              | declines it with a message for the agent        |
+| `m`              | opens the message for the answer to the prompt  |
 | `j`, `k`, arrows | select                                          |
 | PgUp, PgDn       | scroll the selected prompt                      |
 | `s`              | mutes the pings for 10 minutes                  |
@@ -73,25 +73,33 @@ above the right one.
 - An answer names its entry by ID. The selection stays on its entry while other
   entries come and go.
 - When the selected entry leaves, the oldest entry gets the selection.
-- The list takes `a`, `d`, `m`, `s`, `S`, `u` and `q` only after 1 second
+- The list takes `a`, `d`, `s`, `S`, `u` and `q` only after 1 second
   without a key press, pasted text, a new selection by the list or a new focus
   of its window. A key that the list does not use counts as a key press too. A
-  key meant for the entry that left then does not answer the next one. Of text
-  typed into the list without a pause of 1 second, only the first key can act.
-  An `a` or `d` there answers one prompt. An `s` or `S` there mutes the pings.
-  An `m` there opens a message with the rest of the text, which Enter sends as
-  a denial.
+  key meant for the entry that left then does not answer the next one. Text
+  typed into the list without a pause of 1 second sends no answer, except
+  with its first key: an `a` or `d` there answers one prompt. An `s` or `S`
+  there mutes the pings. An `m` in such text opens a message with the rest of
+  the text, which sends nothing (owner, 2026-11-22). The message field below
+  the actions shows that text, and the next answer to that prompt sends it.
 - A ping gives the window of the list the focus. Keys that the owner types for
-  another window in the second after that answer no prompt, open no message,
-  change no mute and do not quit with `q`. An open message or own
-  answer then takes a key or pasted text only after 1 second without either. The keys that select and
-  scroll, and Ctrl-C, act at once. A terminal that does not report the focus
-  gives no such second.
+  another window in the second after that answer no prompt, change no mute and
+  do not quit with `q`. An open message or own answer then takes a key or pasted
+  text only after 1 second without either. The keys that select and scroll, and
+  Ctrl-C, act at once. A terminal that does not report the focus gives no such
+  second.
 - A key without a function gets a notice with its name, such as
   `Key Alt+a has no function`.
 - With Caps Lock on, `s` arrives as `S` and mutes for 1 hour.
-- After `m`, each key is text of the message, also when the prompt leaves the
-  queue in that time. Esc closes the message.
+- `m` opens the message field below the actions. Each key is then text of the
+  message, also when the prompt leaves the queue in that time. Enter or Esc
+  closes the field and keeps the text of at most 500 characters. The next answer
+  to that prompt sends the message with it: an `a`, a `d` or the answers to its
+  questions. `m` opens the text again. An empty text takes the message away. The
+  field shows the whole message. In a pane too small for it, the field shows the
+  end of a message that the owner types and the start of a kept one, and the
+  border of the pane counts the lines that do not show. A message whose prompt
+  left shows in the footer and is dropped when it closes.
 - A key with Ctrl or Alt is not its plain key: Ctrl-D is no `d`. Ctrl-C quits.
 - Pasted text is text of an open message or own answer and no key. A terminal
   without bracketed paste sends pasted text as keys.
@@ -102,18 +110,21 @@ above the right one.
   direction overrides. Unicode has more such characters than that list.
 - A prompt of the tool `AskUserQuestion` with 1 to 4 questions, each with a
   text of its own and at most 9 options, shows one question after the other:
-  - `1` to `9` pick an option. For a question with one answer, the option is
-    the answer. For a question with several answers, the key marks the option
-    or takes the mark away, and Enter answers with the marked options.
-  - `t` opens an own answer as text. Enter gives it, Esc closes it. After
-    `t`, each key is text of the answer, also when the prompt leaves the queue
-    in that time. Enter and Esc then close the text.
-  - Esc starts the questions of the selected prompt again. The answers so far
-    stay while another prompt is selected.
-  - After the last question, the list sends the answers. `d` and `m` decline
-    the prompt, as for a permission prompt. `a` does not answer a question.
-  - `1` to `9`, `t`, Enter and Esc obey the rule of 1 second without a key.
-    Enter in an open text does not.
+  - `1` to `9` mark an option or take its mark away. A question with one
+    answer keeps one mark.
+  - `t` opens an own answer as text. Enter keeps it, Esc closes the text
+    without a change. After `t`, each key is text of the answer, also when the
+    prompt leaves the queue in that time. A question with one answer takes
+    the own answer in place of a mark. A question with several answers takes
+    it after its marked options.
+  - Enter shows the next question when the current one has an answer. Esc
+    shows the question before. The marks stay while another prompt is
+    selected.
+  - Enter at the last question sends the answers. `d` declines the prompt, as
+    for a permission prompt. `a` does not answer a question.
+  - The Enter that sends and `d` obey the rule of 1 second without a key. The
+    keys that mark an option, show another question or open a text act at
+    once: they send nothing.
   - Another prompt of that tool, such as one with an option that the queue
     does not take as an answer, shows as its input, with the keys of a
     permission prompt. An `a` there leaves the dialog to the terminal.
@@ -238,11 +249,12 @@ required. A text with a limit is not empty:
 The hook keeps the connection open and sends nothing after its line. It ends its
 wait after 1 day. The reply is one JSON line:
 
-- `{"behavior":"allow"}`
+- `{"behavior":"allow"}`, with a `message` when the owner typed one
 - `{"behavior":"allow","answers":{"<question>":"<answer>"}}` for a prompt with
   questions: one answer for each question, by the text of the question. An
-  answer is the label of the picked option, the labels of several picked
-  options joined with `, `, or the owner's own text of at most 500 characters.
+  answer is the label of the marked option, the owner's own text or the
+  labels of several marked options and the own text joined with `, `, at most
+  500 characters. A `message` comes with it when the owner typed one.
 - `{"behavior":"deny"}`, with a `message` when the owner typed one
 - `{"error":"<reason>"}` for a refused request and for a `list_only` prompt
   while no list is open. The journal of `approval-queue@.service` has the whole
@@ -277,9 +289,9 @@ request states.
   process locks.
 - `answers/<id>.json`: the answer for that entry, in the form of the reply
   line: `{"behavior":"allow"}`, with `answers` for a prompt with questions, or
-  `{"behavior":"deny","message":"<text>"}`. The message is one line of at most
-  500 characters. The file stays until its entry leaves, so the queue refuses a
-  second answer.
+  `{"behavior":"deny"}`, each with a `message` when the owner typed one. The
+  message is one line of at most 500 characters. The file stays until its
+  entry leaves, so the queue refuses a second answer.
 - `lists/<id>`: the mark of one open list. Its list keeps a lock on the file. A
   service process and `approval-queue-notify` remove a mark that no process
   locks.

@@ -1,7 +1,6 @@
 use crate::answer::MAX_MESSAGE_CHARS;
 
-/// The message of a denial while the owner types it, with the entry that it
-/// denies.
+/// The message for the next answer to an entry while the owner types it.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct MessageDraft {
     pub(crate) id: String,

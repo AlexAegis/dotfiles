@@ -4,16 +4,24 @@ use std::{
 };
 
 use crate::{
-    action::Action, answer::Answer, key::Key, listed_entry::ListedEntry,
-    message_draft::MessageDraft, question::questions_of, question_draft::QuestionDraft,
+    action::Action,
+    answer::Answer,
+    key::Key,
+    listed_entry::ListedEntry,
+    message_draft::MessageDraft,
+    question::questions_of,
+    question_draft::{QuestionDraft, Step},
 };
 
-/// The list takes a key that answers, opens a message, mutes or unmutes the
-/// pings or quits only after this time without a key press, pasted text, a
-/// new selection by the list or a new focus of its window.
-/// A key that the owner pressed for an entry that left then does not answer
-/// the next one. Of text that someone types into the list without such a
-/// pause, only the first key can act.
+/// The list takes a key that sends an answer, mutes or unmutes the pings or
+/// quits only after this time without a key press, pasted text, a new
+/// selection by the list or a new focus of its window. A key that the owner
+/// pressed for an entry that left then does not answer the next one. Text
+/// that someone types into the list without such a pause sends no answer.
+/// The keys that mark an option, show another question or open a text send
+/// nothing, so they act at once (owner, 2026-11-22). Text that someone
+/// types into the list by mistake can so fill the message or an own answer
+/// of the selected prompt, which the pane shows.
 const QUIET_TIME: Duration = Duration::from_secs(1);
 const SCROLL_STEP: u16 = 10;
 const SHORT_MUTE: Duration = Duration::from_mins(10);
@@ -23,9 +31,9 @@ const ANSWERED: &str = "The prompt has its answer";
 const NO_PROMPT: &str = "No prompt waits";
 const DRAFT_ENTRY_LEFT: &str = "The prompt left the queue. Esc closes the message.";
 const QUESTION_ENTRY_LEFT: &str = "The prompt left the queue. Esc closes the text.";
-const QUESTION_KEYS: &str = "A question takes an answer: a number picks an option, t opens a text.";
+const QUESTION_KEYS: &str =
+    "A question takes an answer: a number marks an option, t opens a text, Enter goes on.";
 const NO_SUCH_OPTION: &str = "The question has no option with this number";
-const NOTHING_PICKED: &str = "Pick an option with its number first";
 const PASTE_IGNORED: &str = "Pasted text is no answer. The m key opens a message.";
 const PASTE_IGNORED_BY_QUESTION: &str = "Pasted text is no answer. The t key opens a text.";
 
@@ -40,8 +48,11 @@ pub struct ListState {
     /// message takes no key before it.
     focus_quiet_from: Option<Instant>,
     answered: HashMap<String, Answer>,
+    /// The message field while it is open.
     draft: Option<MessageDraft>,
-    /// The answers so far to the questions of each entry, by its ID.
+    /// The message that the next answer to each entry gets, by its ID.
+    messages: HashMap<String, String>,
+    /// The marks so far for the questions of each entry, by its ID.
     questions: HashMap<String, QuestionDraft>,
     scroll: u16,
     scroll_limit: u16,
@@ -57,6 +68,7 @@ impl ListState {
     pub fn refresh(&mut self, entries: Vec<ListedEntry>, now: Instant) {
         self.entries = entries;
         self.answered.retain(|id, _| contains(&self.entries, id));
+        self.messages.retain(|id, _| contains(&self.entries, id));
         self.questions
             .retain(|id, draft| draft.text().is_some() || contains(&self.entries, id));
         if self
@@ -105,14 +117,24 @@ impl ListState {
                     .saturating_add(SCROLL_STEP)
                     .min(self.scroll_limit);
             }
-            Key::Character('a') => return self.answer(Answer::ALLOW, is_quiet),
+            Key::Character('a') => {
+                let id = self.target(is_quiet)?;
+                let message = self.messages.get(&id).cloned();
+                let answer = Answer::Allow {
+                    answers: None,
+                    message,
+                };
+                return Some(self.record(id, answer));
+            }
             Key::Character('d') => {
-                return self.answer(Answer::Deny { message: None }, is_quiet);
+                let id = self.target(is_quiet)?;
+                let message = self.messages.get(&id).cloned();
+                return Some(self.record(id, Answer::Deny { message }));
             }
             Key::Character('m') => {
-                self.draft = self.target(is_quiet).map(|id| MessageDraft {
+                self.draft = self.unanswered().map(|id| MessageDraft {
+                    text: self.messages.get(&id).cloned().unwrap_or_default(),
                     id,
-                    text: String::new(),
                 });
             }
             Key::Character('q') => {
@@ -250,7 +272,7 @@ impl ListState {
         self.answered.get(id)
     }
 
-    /// The questions of the selected entry with the answers so far. `None`
+    /// The questions of the selected entry with the marks so far. `None`
     /// for an entry without questions that the list can answer.
     #[must_use]
     pub fn question_draft(&self) -> Option<QuestionDraft> {
@@ -270,10 +292,26 @@ impl ListState {
         self.questions.values().find_map(QuestionDraft::text)
     }
 
-    /// The message of a denial while the owner types it.
+    /// The text of the message field while it is open.
     #[must_use]
     pub fn message(&self) -> Option<&str> {
         self.draft.as_ref().map(|draft| draft.text.as_str())
+    }
+
+    /// True while the message field is open for the selected entry. An
+    /// open message of an entry that left belongs to no pane.
+    #[must_use]
+    pub fn message_is_of_selected(&self) -> bool {
+        self.draft
+            .as_ref()
+            .is_some_and(|draft| self.selected.as_deref() == Some(draft.id.as_str()))
+    }
+
+    /// The message that the next answer to the selected entry gets.
+    #[must_use]
+    pub fn kept_message(&self) -> Option<&str> {
+        let selected = self.selected.as_deref()?;
+        self.messages.get(selected).map(String::as_str)
     }
 
     #[must_use]
@@ -294,22 +332,23 @@ impl ListState {
         self.scroll
     }
 
+    /// Takes a key for the open message field. Enter and Esc close the
+    /// field and keep its text for the next answer to the entry. No key of
+    /// the field sends an answer.
     fn press_in_message(&mut self, key: &Key, now: Instant) -> Option<Action> {
         match key {
             Key::Character(character) => self.draft.as_mut()?.push(*character),
             Key::Backspace => {
                 self.draft.as_mut()?.text.pop();
             }
-            Key::Escape => self.close_draft(now),
-            Key::Enter => {
-                if self.draft_entry_left() {
-                    self.close_draft(now);
+            Key::Escape | Key::Enter => {
+                let draft = self.draft.take()?;
+                self.start_quiet_time(now);
+                let text = draft.text.trim();
+                if text.is_empty() || !contains(&self.entries, &draft.id) {
+                    self.messages.remove(&draft.id);
                 } else {
-                    let draft = self.draft.take()?;
-                    self.start_quiet_time(now);
-                    let text = draft.text.trim();
-                    let message = (!text.is_empty()).then(|| text.to_owned());
-                    return Some(self.record(draft.id, Answer::Deny { message }));
+                    self.messages.insert(draft.id, text.to_owned());
                 }
             }
             _ => {}
@@ -318,49 +357,73 @@ impl ListState {
     }
 
     /// Takes a key for the questions of the selected entry. `NotOne` for a
-    /// key that is none of theirs, and for an entry without questions.
+    /// key that is none of theirs, and for an entry without questions. Only
+    /// the Enter at the last question sends, so only it needs the quiet
+    /// time.
     fn press_for_question(&mut self, key: &Key, is_quiet: bool) -> QuestionKey {
         let Some(mut draft) = self.question_draft() else {
             return QuestionKey::NotOne;
         };
-        let number = match key {
-            Key::Character(character @ '1'..='9') => character.to_digit(10),
-            Key::Enter if !draft.current().multi_select => return QuestionKey::NotOne,
-            Key::Character('a' | 't') | Key::Enter | Key::Escape => None,
-            _ => return QuestionKey::NotOne,
-        };
-        if *key == Key::Character('a') {
-            self.notice = Some(QUESTION_KEYS.to_owned());
-            return QuestionKey::Taken(None);
-        }
-        if *key == Key::Escape {
-            if is_quiet {
-                self.questions.remove(draft.id());
-                self.scroll = 0;
-            } else {
-                self.notice = Some(NOT_QUIET.to_owned());
-            }
-            return QuestionKey::Taken(None);
-        }
-        if self.target(is_quiet).is_none() {
-            return QuestionKey::Taken(None);
-        }
         let position = draft.position();
-        let refusal = match (key, number) {
-            (_, Some(number)) => (!draft.pick(number as usize)).then_some(NO_SUCH_OPTION),
-            (Key::Enter, _) => (!draft.confirm()).then_some(NOTHING_PICKED),
-            _ => {
-                draft.open_text();
-                None
+        match key {
+            Key::Character('a') => {
+                self.notice = Some(QUESTION_KEYS.to_owned());
+                return QuestionKey::Taken(None);
             }
-        };
-        if let Some(refusal) = refusal {
-            self.notice = Some(refusal.to_owned());
-            return QuestionKey::Taken(None);
+            Key::Character(character @ '1'..='9') => {
+                if self.unanswered().is_none() {
+                    return QuestionKey::Taken(None);
+                }
+                let number = character.to_digit(10).unwrap_or(0) as usize;
+                if !draft.pick(number) {
+                    self.notice = Some(NO_SUCH_OPTION.to_owned());
+                    return QuestionKey::Taken(None);
+                }
+            }
+            Key::Character('t') => {
+                if self.unanswered().is_none() {
+                    return QuestionKey::Taken(None);
+                }
+                draft.open_text();
+            }
+            Key::Escape => {
+                if !draft.go_back() {
+                    return QuestionKey::NotOne;
+                }
+            }
+            Key::Enter => {
+                let target = if draft.is_at_last() {
+                    self.target(is_quiet)
+                } else {
+                    self.unanswered()
+                };
+                let Some(id) = target else {
+                    return QuestionKey::Taken(None);
+                };
+                match draft.go_on() {
+                    Step::Refused(reason) => {
+                        self.notice = Some(reason.to_owned());
+                        return QuestionKey::Taken(None);
+                    }
+                    Step::Next => {}
+                    Step::Finished(answers) => {
+                        let answer = Answer::Allow {
+                            answers: Some(answers),
+                            message: self.messages.get(&id).cloned(),
+                        };
+                        return QuestionKey::Taken(Some(self.record(id, answer)));
+                    }
+                }
+            }
+            _ => return QuestionKey::NotOne,
         }
-        QuestionKey::Taken(self.keep_or_send(draft, position))
+        self.keep(draft, position);
+        QuestionKey::Taken(None)
     }
 
+    /// Takes a key for the open text of an own answer. Enter keeps the text
+    /// as the own answer, Esc closes it without a change. No key of the text
+    /// sends an answer.
     fn press_in_question_text(&mut self, key: &Key, now: Instant) -> Option<Action> {
         let id = self
             .questions
@@ -382,32 +445,23 @@ impl ListState {
                 draft.close_text();
                 self.start_quiet_time(now);
             }
-            Key::Enter if draft.send_text() => self.start_quiet_time(now),
+            Key::Enter => {
+                draft.keep_text();
+                self.start_quiet_time(now);
+            }
             _ => {}
         }
-        self.keep_or_send(draft, position)
-    }
-
-    /// Keeps the answers so far. With an answer to each question, sends
-    /// them as the answer to the entry. The pane starts at its top for
-    /// another question than the one at `position`.
-    fn keep_or_send(&mut self, draft: QuestionDraft, position: (usize, usize)) -> Option<Action> {
-        if draft.position() != position {
-            self.scroll = 0;
-        }
-        if let Some(answers) = draft.finished() {
-            let answer = Answer::Allow {
-                answers: Some(answers),
-            };
-            return Some(self.record(draft.id().to_owned(), answer));
-        }
-        self.questions.insert(draft.id().to_owned(), draft);
+        self.keep(draft, position);
         None
     }
 
-    fn close_draft(&mut self, now: Instant) {
-        self.draft = None;
-        self.start_quiet_time(now);
+    /// Keeps the marks so far. The pane starts at its top for another
+    /// question than the one at `position`.
+    fn keep(&mut self, draft: QuestionDraft, position: (usize, usize)) {
+        if draft.position() != position {
+            self.scroll = 0;
+        }
+        self.questions.insert(draft.id().to_owned(), draft);
     }
 
     fn draft_entry_left(&self) -> bool {
@@ -435,11 +489,6 @@ impl ListState {
         self.scroll = 0;
     }
 
-    fn answer(&mut self, answer: Answer, is_quiet: bool) -> Option<Action> {
-        let id = self.target(is_quiet)?;
-        Some(self.record(id, answer))
-    }
-
     fn start_quiet_time(&mut self, now: Instant) {
         self.quiet_from = Some(now + QUIET_TIME);
     }
@@ -448,14 +497,23 @@ impl ListState {
         self.quiet_from.is_none_or(|from| now >= from)
     }
 
-    /// The selected entry when a key can act on it: it has no answer, and the
-    /// key came after the quiet time. Else sets the notice.
+    /// The selected entry when a key can send its answer: it has no answer,
+    /// and the key came after the quiet time. Else sets the notice.
     fn target(&mut self, is_quiet: bool) -> Option<String> {
+        let id = self.unanswered()?;
+        if !is_quiet {
+            self.notice = Some(NOT_QUIET.to_owned());
+            return None;
+        }
+        Some(id)
+    }
+
+    /// The selected entry when it has no answer. Else sets the notice.
+    fn unanswered(&mut self) -> Option<String> {
         let selected = self.selected().map(|listed| listed.id.clone());
         let refusal = match &selected {
             None => NO_PROMPT,
             Some(id) if self.answered.contains_key(id) => ANSWERED,
-            Some(_) if !is_quiet => NOT_QUIET,
             Some(_) => return selected,
         };
         self.notice = Some(refusal.to_owned());

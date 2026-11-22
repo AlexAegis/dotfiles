@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 
-/// Longest message of a denial and longest answer to one question, in
+/// Longest message of an answer and longest answer to one question, in
 /// characters.
 pub const MAX_MESSAGE_CHARS: usize = 500;
 /// The most questions that one prompt asks.
@@ -19,6 +19,9 @@ pub enum Answer {
         /// the text of the question.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         answers: Option<BTreeMap<String, String>>,
+        /// What the owner tells the agent with the approval.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        message: Option<String>,
     },
     Deny {
         /// What the agent reads as the result of the denied call.
@@ -29,43 +32,44 @@ pub enum Answer {
 
 impl Answer {
     /// The answer that allows a call as it is.
-    pub const ALLOW: Self = Self::Allow { answers: None };
+    pub const ALLOW: Self = Self::Allow {
+        answers: None,
+        message: None,
+    };
 
     /// Refuses a message or answers that do not fit one reply line.
     pub fn check(&self) -> Result<()> {
-        match self {
-            Self::Deny {
-                message: Some(message),
-            } => {
+        let (Self::Allow { message, .. } | Self::Deny { message }) = self;
+        if let Some(message) = message {
+            ensure!(
+                !message.chars().any(char::is_control),
+                "Message contains a control character"
+            );
+            ensure!(
+                message.chars().count() <= MAX_MESSAGE_CHARS,
+                "Message longer than {MAX_MESSAGE_CHARS} characters"
+            );
+        }
+        if let Self::Allow {
+            answers: Some(answers),
+            ..
+        } = self
+        {
+            ensure!(
+                (1..=MAX_QUESTIONS).contains(&answers.len()),
+                "Answers for {} questions, not for 1 to {MAX_QUESTIONS}",
+                answers.len()
+            );
+            for answer in answers.values() {
                 ensure!(
-                    !message.chars().any(char::is_control),
-                    "Message contains a control character"
+                    !answer.chars().any(char::is_control),
+                    "Answer contains a control character"
                 );
                 ensure!(
-                    message.chars().count() <= MAX_MESSAGE_CHARS,
-                    "Message longer than {MAX_MESSAGE_CHARS} characters"
+                    (1..=MAX_MESSAGE_CHARS).contains(&answer.chars().count()),
+                    "Answer is empty or longer than {MAX_MESSAGE_CHARS} characters"
                 );
             }
-            Self::Allow {
-                answers: Some(answers),
-            } => {
-                ensure!(
-                    (1..=MAX_QUESTIONS).contains(&answers.len()),
-                    "Answers for {} questions, not for 1 to {MAX_QUESTIONS}",
-                    answers.len()
-                );
-                for answer in answers.values() {
-                    ensure!(
-                        !answer.chars().any(char::is_control),
-                        "Answer contains a control character"
-                    );
-                    ensure!(
-                        (1..=MAX_MESSAGE_CHARS).contains(&answer.chars().count()),
-                        "Answer is empty or longer than {MAX_MESSAGE_CHARS} characters"
-                    );
-                }
-            }
-            _ => {}
         }
         Ok(())
     }

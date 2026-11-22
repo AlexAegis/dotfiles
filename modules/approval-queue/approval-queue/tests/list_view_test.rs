@@ -260,10 +260,14 @@ fn should_draw_at_each_small_size_without_a_panic() {
             )
         })
         .collect();
-    for count in [0, 1, 9] {
+    for (count, has_message) in [(0, false), (1, false), (9, false), (9, true)] {
         let (mut state, later) = state_with(entries[..count].to_vec());
         for _ in 0..count {
             state.press(Key::Down, later);
+        }
+        if has_message {
+            state.press(Key::Character('m'), later + Duration::from_secs(2));
+            state.paste(&"long ".repeat(100), later + Duration::from_secs(2));
         }
         for width in 1..=110 {
             for height in 1..=12 {
@@ -364,7 +368,7 @@ fn should_show_the_selected_prompt_in_full() {
         "││Bash git push origin 1a2b:master ",
         "command: git push origin 1a2b:master",
         "timeout: 5000",
-        " a  Approve    d  Decline    m  Decline with a message",
+        " a  Approve    d  Decline    m  Message",
         "j/k select   PgUp/PgDn scroll   s/S mute pings 10 min/1 hour   u unmute   q quit",
     ] {
         assert_shows(&lines, part);
@@ -473,8 +477,106 @@ fn should_show_the_message_while_the_owner_types_it() {
         state.press(Key::Character(character), later);
     }
     let lines = screen(&state, 5);
-    assert_shows(&lines, "Message of the decline: Use a branch_");
-    assert_shows(&lines, "Enter send   Esc cancel");
+    assert_shows(&lines, "│Message: Use a branch_");
+    assert_shows(
+        &lines,
+        "Enter or Esc keeps the message for the answer to this prompt",
+    );
+    state.press(Key::Enter, later);
+    let lines = screen(&state, 5);
+    assert_shows(&lines, "│Message: Use a branch ");
+    assert_shows(&lines, "j/k select");
+}
+
+fn text_of_the_pane(lines: &[String]) -> String {
+    lines
+        .iter()
+        .filter_map(|line| line.split_once('│'))
+        .filter_map(|(_, rest)| rest.rsplit_once('│'))
+        .map(|(inner, _)| inner.rsplit_once('│').map_or(inner, |(_, pane)| pane))
+        .collect::<Vec<_>>()
+        .join("")
+}
+
+#[test]
+fn should_show_each_character_of_a_long_kept_message() {
+    let (mut state, later) = state_with(vec![push()]);
+    state.press(Key::Character('m'), later);
+    let long: String = "START"
+        .chars()
+        .chain((0..490).map(|index| if index % 7 == 0 { ' ' } else { 'x' }))
+        .chain("END".chars())
+        .collect();
+    state.paste(&long, later);
+    state.press(Key::Enter, later);
+    for width in [80, 120] {
+        let lines = drawn_at_width(&state, 5, width).0;
+        let pane: String = text_of_the_pane(&lines).split_whitespace().collect();
+        let message: String = long.split_whitespace().collect();
+        assert!(pane.contains(&format!("Message:{message}")), "{width}");
+        assert_shows(&lines, " a  Approve");
+    }
+}
+
+#[test]
+fn should_count_the_lines_of_a_message_that_a_small_pane_does_not_show() {
+    let (mut state, later) = state_with(vec![push()]);
+    state.press(Key::Character('m'), later);
+    state.paste(&format!("START {}END", "word ".repeat(98)), later);
+    let typed = drawn_at_size(&state, 80, 10);
+    assert_shows(&typed, "END_");
+    assert_shows(&typed, " message: 6 more lines, in a larger window ");
+    state.press(Key::Enter, later);
+    let kept = drawn_at_size(&state, 80, 10);
+    assert_shows(&kept, "│Message: START");
+    assert_shows(&kept, " message: 6 more lines, in a larger window ");
+    assert_shows(&kept, " a  Approve");
+    let whole = drawn_at_size(&state, 80, 40);
+    assert!(!whole.iter().any(|line| line.contains("more lines, in a")));
+}
+
+fn drawn_at_size(state: &ListState, width: u16, height: u16) -> Vec<String> {
+    let mut terminal = Terminal::new(TestBackend::new(width, height)).unwrap();
+    terminal
+        .draw(|frame| {
+            list_view::draw(frame, state, UNIX_EPOCH);
+        })
+        .unwrap();
+    let buffer = terminal.backend().buffer();
+    (0..buffer.area.height)
+        .map(|y| {
+            (0..buffer.area.width)
+                .map(|x| buffer[(x, y)].symbol())
+                .collect::<String>()
+                .trim_end()
+                .to_owned()
+        })
+        .collect()
+}
+
+#[test]
+fn should_show_each_wide_character_of_a_message() {
+    let (mut state, later) = state_with(vec![push()]);
+    state.press(Key::Character('m'), later);
+    state.paste(&format!("{}END", "中".repeat(100)), later);
+    state.press(Key::Enter, later);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    let shown = lines.join("").matches('中').count();
+    assert_eq!(shown, 100);
+    assert_shows(&lines, "END");
+}
+
+#[test]
+fn should_show_the_kept_message_only_with_its_prompt() {
+    let other = listed("2-1", "agent", "Bash", &json!({ "command": "ls" }), None);
+    let (mut state, later) = state_with(vec![push(), other]);
+    state.press(Key::Character('m'), later);
+    state.press(Key::Character('x'), later);
+    state.press(Key::Enter, later);
+    assert_shows(&screen(&state, 5), "Message: x");
+    state.press(Key::Down, later);
+    let lines = screen(&state, 5);
+    assert!(!lines.iter().any(|line| line.contains("Message:")));
 }
 
 #[test]
@@ -593,17 +695,21 @@ fn should_name_a_prompt_that_only_the_list_can_answer() {
 }
 
 #[test]
-fn should_show_the_notice_below_the_message_while_the_owner_types_it() {
-    let (mut state, later) = state_with(vec![push()]);
-    state.press(Key::Character('m'), later);
-    state.press(Key::Character('x'), later);
-    state.refresh(Vec::new(), later);
-    let lines = screen(&state, 5);
-    assert_eq!(lines[22], "Message of the decline: x_");
-    assert_eq!(
-        lines[23],
-        "The prompt left the queue. Esc closes the message."
-    );
+fn should_show_the_message_of_a_prompt_that_left_in_the_footer_and_in_no_pane() {
+    let other = listed("2-1", "agent", "Bash", &json!({ "command": "ls" }), None);
+    for left in [Vec::new(), vec![other]] {
+        let (mut state, later) = state_with(vec![push()]);
+        state.press(Key::Character('m'), later);
+        state.press(Key::Character('x'), later);
+        state.refresh(left, later);
+        let lines = screen(&state, 5);
+        assert_eq!(lines[22], "Message: x_");
+        assert_eq!(
+            lines[23],
+            "The prompt left the queue. Esc closes the message."
+        );
+        assert!(!lines[..22].iter().any(|line| line.contains("Message:")));
+    }
 }
 
 #[test]
@@ -636,7 +742,7 @@ fn should_show_each_key_in_a_terminal_of_80_columns() {
     for key in [
         " a  Approve",
         " d  Decline",
-        " m  Decline with a message",
+        " m  Message",
         "j/k select",
         "PgUp/PgDn scroll",
         "s/S mute pings 10 min/1 hour",
@@ -818,10 +924,10 @@ fn should_show_the_current_question_with_its_options_by_number() {
     for part in [
         "│Question 1 of 2: Library",
         "│Which library\\u{1b}?",
-        "│  1  date-fns: small",
-        "│  2  luxon ",
+        "│  1  ( ) date-fns: small",
+        "│  2  ( ) luxon ",
         "│  t  an own answer as text",
-        " 1-9  Pick    t  Own answer    d  Decline    m  Decline with a message",
+        " 1-9  Mark    t  Own answer    Enter  Next    d  Decline    m  Message",
     ] {
         assert_shows(&lines, part);
     }
@@ -834,20 +940,22 @@ fn should_show_the_current_question_with_its_options_by_number() {
 fn should_show_the_picked_options_and_the_answers_so_far_of_a_question() {
     let (mut state, later) = state_with(vec![question_prompt()]);
     state.press(Key::Character('2'), later);
-    state.press(Key::Character('2'), later + Duration::from_secs(2));
+    assert_shows(&drawn_at_width(&state, 5, 80).0, "│  2  (x) luxon");
+    state.press(Key::Enter, later);
+    state.press(Key::Character('2'), later);
     let (lines, scroll_limit) = drawn_at_width(&state, 5, 80);
     for part in [
         "│Question 2 of 2: Features",
         "│  1  [ ] zones",
         "│  2  [x] locales",
-        " 1-9  Pick    Enter  Confirm    t  Own answer    d  Decline",
+        " 1-9  Mark    t  Own answer    Enter  Send    d  Decline    m  Message",
     ] {
         assert_shows(&lines, part);
     }
     state.limit_scroll(scroll_limit);
     state.press(Key::PageDown, later);
     let lines = drawn_at_width(&state, 5, 80).0;
-    assert_shows(&lines, "│Answers so far, Esc starts again:");
+    assert_shows(&lines, "│Answers so far, Esc goes back:");
     assert_shows(&lines, "│  Which library\\u{1b}?: luxon");
 }
 
@@ -858,7 +966,12 @@ fn should_show_the_own_answer_to_a_question_while_the_owner_types_it() {
     state.press(Key::Character('x'), later);
     let lines = drawn_at_width(&state, 5, 80).0;
     assert_eq!(lines[22], "Own answer: x_");
-    assert_eq!(lines[23], "Enter send   Esc cancel");
+    assert_eq!(
+        lines[23],
+        "Enter keeps the own answer   Esc closes the text"
+    );
+    state.press(Key::Enter, later);
+    assert_shows(&drawn_at_width(&state, 5, 80).0, "│  t  own answer: x");
 }
 
 #[test]

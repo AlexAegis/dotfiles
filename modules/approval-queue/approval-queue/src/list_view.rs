@@ -27,7 +27,8 @@ use crate::{
 
 const KEYS: &str =
     "j/k select   PgUp/PgDn scroll   s/S mute pings 10 min/1 hour   u unmute   q quit";
-const MESSAGE_KEYS: &str = "Enter send   Esc cancel";
+const MESSAGE_KEYS: &str = "Enter or Esc keeps the message for the answer to this prompt";
+const OWN_ANSWER_KEYS: &str = "Enter keeps the own answer   Esc closes the text";
 const LIST_ONLY: &str = "only in this list: its terminal shows the prompt when no list is open";
 /// The count of the characters of a session ID that an entry of the list shows.
 const SESSION_START: usize = 8;
@@ -39,24 +40,23 @@ const TWO_COLUMN_WIDTH: u16 = 100;
 const KIND_WIDTH: u16 = 11;
 /// The name under which the pane shows both texts of an Edit call.
 const DIFF_NAME: &str = "change";
-const QUESTION_ACTIONS: [(&str, &str); 4] = [
-    ("1-9", "Pick"),
+/// The lines of the pane that stay for the prompt above a long message.
+const DETAIL_HEIGHT_BESIDE_MESSAGE: u16 = 4;
+const QUESTION_ACTIONS: [(&str, &str); 5] = [
+    ("1-9", "Mark"),
     ("t", "Own answer"),
+    ("Enter", "Next"),
     ("d", "Decline"),
-    ("m", "Decline with a message"),
+    ("m", "Message"),
 ];
-const MULTI_QUESTION_ACTIONS: [(&str, &str); 5] = [
-    ("1-9", "Pick"),
-    ("Enter", "Confirm"),
+const LAST_QUESTION_ACTIONS: [(&str, &str); 5] = [
+    ("1-9", "Mark"),
     ("t", "Own answer"),
+    ("Enter", "Send"),
     ("d", "Decline"),
-    ("m", "Decline with a message"),
+    ("m", "Message"),
 ];
-const ACTIONS: [(&str, &str); 3] = [
-    ("a", "Approve"),
-    ("d", "Decline"),
-    ("m", "Decline with a message"),
-];
+const ACTIONS: [(&str, &str); 3] = [("a", "Approve"), ("d", "Decline"), ("m", "Message")];
 
 /// Draws the waiting prompts as a list of entries, the selected one in full
 /// with its actions and the keys. Returns how far the pane of the selected
@@ -79,16 +79,19 @@ pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
     draw_list(frame, list_area, state, now);
     let scroll_limit = draw_pane(frame, pane_area, state);
     let notice = state.notice().map(visible_line);
-    let typed = state
-        .message()
-        .map(|message| ("Message of the decline", message))
-        .or_else(|| state.question_text().map(|text| ("Own answer", text)));
-    let footer = match typed {
-        Some((name, text)) => [
-            format!("{name}: {}_", visible_line(text)),
-            notice.unwrap_or_else(|| MESSAGE_KEYS.to_owned()),
+    let footer = match (state.message(), state.question_text()) {
+        (Some(_), _) if state.message_is_of_selected() => {
+            [notice.unwrap_or_default(), MESSAGE_KEYS.to_owned()]
+        }
+        (Some(typed), _) => [
+            format!("Message: {}_", visible_line(typed)),
+            notice.unwrap_or_default(),
         ],
-        None => [notice.unwrap_or_default(), KEYS.to_owned()],
+        (None, Some(text)) => [
+            format!("Own answer: {}_", visible_line(text)),
+            notice.unwrap_or_else(|| OWN_ANSWER_KEYS.to_owned()),
+        ],
+        (None, None) => [notice.unwrap_or_default(), KEYS.to_owned()],
     };
     frame.render_widget(Paragraph::new(footer.map(Line::from).to_vec()), footer_area);
     scroll_limit
@@ -204,8 +207,27 @@ fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
         Span::raw(format!(": {} ", visible_line(&entry.tool))),
     ]));
     let inner = pane.inner(area);
-    let [detail_area, action_area] =
-        Layout::vertical([Constraint::Fill(1), Constraint::Length(1)]).areas(inner);
+    let (message, is_typed) = message_field(state);
+    let has_message = !message.is_empty();
+    let message = Paragraph::new(message).wrap(Wrap { trim: false });
+    let message_lines = if has_message {
+        u16::try_from(message.line_count(inner.width)).unwrap_or(u16::MAX)
+    } else {
+        0
+    };
+    let message_height = message_lines.min(
+        inner
+            .height
+            .saturating_sub(DETAIL_HEIGHT_BESIDE_MESSAGE + 1)
+            .max(1),
+    );
+    let message_lines_hidden = message_lines - message_height;
+    let [detail_area, action_area, message_area] = Layout::vertical([
+        Constraint::Fill(1),
+        Constraint::Length(1),
+        Constraint::Length(message_height),
+    ])
+    .areas(inner);
     let questions = state.question_draft();
     let lines = match &questions {
         Some(draft) => {
@@ -226,10 +248,18 @@ fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
     if scroll < scroll_limit {
         pane = pane.title_bottom(format!(" lines below: {}, PgDn ", scroll_limit - scroll));
     }
+    if message_lines_hidden > 0 {
+        pane = pane.title_bottom(
+            Line::from(format!(
+                " message: {message_lines_hidden} more lines, in a larger window "
+            ))
+            .right_aligned(),
+        );
+    }
     frame.render_widget(pane, area);
     frame.render_widget(detail.scroll((scroll, 0)), detail_area);
     let actions = match &questions {
-        Some(draft) if draft.current().multi_select => &MULTI_QUESTION_ACTIONS[..],
+        Some(draft) if draft.is_at_last() => &LAST_QUESTION_ACTIONS[..],
         Some(_) => &QUESTION_ACTIONS[..],
         None => &ACTIONS[..],
     };
@@ -246,7 +276,26 @@ fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
         })
         .collect();
     frame.render_widget(Paragraph::new(Line::from(actions)), action_area);
+    let above = if is_typed { message_lines_hidden } else { 0 };
+    frame.render_widget(message.scroll((above, 0)), message_area);
     scroll_limit
+}
+
+/// The text of the message field below the actions, and whether the owner
+/// types it: the open message of the selected prompt, else the message that
+/// the next answer to that prompt gets. The field wraps and shows the whole
+/// message. In a pane too small for it, the field has at least one line and
+/// shows the end of a message that the owner types, and the start of a kept
+/// one. The border of the pane then counts the lines that do not show. An
+/// empty text for no message.
+fn message_field(state: &ListState) -> (String, bool) {
+    match (state.message(), state.kept_message()) {
+        (Some(typed), _) if state.message_is_of_selected() => {
+            (format!("Message: {}_", visible_line(typed)), true)
+        }
+        (_, Some(kept)) => (format!("Message: {}", visible_line(kept)), false),
+        _ => (String::new(), false),
+    }
 }
 
 fn kind_span<'a>(entry: &Entry) -> Span<'a> {
@@ -371,7 +420,8 @@ fn question_lines(draft: &QuestionDraft) -> Vec<Line<'static>> {
     ];
     for (index, choice) in question.options.iter().enumerate() {
         let mark = match (question.multi_select, draft.is_picked(index)) {
-            (false, _) => "",
+            (false, false) => "( ) ",
+            (false, true) => "(x) ",
             (true, false) => "[ ] ",
             (true, true) => "[x] ",
         };
@@ -386,15 +436,18 @@ fn question_lines(draft: &QuestionDraft) -> Vec<Line<'static>> {
             visible_line(&choice.label)
         )));
     }
-    lines.push(Line::from("  t  an own answer as text"));
+    lines.push(Line::from(match draft.own_answer() {
+        Some(own) => format!("  t  own answer: {}", visible_line(own)),
+        None => "  t  an own answer as text".to_owned(),
+    }));
     if draft.answered().next().is_some() {
         lines.push(Line::default());
-        lines.push(Line::from("Answers so far, Esc starts again:"));
+        lines.push(Line::from("Answers so far, Esc goes back:"));
         for (question, answer) in draft.answered() {
             lines.push(Line::from(format!(
                 "  {}: {}",
                 visible_line(question),
-                visible_line(answer)
+                visible_line(&answer)
             )));
         }
     }
