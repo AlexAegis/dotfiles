@@ -2,6 +2,8 @@
 
 ## Services
 
-Services can be enabled using the `/etc/rc.conf` configuiration file.
+Enable services in `/etc/rc.conf`, by hand or with `sysrc`.
 
-Either by hand or using the sys
+The root step enables sshd. When no `ifconfig_` variable is set, it also sets
+DHCP for the first network adapter that is up, and fails when none is up. Both
+settings apply at the next boot.
