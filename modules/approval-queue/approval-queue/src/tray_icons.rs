@@ -8,7 +8,7 @@ use std::{
 use anyhow::{Context, Result};
 
 /// Each icon: its name in the theme and its SVG text.
-pub const ICONS: [(&str, &str); 4] = [
+pub const ICONS: [(&str, &str); 5] = [
     (
         "approval-queue-empty",
         include_str!("icons/approval-queue-empty.svg"),
@@ -16,6 +16,10 @@ pub const ICONS: [(&str, &str); 4] = [
     (
         "approval-queue-flash",
         include_str!("icons/approval-queue-flash.svg"),
+    ),
+    (
+        "approval-queue-idle",
+        include_str!("icons/approval-queue-idle.svg"),
     ),
     (
         "approval-queue-permission",

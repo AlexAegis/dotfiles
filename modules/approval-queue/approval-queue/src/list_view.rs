@@ -22,6 +22,7 @@ use crate::{
     question_draft::QuestionDraft,
     queue_folder,
     request::MAX_TITLE_CHARACTERS,
+    session_state::{Activity, ListedSession},
     tray_view::EntryKind,
 };
 
@@ -38,6 +39,8 @@ const ENTRY_HEIGHT: u16 = 4;
 const TWO_COLUMN_WIDTH: u16 = 100;
 /// The width of the longest kind and one blank after it.
 const KIND_WIDTH: u16 = 11;
+/// The most sessions that the part below the prompts shows.
+const SHOWN_SESSIONS: u16 = 8;
 /// The name under which the pane shows both texts of an Edit call.
 const DIFF_NAME: &str = "change";
 /// The lines of the pane that stay for the prompt above a long message.
@@ -64,8 +67,20 @@ const ACTIONS: [(&str, &str); 3] = [("a", "Approve"), ("d", "Decline"), ("m", "M
 pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
     let [body_area, footer_area] =
         Layout::vertical([Constraint::Min(6), Constraint::Length(2)]).areas(frame.area());
-    let [list_area, pane_area] = if body_area.width >= TWO_COLUMN_WIDTH {
-        Layout::horizontal([Constraint::Percentage(40), Constraint::Fill(1)]).areas(body_area)
+    let session_count = u16::try_from(state.sessions().len()).unwrap_or(u16::MAX);
+    let wanted_session_height = if session_count == 0 {
+        0
+    } else {
+        session_count.min(SHOWN_SESSIONS) + 2
+    };
+    let [list_area, session_area, pane_area] = if body_area.width >= TWO_COLUMN_WIDTH {
+        let [left_area, pane_area] =
+            Layout::horizontal([Constraint::Percentage(40), Constraint::Fill(1)]).areas(body_area);
+        let session_height = wanted_session_height.min(left_area.height / 2);
+        let [list_area, session_area] =
+            Layout::vertical([Constraint::Fill(1), Constraint::Length(session_height)])
+                .areas(left_area);
+        [list_area, session_area, pane_area]
     } else {
         let list_height = (body_area.height / 2).min(
             u16::try_from(state.entries().len())
@@ -74,9 +89,21 @@ pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
                 .saturating_add(2)
                 .max(ENTRY_HEIGHT + 2),
         );
-        Layout::vertical([Constraint::Length(list_height), Constraint::Fill(1)]).areas(body_area)
+        // The sessions take their rows from the pane, not from the prompts
+        let session_height =
+            wanted_session_height.min(body_area.height.saturating_sub(list_height) / 2);
+        Layout::vertical([
+            Constraint::Length(list_height),
+            Constraint::Length(session_height),
+            Constraint::Fill(1),
+        ])
+        .areas(body_area)
     };
+    let session_height = session_area.height;
     draw_list(frame, list_area, state, now);
+    if session_height > 0 {
+        draw_sessions(frame, session_area, state.sessions(), now);
+    }
     let scroll_limit = draw_pane(frame, pane_area, state);
     let notice = state.notice().map(visible_line);
     let footer = match (state.message(), state.question_text()) {
@@ -139,6 +166,71 @@ fn draw_list(frame: &mut Frame, area: Rect, state: &ListState, now: SystemTime) 
         );
         top = top.saturating_add(ENTRY_HEIGHT);
     }
+}
+
+/// Draws one line for each session: its lamp, its folder, what it does
+/// since when, its user and the start of its ID. A narrow part cuts the end
+/// of the line. The sessions that need the owner come first, then the
+/// oldest state.
+fn draw_sessions(frame: &mut Frame, area: Rect, sessions: &[ListedSession], now: SystemTime) {
+    let now = now
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |since| since.as_secs());
+    let mut sessions: Vec<&ListedSession> = sessions.iter().collect();
+    sessions.sort_by_key(|listed| {
+        let rank = match listed.state.activity {
+            Activity::Idle => 0,
+            Activity::Waiting => 1,
+            Activity::Active => 2,
+        };
+        (rank, listed.state.since)
+    });
+    let mut block = Block::bordered().title(format!(" sessions: {} ", sessions.len()));
+    let shown = usize::from(block.inner(area).height);
+    let below = sessions.len().saturating_sub(shown);
+    if below > 0 {
+        block = block.title_bottom(Line::from(format!(" below: {below} ")).right_aligned());
+    }
+    let lines: Vec<Line> = sessions
+        .into_iter()
+        .take(shown)
+        .map(|listed| session_line(listed, now))
+        .collect();
+    frame.render_widget(Paragraph::new(lines).block(block), area);
+}
+
+/// The lamp of a session: full green while a turn runs, half green while
+/// the session waits for something that it started, yellow when it is idle.
+fn lamp(activity: Activity) -> Span<'static> {
+    let (text, color) = match activity {
+        Activity::Active => ("[##]", Color::Green),
+        Activity::Waiting => ("[# ]", Color::Green),
+        Activity::Idle => ("[##]", Color::Yellow),
+    };
+    Span::styled(text, Style::new().fg(color).add_modifier(Modifier::BOLD))
+}
+
+fn session_line(listed: &ListedSession, now: u64) -> Line<'static> {
+    let state = &listed.state;
+    let time = age(now.saturating_sub(state.since));
+    let does = match (state.activity, state.waits_for.as_slice()) {
+        (Activity::Active, _) => format!("active {time}"),
+        (Activity::Idle, _) => format!("idle {time}"),
+        (Activity::Waiting, []) => format!("waits {time}"),
+        (Activity::Waiting, [only]) => format!("waits {time}: {}", visible_line(only)),
+        (Activity::Waiting, [first, more @ ..]) => {
+            format!("waits {time}: {} (+{})", visible_line(first), more.len())
+        }
+    };
+    let start: String = listed.session.chars().take(SESSION_START).collect();
+    Line::from(vec![
+        lamp(state.activity),
+        Span::raw(format!(
+            " {}  {does}  {}  {start}",
+            folder_name(&state.folder),
+            state.user_text(),
+        )),
+    ])
 }
 
 fn draw_entry(

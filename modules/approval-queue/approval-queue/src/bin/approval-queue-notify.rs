@@ -229,8 +229,8 @@ fn run() -> Result<()> {
             && has_host.load(Ordering::Relaxed);
         match alerts.refresh(now, SystemTime::now(), has_tray) {
             Ok(refreshed) => {
-                if let Some(count) = refreshed.pinged_prompts {
-                    eprintln!("Ping for {count} new prompts");
+                if let Some(count) = refreshed.pinged {
+                    eprintln!("Ping for {count} new prompts and idle sessions");
                 }
                 shows_list |= refreshed.shows_list;
                 if shown != Some(refreshed.view)

@@ -57,3 +57,16 @@ fn is_invisible(character: char) -> bool {
                 | '\u{e0100}'..='\u{e01ef}'
         )
 }
+
+/// The name of a user on one line, after `?` when the service could not
+/// compare it with the sender of its line. The mark is first, so a short
+/// column keeps it.
+#[must_use]
+pub fn user_text(name: &str, is_verified: bool) -> String {
+    let name = visible_line(name);
+    if is_verified {
+        name
+    } else {
+        format!("?{name}")
+    }
+}

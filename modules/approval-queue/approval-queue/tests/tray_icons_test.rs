@@ -39,6 +39,10 @@ fn should_have_an_icon_for_each_name_that_the_tray_shows() {
             settings: AlertSettings::default(),
             ..TrayView::default()
         },
+        TrayView {
+            idle_sessions: 1,
+            ..TrayView::default()
+        },
     ];
     for view in views {
         assert!(ICONS.iter().any(|(name, _)| *name == view.icon_name()));

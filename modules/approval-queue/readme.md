@@ -37,6 +37,19 @@ above the right one.
   - Line 3: user, tool, name of the folder, start of the session ID.
   - The border counts the entries above and below the shown ones. Its lower
     edge shows how long the pings are muted.
+- Below the entries, while a session reports its state: one line for each
+  session, at most 8, with a count of the others in the border. Idle sessions
+  come first, then waiting ones, then active ones. In each group, the oldest
+  state comes first. A narrow part cuts the end of a line. In a narrow
+  terminal, the lines take their rows from the selected prompt.
+  - Lamp:
+    - green `[##]`: active, a turn runs
+    - green `[# ]`: waiting, no turn runs and something that the session
+      started still runs, such as a build or a wait for a CI run
+    - yellow `[##]`: idle, the turn ended with nothing in flight
+  - Then: name of the folder, `active`, `waits` or `idle` with the time since
+    then, for `waits` the first thing that the session waits for and the count
+    of the others, user, start of the session ID.
 - Right: the selected prompt in full: user, harness, permission mode, session,
   folder, the reason of a guard hook that asked, the title and the input of the
   tool. A `description` of the input that equals the title is not shown again.
@@ -147,6 +160,11 @@ for at most one ping. Until then it waits for its ping:
   fewer, when the oldest of them has waited 2 minutes.
 - A prompt that leaves the queue before its ping counts for none.
 
+A session that is idle for 1 minute counts as one more prompt for the cadence,
+one time for each time that it goes idle (owner, 2026-11-22). The icon counts
+it from then on too. A session that gets its next turn sooner pings for nothing
+and shows only in the list.
+
 The cadence comes from the
 [`ping_throttle`](https://github.com/AlexAegis/ping_throttle) crate. The values
 above are those of the preset `Normal`. The menu of the tray icon sets another
@@ -174,11 +192,13 @@ The icon is a StatusNotifierItem on the session bus, an inbox:
 | white with a yellow border    | a ping, for 400 ms         |
 | yellow with an attention mark | a permission prompt waits  |
 | blue with a question mark     | only question dialogs wait |
+| yellow with a white lamp      | only idle sessions wait    |
 
 A question dialog is a prompt of the `AskUserQuestion` tool.
 
-While a prompt waits, the icon has the status `NeedsAttention`, so a desktop
-that hides idle icons shows it. The tooltip has the counts. A click on the icon
+While a prompt waits or a session is idle for 1 minute, the icon has the status
+`NeedsAttention`, so a desktop that hides idle icons shows it. The tooltip has
+the counts. A click on the icon
 brings the list to view, as steps 1 and 2 below describe. The menu of the icon:
 
 - Open the list
@@ -287,6 +307,56 @@ a request of another user does not show as a request of the owner. The service
 cannot tell two other users apart: for them, the list shows the name that the
 request states.
 
+### Session Reports
+
+A hook can also report the state of its session, on a connection of its own.
+The line names its kind, which no request does:
+
+| Field            | Content                                                         | Limit                         |
+| ---------------- | --------------------------------------------------------------- | ----------------------------- |
+| `version`        | `1`                                                             |                               |
+| `kind`           | `session`                                                       |                               |
+| `host`           | the harness, such as `claude-code`                              | 32 bytes                      |
+| `user`           | the user that the hook runs as, an account name as in a request | 64 bytes                      |
+| `session`        | the session ID: letters, digits, `-` and `_`                    | 128 bytes                     |
+| `folder`         | the working folder of the session                               | 4096 bytes                    |
+| `pid`            | the process of the session: the sender or a process above it    |                               |
+| `state`          | `active`, `waiting`, `idle` or `ended`                          |                               |
+| `sent_at`        | milliseconds since 1970 at which the hook wrote the line        |                               |
+| `waits_for`      | optional: what a waiting session waits for                      | 16 items, 144 characters each |
+| `seconds_ago`    | optional: the seconds for which the session already has `state` | 86400 seconds                 |
+| `unless_waiting` | optional, `true` with `idle`: replaces no waiting state         |                               |
+
+The hook keeps the connection open until the service closes it: the service
+checks the sender while it runs, and refuses the line of a sender that ended.
+The service stores the state in place of the one before and sends no reply. A
+state that stays keeps its start. `ended` removes the state. These lines change
+nothing and get no reply:
+
+- a line with a `sent_at` before that of the stored state. Each line comes on
+  its own connection, so two lines of one session can arrive in the other
+  order. A stored `sent_at` more than 5 seconds after the time of the
+  service, as after a step back of the clock, does not count.
+- a line with `unless_waiting` for a session that waits
+
+A refused report gets `{"error":"<reason>"}`:
+
+- a line of another form
+- a `user` that the sender is not, by the rule of a request
+- a `pid` that names neither the sender nor a process above it, or that names
+  process 1. The state leaves when that process ends, so a sender cannot keep
+  a state for longer than a process that it comes from. The service does not
+  compare user IDs for this: in its unit, every other user has one ID. It
+  only refuses a process of the owner from another sender.
+- a `sent_at` more than 5 seconds after the time of the service
+- `unless_waiting` with a `state` other than `idle`
+- a session whose stored state has another user
+- a new session of a user that has 64 sessions with a state
+
+Limit: `pid` and the sender must be process IDs in the PID namespace of the
+service. The service refuses the report of a hook in another PID namespace, or
+takes it for a wrong process.
+
 ## Files
 
 `$XDG_RUNTIME_DIR/approval-queue`, for the owner only:
@@ -301,6 +371,9 @@ request states.
   `{"behavior":"deny"}`, each with a `message` when the owner typed one. The
   message is one line of at most 500 characters. The file stays until its
   entry leaves, so the queue refuses a second answer.
+- `sessions/<session>.json`: the state of one session that reported it, with
+  the time since which it has it. The list, `approval-queue-notify` and the
+  service remove the state of a session whose process is gone.
 - `lists/<id>`: the mark of one open list. Its list keeps a lock on the file. A
   service process and `approval-queue-notify` remove a mark that no process
   locks.

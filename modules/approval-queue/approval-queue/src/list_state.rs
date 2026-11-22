@@ -11,6 +11,7 @@ use crate::{
     message_draft::MessageDraft,
     question::questions_of,
     question_draft::{QuestionDraft, Step},
+    session_state::ListedSession,
 };
 
 /// The list takes a key that sends an answer, mutes or unmutes the pings or
@@ -58,6 +59,7 @@ pub struct ListState {
     scroll_limit: u16,
     notice: Option<String>,
     pings_muted_until: Option<SystemTime>,
+    sessions: Vec<ListedSession>,
 }
 
 impl ListState {
@@ -230,6 +232,17 @@ impl ListState {
     pub fn report_refused_answer(&mut self, id: &str, reason: &str) {
         self.answered.remove(id);
         self.notice = Some(reason.to_owned());
+    }
+
+    /// Takes the sessions that reported a state, for the part below the
+    /// prompts.
+    pub fn show_sessions(&mut self, sessions: Vec<ListedSession>) {
+        self.sessions = sessions;
+    }
+
+    #[must_use]
+    pub fn sessions(&self) -> &[ListedSession] {
+        &self.sessions
     }
 
     /// Takes the time until which the pings are muted, for the title.

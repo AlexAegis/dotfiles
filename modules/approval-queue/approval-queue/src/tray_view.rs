@@ -25,6 +25,8 @@ impl EntryKind {
 pub struct TrayView {
     pub permissions: usize,
     pub questions: usize,
+    /// The sessions that are idle for the time after which they ping.
+    pub idle_sessions: usize,
     /// True for the short time after a ping.
     pub is_flashing: bool,
     /// The minutes that a mute still lasts.
@@ -34,7 +36,7 @@ pub struct TrayView {
 
 impl TrayView {
     /// The name of the icon in the icon theme. A permission prompt shows
-    /// before a question.
+    /// before a question, and a question before an idle session.
     #[must_use]
     pub fn icon_name(&self) -> &'static str {
         if self.is_flashing {
@@ -43,16 +45,18 @@ impl TrayView {
             "approval-queue-permission"
         } else if self.questions > 0 {
             "approval-queue-question"
+        } else if self.idle_sessions > 0 {
+            "approval-queue-idle"
         } else {
             "approval-queue-empty"
         }
     }
 
-    /// True while a prompt waits or a ping shows. The desktop then shows
-    /// the icon also when it hides idle icons.
+    /// True while a prompt or an idle session waits or a ping shows. The
+    /// desktop then shows the icon also when it hides idle icons.
     #[must_use]
     pub fn needs_attention(&self) -> bool {
-        self.is_flashing || self.permissions > 0 || self.questions > 0
+        self.is_flashing || self.permissions > 0 || self.questions > 0 || self.idle_sessions > 0
     }
 
     /// One line on what waits, for the tooltip.
@@ -64,6 +68,9 @@ impl TrayView {
         }
         if self.questions > 0 {
             parts.push(format!("questions: {}", self.questions));
+        }
+        if self.idle_sessions > 0 {
+            parts.push(format!("idle sessions: {}", self.idle_sessions));
         }
         if parts.is_empty() {
             parts.push("nothing waits".to_owned());

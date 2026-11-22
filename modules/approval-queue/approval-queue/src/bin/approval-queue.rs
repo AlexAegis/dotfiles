@@ -82,6 +82,7 @@ fn show(terminal: &mut DefaultTerminal, queue: &QueueFolder) -> Result<()> {
         queue.remove_leftovers()?;
         state.refresh(queue.waiting()?, Instant::now());
         state.show_mute(queue.pings_muted_until());
+        state.show_sessions(queue.sessions()?);
         let mut scroll_limit = 0;
         terminal.draw(|frame| scroll_limit = list_view::draw(frame, &state, SystemTime::now()))?;
         state.limit_scroll(scroll_limit);

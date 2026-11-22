@@ -7,7 +7,11 @@ use std::{
 };
 
 use anyhow::{Context, Result};
-use approval_queue::{log_text, queue_folder::QueueFolder, service::Service};
+use approval_queue::{
+    log_text,
+    queue_folder::QueueFolder,
+    service::{Sender, Served, Service},
+};
 
 /// Above the day that a hook waits, so the hook ends the wait.
 const LONGEST_WAIT: Duration = Duration::from_hours(25);
@@ -39,13 +43,25 @@ fn run() -> Result<()> {
     let service = Service {
         queue: &queue,
         own_user: &own_user,
+        own_uid: rustix::process::getuid().as_raw(),
         poll_interval: Duration::from_millis(200),
         longest_wait: LONGEST_WAIT,
         no_list_grace: NO_LIST_GRACE,
     };
-    let (entry, outcome) = service
-        .serve(&mut stream, sender.uid == rustix::process::getuid())
+    let served = service
+        .serve(
+            &mut stream,
+            Sender {
+                uid: sender.uid.as_raw(),
+                pid: sender.pid.as_raw_nonzero().get().cast_unsigned(),
+            },
+        )
         .context("Request refused")?;
-    eprintln!("{}", log_text::served(&entry, &outcome));
+    match served {
+        Served::Prompt(entry, outcome) => eprintln!("{}", log_text::served(&entry, &outcome)),
+        Served::Session(session, state) => {
+            eprintln!("{}", log_text::reported(&session, state.as_ref()));
+        }
+    }
     Ok(())
 }

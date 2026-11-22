@@ -37,10 +37,11 @@ impl PingWatch {
         self.notifier.set_cadence(cadence);
     }
 
-    /// Takes the IDs of the prompts that wait at `now`, oldest first, and
-    /// pings when the cadence allows it. A prompt that left the queue counts
-    /// for no ping. While the pings are muted, no ping comes: the prompts
-    /// keep their wait and ping when the mute ends.
+    /// Takes the IDs of the prompts that wait at `now`, oldest first, then
+    /// the keys of what else waits for a ping, and pings when the cadence
+    /// allows it. A prompt that left the queue counts for no ping. While the
+    /// pings are muted, no ping comes: the prompts keep their wait and ping
+    /// when the mute ends.
     pub fn refresh(&mut self, waiting: Vec<String>, now: Instant, is_muted: bool) {
         for id in &self.known {
             if !waiting.contains(id) {

@@ -1,7 +1,12 @@
 use std::time::{Duration, Instant, UNIX_EPOCH};
 
 use approval_queue::{
-    entry::Entry, key::Key, list_state::ListState, list_view, listed_entry::ListedEntry,
+    entry::Entry,
+    key::Key,
+    list_state::ListState,
+    list_view,
+    listed_entry::ListedEntry,
+    session_state::{Activity, ListedSession, SessionState},
 };
 use ratatui::{
     Terminal,
@@ -775,6 +780,16 @@ fn color_at(state: &ListState, text: &str) -> Color {
 
 #[test]
 fn should_color_the_command_of_a_bash_call_as_a_shell_script() {
+    let one_line = listed(
+        "1-2",
+        "agent",
+        "Bash",
+        &json!({ "command": "echo 'a'" }),
+        None,
+    );
+    let (state, _) = state_with(vec![one_line]);
+    assert_shows(&drawn_at_width(&state, 5, 80).0, "│command: echo 'a'");
+    assert_eq!(color_at(&state, "'a'"), Color::Green);
     let script = listed(
         "1-1",
         "agent",
@@ -786,16 +801,6 @@ fn should_color_the_command_of_a_bash_call_as_a_shell_script() {
     assert_eq!(color_at(&state, "if true; then"), Color::Blue);
     assert_eq!(color_at(&state, "yes"), Color::Green);
     assert_eq!(color_at(&state, "note: if true"), Color::Reset);
-    let one_line = listed(
-        "1-2",
-        "agent",
-        "Bash",
-        &json!({ "command": "echo 'a'" }),
-        None,
-    );
-    let (state, _) = state_with(vec![one_line]);
-    assert_shows(&drawn_at_width(&state, 5, 80).0, "│command: echo 'a'");
-    assert_eq!(color_at(&state, "'a'"), Color::Green);
 }
 
 #[test]
@@ -987,4 +992,97 @@ fn should_show_a_question_prompt_that_the_list_cannot_answer_as_its_input() {
     let lines = drawn_at_width(&state, 5, 80).0;
     assert_shows(&lines, "│questions: []");
     assert_shows(&lines, " a  Approve ");
+}
+
+fn session(id: &str, activity: Activity, since: u64, waits_for: &[&str]) -> ListedSession {
+    ListedSession {
+        session: id.to_owned(),
+        state: SessionState {
+            user: "agent".to_owned(),
+            user_is_verified: false,
+            host: "claude-code".to_owned(),
+            folder: "/home/agent/git/pont".to_owned(),
+            pid: 1,
+            activity,
+            since,
+            waits_for: waits_for.iter().map(|wait| (*wait).to_owned()).collect(),
+            sent_at: 0,
+        },
+    }
+}
+
+#[test]
+fn should_show_no_sessions_part_without_a_session() {
+    let (state, _) = state_with(vec![push()]);
+    assert!(
+        !screen(&state, 0)
+            .iter()
+            .any(|line| line.contains("sessions:"))
+    );
+}
+
+#[test]
+fn should_show_each_session_with_its_lamp_and_the_idle_ones_first() {
+    let (mut state, _) = state_with(vec![push()]);
+    state.show_sessions(vec![
+        session("aaaaaaaa-1", Activity::Active, RECEIVED - 5, &[]),
+        session(
+            "bbbbbbbb-2",
+            Activity::Waiting,
+            RECEIVED - 720,
+            &["cargo test", "CI run"],
+        ),
+        session("cccccccc-3", Activity::Waiting, RECEIVED - 30, &["sleep"]),
+        session("dddddddd-4", Activity::Idle, RECEIVED - 90, &[]),
+    ]);
+    let lines = screen(&state, 0);
+    let part: Vec<&str> = lines
+        .iter()
+        .skip_while(|line| !line.contains(" sessions: 4 "))
+        .skip(1)
+        .take(4)
+        .map(|line| line.split('│').nth(1).unwrap().trim_end())
+        .collect();
+    assert_eq!(
+        part,
+        [
+            "[##] pont  idle 1m  ?agent  dddddddd",
+            "[# ] pont  waits 12m: cargo test (+1)  ?ag",
+            "[# ] pont  waits 30s: sleep  ?agent  ccccc",
+            "[##] pont  active 5s  ?agent  aaaaaaaa",
+        ]
+    );
+}
+
+#[test]
+fn should_keep_the_prompt_and_show_the_sessions_in_a_narrow_terminal() {
+    let (mut state, _) = state_with(vec![push()]);
+    state.show_sessions(vec![
+        session("aaaaaaaa-1", Activity::Active, RECEIVED, &[]),
+        session("bbbbbbbb-2", Activity::Waiting, RECEIVED - 300, &[]),
+        session("cccccccc-3", Activity::Waiting, RECEIVED, &["a\nb"]),
+        session("dddddddd-4", Activity::Idle, RECEIVED, &[]),
+    ]);
+    let lines = drawn_at_width(&state, 0, 80).0;
+    assert_shows(&lines, "│Bash git push origin 1a2b:master ");
+    assert_shows(&lines, "│agent  Bash  pont  0a1b ");
+    for part in [
+        "[##] pont  idle 0s  ?agent  dddddddd",
+        "[# ] pont  waits 5m  ?agent  bbbbbbbb",
+        "[# ] pont  waits 0s: a\\nb  ?agent  cccccccc",
+        "[##] pont  active 0s  ?agent  aaaaaaaa",
+    ] {
+        assert_shows(&lines, part);
+    }
+}
+
+#[test]
+fn should_count_the_sessions_below_the_part() {
+    let (mut state, _) = state_with(vec![push()]);
+    state.show_sessions(
+        (0..12)
+            .map(|number| session(&format!("{number:02}"), Activity::Active, RECEIVED, &[]))
+            .collect(),
+    );
+    assert_shows(&screen(&state, 0), " below: 4 ");
 }

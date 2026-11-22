@@ -1,13 +1,14 @@
 use std::{
-    fs,
+    fs, process,
     time::{Duration, Instant, SystemTime},
 };
 
 use approval_queue::{
     alert_settings::{AlertSettings, CadencePreset},
-    alerts::{Alerts, FLASH_TIME, TrayCommand},
+    alerts::{Alerts, FLASH_TIME, IDLE_PING_AFTER, TrayCommand},
     entry::Entry,
     queue_folder::QueueFolder,
+    session_state::SessionReport,
 };
 use serde_json::Map;
 use tempfile::TempDir;
@@ -110,14 +111,14 @@ fn should_flash_for_the_flash_time_after_a_ping() {
         .alerts
         .refresh(fixture.start, fixture.clock, true)
         .unwrap();
-    assert_eq!(refreshed.pinged_prompts, Some(1));
+    assert_eq!(refreshed.pinged, Some(1));
     assert!(refreshed.view.is_flashing);
     assert_eq!(FLASH_TIME, Duration::from_millis(400));
     assert_eq!(fixture.alerts.flash_left(fixture.start), Some(FLASH_TIME));
     let end = fixture.start + FLASH_TIME;
     assert_eq!(fixture.alerts.flash_left(end), None);
     let refreshed = fixture.alerts.refresh(end, fixture.clock, true).unwrap();
-    assert_eq!(refreshed.pinged_prompts, None);
+    assert_eq!(refreshed.pinged, None);
     assert!(!refreshed.view.is_flashing);
 }
 
@@ -156,11 +157,7 @@ fn should_not_ping_for_a_new_cadence_alone() {
     let start = fixture.start;
     let clock = fixture.clock;
     assert_eq!(
-        fixture
-            .alerts
-            .refresh(start, clock, true)
-            .unwrap()
-            .pinged_prompts,
+        fixture.alerts.refresh(start, clock, true).unwrap().pinged,
         Some(1)
     );
     let _second = fixture.queue.add(&entry("Bash")).unwrap();
@@ -180,7 +177,7 @@ fn should_not_ping_for_a_new_cadence_alone() {
             .alerts
             .refresh(start + seconds(time), clock, true)
             .unwrap();
-        assert_eq!(refreshed.pinged_prompts, None);
+        assert_eq!(refreshed.pinged, None);
         assert_eq!(refreshed.view.settings.cadence, CadencePreset::Seldom);
     }
     assert_eq!(
@@ -188,7 +185,7 @@ fn should_not_ping_for_a_new_cadence_alone() {
             .alerts
             .refresh(start + seconds(605), clock, true)
             .unwrap()
-            .pinged_prompts,
+            .pinged,
         Some(1)
     );
 }
@@ -205,7 +202,7 @@ fn should_ping_at_the_stored_cadence_from_the_start() {
         alerts
             .refresh(start + seconds(time), clock, true)
             .unwrap()
-            .pinged_prompts
+            .pinged
     };
     assert_eq!(pinged(&mut fixture.alerts, 1), None);
     assert_eq!(pinged(&mut fixture.alerts, 9), None);
@@ -260,7 +257,7 @@ fn should_mute_and_unmute_the_pings_and_show_the_minutes_left() {
         .refresh(start, clock + seconds(60), true)
         .unwrap();
     assert_eq!(refreshed.view.muted_minutes, Some(9));
-    assert_eq!(refreshed.pinged_prompts, None);
+    assert_eq!(refreshed.pinged, None);
     assert_eq!(refreshed.view.permissions, 1);
     fixture
         .alerts
@@ -271,7 +268,7 @@ fn should_mute_and_unmute_the_pings_and_show_the_minutes_left() {
         .refresh(start + seconds(1), clock + seconds(61), true)
         .unwrap();
     assert_eq!(refreshed.view.muted_minutes, None);
-    assert_eq!(refreshed.pinged_prompts, Some(1));
+    assert_eq!(refreshed.pinged, Some(1));
 }
 
 #[test]
@@ -289,5 +286,80 @@ fn should_ask_for_the_list_only_at_the_open_command() {
             .alerts
             .carry_out(TrayCommand::Unmute, clock)
             .unwrap()
+    );
+}
+
+fn report_session(fixture: &Fixture, session: &str, state: &str, since: SystemTime) {
+    let line = serde_json::json!({
+        "version": 1,
+        "kind": "session",
+        "host": "claude-code",
+        "user": "agent",
+        "session": session,
+        "folder": "/home/agent/git/pont",
+        "pid": process::id(),
+        "state": state,
+        "sent_at": 0,
+    });
+    let since = since
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    fixture
+        .queue
+        .report_session(
+            &SessionReport::parse(&line.to_string()).unwrap(),
+            since,
+            false,
+        )
+        .unwrap();
+}
+
+#[test]
+fn should_count_the_idle_sessions_and_ping_one_time_for_a_session_that_is_idle_for_a_minute() {
+    let mut fixture = Fixture::with_settings("{}");
+    report_session(&fixture, "idle", "idle", fixture.clock);
+    report_session(&fixture, "active", "active", fixture.clock);
+    report_session(&fixture, "waiting", "waiting", fixture.clock);
+    let mut refresh = |after: Duration| {
+        fixture
+            .alerts
+            .refresh(fixture.start + after, fixture.clock + after, true)
+            .unwrap()
+    };
+    let early = refresh(IDLE_PING_AFTER.checked_sub(seconds(1)).unwrap());
+    assert_eq!(early.view.idle_sessions, 0);
+    assert_eq!(early.pinged, None);
+    let first = refresh(IDLE_PING_AFTER);
+    assert_eq!(first.view.idle_sessions, 1);
+    assert_eq!(first.pinged, Some(1));
+    let later = refresh(IDLE_PING_AFTER * 20);
+    assert_eq!(later.view.idle_sessions, 1);
+    assert_eq!(later.pinged, None);
+}
+
+#[test]
+fn should_ping_again_when_a_session_goes_idle_another_time() {
+    let mut fixture = Fixture::with_settings("{}");
+    report_session(&fixture, "one", "idle", fixture.clock);
+    let later = IDLE_PING_AFTER * 10;
+    assert_eq!(
+        fixture
+            .alerts
+            .refresh(fixture.start + later, fixture.clock + later, true)
+            .unwrap()
+            .pinged,
+        Some(1)
+    );
+    report_session(&fixture, "one", "active", fixture.clock + later);
+    report_session(&fixture, "one", "idle", fixture.clock + later);
+    let again = later + IDLE_PING_AFTER;
+    assert_eq!(
+        fixture
+            .alerts
+            .refresh(fixture.start + again, fixture.clock + again, true)
+            .unwrap()
+            .pinged,
+        Some(1)
     );
 }

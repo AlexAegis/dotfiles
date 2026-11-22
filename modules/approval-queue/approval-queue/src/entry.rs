@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::{display_text::visible_line, request::Request};
+use crate::{display_text::user_text, request::Request};
 
 /// One waiting prompt, as the service stores it for the list.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -49,11 +49,6 @@ impl Entry {
     /// short column keeps it.
     #[must_use]
     pub fn user_text(&self) -> String {
-        let name = visible_line(&self.user);
-        if self.user_is_verified {
-            name
-        } else {
-            format!("?{name}")
-        }
+        user_text(&self.user, self.user_is_verified)
     }
 }

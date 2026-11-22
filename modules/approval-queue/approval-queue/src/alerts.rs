@@ -4,7 +4,7 @@ use std::{
     collections::HashMap,
     path::PathBuf,
     sync::mpsc::{self, Receiver},
-    time::{Duration, Instant, SystemTime},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 use anyhow::Result;
@@ -13,11 +13,17 @@ use crate::{
     alert_settings::{AlertSettings, CadencePreset},
     ping_watch::PingWatch,
     queue_folder::{self, QueueFolder},
+    session_state::Activity,
     tray_view::{EntryKind, TrayView},
 };
 
 /// How long the icon of a ping shows before the icon of what waits.
 pub const FLASH_TIME: Duration = Duration::from_millis(400);
+
+/// A session pings and counts for the tray after this time without a turn
+/// and with nothing in flight. A session that its user answers sooner stays
+/// quiet.
+pub const IDLE_PING_AFTER: Duration = Duration::from_mins(1);
 
 /// What the owner chose in the tray.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,8 +40,8 @@ pub enum TrayCommand {
 pub struct Refreshed {
     /// What the tray shows.
     pub view: TrayView,
-    /// The count of the prompts of a ping that came.
-    pub pinged_prompts: Option<usize>,
+    /// The count of the prompts and idle sessions of a ping that came.
+    pub pinged: Option<usize>,
     /// True when the ping also brings the list to view.
     pub shows_list: bool,
 }
@@ -101,7 +107,9 @@ impl Alerts {
         Ok(false)
     }
 
-    /// Reads the queue and pings when the cadence allows it. A ping brings
+    /// Reads the queue and pings when the cadence allows it, for each new
+    /// prompt and for each session that is idle for `IDLE_PING_AFTER`. A
+    /// session pings one time for each time that it goes idle. A ping brings
     /// the list to view with high alert, and also while no tray icon shows
     /// the ping.
     pub fn refresh(
@@ -125,21 +133,41 @@ impl Alerts {
                 self.kinds.insert(id.clone(), kind);
             }
         }
-        self.watch.refresh(waiting, now, muted_minutes.is_some());
-        let pinged_prompts = self.pings.try_iter().reduce(|sum, count| sum + count);
-        if pinged_prompts.is_some() {
+        let epoch = clock
+            .duration_since(UNIX_EPOCH)
+            .map_or(0, |since| since.as_secs());
+        let idle: Vec<_> = self
+            .queue
+            .sessions()?
+            .into_iter()
+            .filter(|listed| {
+                listed.state.activity == Activity::Idle
+                    && epoch.saturating_sub(listed.state.since) >= IDLE_PING_AFTER.as_secs()
+            })
+            .collect();
+        let pinging = idle
+            .iter()
+            .map(|listed| format!("session-{}-{}", listed.session, listed.state.since));
+        self.watch.refresh(
+            waiting.into_iter().chain(pinging).collect(),
+            now,
+            muted_minutes.is_some(),
+        );
+        let pinged = self.pings.try_iter().reduce(|sum, count| sum + count);
+        if pinged.is_some() {
             self.flash_until = Some(now + FLASH_TIME);
         }
         Ok(Refreshed {
             view: TrayView {
                 permissions: self.count(EntryKind::Permission),
                 questions: self.count(EntryKind::Question),
+                idle_sessions: idle.len(),
                 is_flashing: self.flash_left(now).is_some(),
                 muted_minutes,
                 settings: self.settings,
             },
-            pinged_prompts,
-            shows_list: pinged_prompts.is_some() && (self.settings.high_alert || !has_tray),
+            pinged,
+            shows_list: pinged.is_some() && (self.settings.high_alert || !has_tray),
         })
     }
 

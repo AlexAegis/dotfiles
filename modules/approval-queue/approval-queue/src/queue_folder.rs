@@ -11,22 +11,35 @@ use std::{
 use anyhow::{Context, Result, bail, ensure};
 
 use crate::{
-    answer::Answer, entry::Entry, listed_entry::ListedEntry, open_list::OpenList,
-    request::check_title, waiting_entry::WaitingEntry,
+    answer::Answer,
+    entry::Entry,
+    listed_entry::ListedEntry,
+    open_list::OpenList,
+    process_tree::process_folder,
+    request::check_title,
+    session_state::{
+        Change, ListedSession, SessionReport, SessionState, is_session_id, latest_sent_at,
+    },
+    waiting_entry::WaitingEntry,
 };
+
+/// The most sessions of one user that have a state.
+pub const MAX_SESSIONS_OF_USER: usize = 64;
 
 /// A temporary file that no process locks is a leftover after this age.
 const LEFTOVER_AGE: Duration = Duration::from_secs(60);
 
 /// The folders through which the service processes and the lists share the
 /// waiting prompts: one file for each entry, one for each answer, one for
-/// each later title and one for each open list.
+/// each later title, one for each open list and one for each session that
+/// reports its state.
 #[derive(Debug, Clone)]
 pub struct QueueFolder {
     entries: PathBuf,
     answers: PathBuf,
     titles: PathBuf,
     lists: PathBuf,
+    sessions: PathBuf,
     mute: PathBuf,
 }
 
@@ -40,13 +53,20 @@ impl QueueFolder {
             answers: root.join("answers"),
             titles: root.join("titles"),
             lists: root.join("lists"),
+            sessions: root.join("sessions"),
             mute: root.join("pings-muted-until"),
         }
     }
 
     /// Creates the folders, for their owner only.
     pub fn create(&self) -> Result<()> {
-        for folder in [&self.entries, &self.answers, &self.titles, &self.lists] {
+        for folder in [
+            &self.entries,
+            &self.answers,
+            &self.titles,
+            &self.lists,
+            &self.sessions,
+        ] {
             DirBuilder::new()
                 .recursive(true)
                 .mode(0o700)
@@ -200,6 +220,113 @@ impl QueueFolder {
         Some(title)
     }
 
+    /// Applies the report to the state of its session: stores the new
+    /// state in place of the one before, removes the state of a session that
+    /// ended, or keeps the state that a later report gave. Refuses a report
+    /// for the session of another user, a report that was sent after `now`
+    /// and a new session of a user that has `MAX_SESSIONS_OF_USER`. Returns
+    /// the state that the session has after it.
+    pub fn report_session(
+        &self,
+        report: &SessionReport,
+        now: u64,
+        user_is_verified: bool,
+    ) -> Result<Option<SessionState>> {
+        let path = self.session_path(&report.session)?;
+        let before = read_session(&path);
+        if let Some(before) = &before {
+            ensure!(
+                before.user == report.user && before.user_is_verified == user_is_verified,
+                "Session belongs to another user"
+            );
+        }
+        ensure!(
+            report.sent_at <= latest_sent_at(now),
+            "Report field sent_at is after the time of the service"
+        );
+        let stored = match SessionState::after(before.as_ref(), report, now, user_is_verified) {
+            Change::Keep => return Ok(before),
+            Change::Remove => {
+                return match fs::remove_file(&path) {
+                    Err(error) if error.kind() != ErrorKind::NotFound => {
+                        Err(error).with_context(|| format!("State {} not removed", path.display()))
+                    }
+                    _ => Ok(None),
+                };
+            }
+            Change::Store(stored) => stored,
+        };
+        if before.is_none() {
+            let of_user = self
+                .sessions()?
+                .iter()
+                .filter(|listed| listed.state.user == report.user)
+                .count();
+            ensure!(
+                of_user < MAX_SESSIONS_OF_USER,
+                "User has {MAX_SESSIONS_OF_USER} sessions with a state"
+            );
+        }
+        let temporary = self
+            .sessions
+            .join(format!(".{}.{}.tmp", report.session, process::id()));
+        let written = store(&temporary, &serde_json::to_vec(&stored)?)
+            .and_then(|_| Ok(fs::rename(&temporary, &path)?));
+        if written.is_err() {
+            let _ = fs::remove_file(&temporary);
+        }
+        written.with_context(|| format!("State {} not stored", path.display()))?;
+        Ok(Some(stored))
+    }
+
+    /// The sessions that reported a state, in the order of their IDs.
+    /// Removes the state of a session whose process is gone, a file of
+    /// another form and each old temporary file.
+    pub fn sessions(&self) -> Result<Vec<ListedSession>> {
+        let mut listed = Vec::new();
+        for path in files_of(&self.sessions)? {
+            let name = path.file_name().and_then(OsStr::to_str).unwrap_or_default();
+            let session = name
+                .strip_suffix(".json")
+                .filter(|session| is_session_id(session));
+            let Some(session) = session else {
+                let is_new_temporary = name.starts_with('.')
+                    && !File::open(&path).is_ok_and(|file| is_older_than(&file, LEFTOVER_AGE));
+                if !is_new_temporary {
+                    let _ = fs::remove_file(&path);
+                }
+                continue;
+            };
+            match read_session(&path) {
+                Some(state) if process_folder(state.pid).exists() => listed.push(ListedSession {
+                    session: session.to_owned(),
+                    state,
+                }),
+                read => self.forget_session(session, read.as_ref()),
+            }
+        }
+        listed.sort_by(|one, other| one.session.cmp(&other.session));
+        Ok(listed)
+    }
+
+    /// Removes the state file of the session when it still reads as `read`.
+    /// A report can store a new state after the read. That state stays.
+    pub fn forget_session(&self, session: &str, read: Option<&SessionState>) {
+        if let Ok(path) = self.session_path(session)
+            && read_session(&path).as_ref() == read
+        {
+            let _ = fs::remove_file(&path);
+        }
+    }
+
+    fn session_path(&self, session: &str) -> Result<PathBuf> {
+        ensure!(
+            is_session_id(session),
+            "Session ID {session:?} has another form"
+        );
+        Ok(self.sessions.join(format!("{session}.json")))
+    }
+
     /// Stores the owner's answer for the service process of the entry.
     pub fn answer(&self, id: &str, answer: &Answer) -> Result<()> {
         ensure!(is_id(id), "Entry ID {id:?} has another form");
@@ -263,6 +390,10 @@ impl QueueFolder {
         }
         Ok(())
     }
+}
+
+fn read_session(path: &Path) -> Option<SessionState> {
+    serde_json::from_reader(BufReader::new(File::open(path).ok()?)).ok()
 }
 
 /// An ID that sorts by its time and names its process.

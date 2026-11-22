@@ -1,6 +1,7 @@
 use std::{
+    fs,
     io::{ErrorKind, Read, Write},
-    os::unix::net::UnixStream,
+    os::unix::{fs::MetadataExt, net::UnixStream},
     time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
@@ -11,8 +12,10 @@ use crate::{
     entry::Entry,
     log_text,
     outcome::Outcome,
+    process_tree::{is_at_or_above, process_folder},
     queue_folder::QueueFolder,
     request::{MAX_REQUEST_BYTES, Request, TitleUpdate},
+    session_state::{SessionReport, SessionState},
 };
 
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
@@ -20,13 +23,34 @@ const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
 /// longest size in JSON with each character as an escape, and its key.
 const MAX_UPDATE_BYTES: usize = 2048;
 
-/// Serves the connection of one hook: one request line in, then lines that
-/// give the waiting prompt a new title, and at most one reply line out.
+/// What one connection of a hook was.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Served {
+    /// A prompt, with how its wait ended.
+    Prompt(Entry, Outcome),
+    /// A report on the state of a session, with its ID and the state that
+    /// the queue now has for it. `None` for a session that ended.
+    Session(String, Option<SessionState>),
+}
+
+/// The process that opened a connection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Sender {
+    /// The user ID of the process, as the service sees it.
+    pub uid: u32,
+    pub pid: u32,
+}
+
+/// Serves the connection of one hook. A request line in, then lines that
+/// give the waiting prompt a new title, and at most one reply line out. Or
+/// one report line on the state of a session in, and no reply.
 #[derive(Debug)]
 pub struct Service<'a> {
     pub queue: &'a QueueFolder,
     /// The name of the user that owns the queue.
     pub own_user: &'a str,
+    /// The user ID of that user.
+    pub own_uid: u32,
     /// How often the service looks for the answer and for the end of the
     /// connection.
     pub poll_interval: Duration,
@@ -42,22 +66,20 @@ impl Service<'_> {
     /// as one JSON line. A refused request gets `{"error": <reason>}` with the
     /// outer reason only, and so does a prompt that only the list can answer
     /// while no list is open. Returns the entry and how its wait ended, for
-    /// the log.
-    pub fn serve(
-        &self,
-        stream: &mut UnixStream,
-        sender_is_own_user: bool,
-    ) -> Result<(Entry, Outcome)> {
+    /// the log. A report line on the state of a session changes that state
+    /// and gets a reply only when it is refused.
+    pub fn serve(&self, stream: &mut UnixStream, sender: Sender) -> Result<Served> {
+        let sender_is_own_user = sender.uid == self.own_uid;
+        let read = read_line(stream);
+        let (line, mut later_bytes) = replied(stream, read)?;
+        if SessionReport::is_named_in(&line) {
+            let reported = self.take_report(&line, sender);
+            return replied(stream, reported);
+        }
         let accepted = self
-            .accept(stream, sender_is_own_user)
-            .and_then(|(entry, later_bytes)| Ok((self.queue.add(&entry)?, entry, later_bytes)));
-        let (waiting, entry, mut later_bytes) = match accepted {
-            Ok(accepted) => accepted,
-            Err(error) => {
-                reply(stream, &json!({ "error": error.to_string() }));
-                return Err(error);
-            }
-        };
+            .accept(&line, sender_is_own_user)
+            .and_then(|entry| Ok((self.queue.add(&entry)?, entry)));
+        let (waiting, entry) = replied(stream, accepted)?;
         let deadline = Instant::now() + self.longest_wait;
         let mut list_seen = Instant::now();
         self.take_titles(waiting.id(), &mut later_bytes)?;
@@ -65,23 +87,23 @@ impl Service<'_> {
         loop {
             if let Some(answer) = self.queue.answer_for(waiting.id())? {
                 reply(stream, &serde_json::to_value(&answer)?);
-                return Ok((entry, Outcome::Answered(answer)));
+                return Ok(Served::Prompt(entry, Outcome::Answered(answer)));
             }
             let now = Instant::now();
             if now >= deadline {
-                return Ok((entry, Outcome::Expired));
+                return Ok(Served::Prompt(entry, Outcome::Expired));
             }
             if entry.list_only {
                 if self.queue.has_open_list()? {
                     list_seen = now;
                 } else if now.duration_since(list_seen) >= self.no_list_grace {
                     reply(stream, &json!({ "error": "No list is open" }));
-                    return Ok((entry, Outcome::NoList));
+                    return Ok(Served::Prompt(entry, Outcome::NoList));
                 }
             }
             let mut chunk = [0; 512];
             match stream.read(&mut chunk) {
-                Ok(0) => return Ok((entry, Outcome::ClientLeft)),
+                Ok(0) => return Ok(Served::Prompt(entry, Outcome::ClientLeft)),
                 Ok(count) => {
                     later_bytes.extend_from_slice(&chunk[..count]);
                     self.take_titles(waiting.id(), &mut later_bytes)?;
@@ -92,7 +114,7 @@ impl Service<'_> {
                         ErrorKind::WouldBlock | ErrorKind::TimedOut | ErrorKind::Interrupted
                     ) => {}
                 Err(error) if error.kind() == ErrorKind::ConnectionReset => {
-                    return Ok((entry, Outcome::ClientLeft));
+                    return Ok(Served::Prompt(entry, Outcome::ClientLeft));
                 }
                 Err(error) => return Err(error).context("Connection failed"),
             }
@@ -121,28 +143,62 @@ impl Service<'_> {
         Ok(())
     }
 
-    /// Reads the request. Returns its entry and the bytes that came after
-    /// its line in the same read.
-    fn accept(
-        &self,
-        stream: &mut UnixStream,
-        sender_is_own_user: bool,
-    ) -> Result<(Entry, Vec<u8>)> {
-        let (line, later_bytes) = read_line(stream)?;
-        let request = Request::parse(&line)?;
+    /// Applies the report line of a session. The process that the report
+    /// names must be the sender or a process above it, so the state leaves
+    /// with a process of the sender. The user IDs of the processes do not
+    /// tell that: the service sees one ID for every user but its own. So
+    /// it only refuses a process of its own user from another sender. The
+    /// sender must still run: the hook waits until the service closes.
+    fn take_report(&self, line: &str, sender: Sender) -> Result<Served> {
+        let sender_is_own_user = sender.uid == self.own_uid;
+        let report = SessionReport::parse(line)?;
+        self.check_user(&report.user, sender_is_own_user)?;
         ensure!(
-            (request.user == self.own_user) == sender_is_own_user,
-            "Request names a user other than its sender"
+            is_at_or_above(report.pid, sender.pid)
+                && (sender_is_own_user
+                    || fs::metadata(process_folder(report.pid))
+                        .is_ok_and(|process| process.uid() != self.own_uid)),
+            "Report field pid names neither its sender nor a process above it"
         );
-        let received = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .context("Clock is before 1970")?
-            .as_secs();
-        Ok((
-            Entry::of(request, received, sender_is_own_user),
-            later_bytes,
-        ))
+        let state = self
+            .queue
+            .report_session(&report, now()?, sender_is_own_user)?;
+        Ok(Served::Session(report.session, state))
     }
+
+    /// The entry of the request line.
+    fn accept(&self, line: &str, sender_is_own_user: bool) -> Result<Entry> {
+        let request = Request::parse(line)?;
+        self.check_user(&request.user, sender_is_own_user)?;
+        Ok(Entry::of(request, now()?, sender_is_own_user))
+    }
+
+    /// Refuses a line that names the owner of the queue from another
+    /// sender, or another user from the owner.
+    fn check_user(&self, user: &str, sender_is_own_user: bool) -> Result<()> {
+        ensure!(
+            (user == self.own_user) == sender_is_own_user,
+            "Line names a user other than its sender"
+        );
+        Ok(())
+    }
+}
+
+/// Replies the outer reason of a failure to the hook, and gives the result
+/// back.
+fn replied<T>(stream: &mut UnixStream, result: Result<T>) -> Result<T> {
+    if let Err(error) = &result {
+        reply(stream, &json!({ "error": error.to_string() }));
+    }
+    result
+}
+
+/// Seconds since the Unix epoch.
+fn now() -> Result<u64> {
+    Ok(SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .context("Clock is before 1970")?
+        .as_secs())
 }
 
 fn line_too_long() -> String {

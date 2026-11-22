@@ -113,7 +113,7 @@ pub fn check_title(title: &str) -> Result<()> {
 
 /// The form of a Linux account name. A name in this form cannot only look
 /// like another name through spaces or characters of other scripts.
-fn is_account_name(text: &str) -> bool {
+pub(crate) fn is_account_name(text: &str) -> bool {
     let mut bytes = text.bytes();
     bytes
         .next()

@@ -3,14 +3,19 @@ use std::{
     io::{Read, Write},
     net::Shutdown,
     os::unix::net::UnixStream,
-    thread,
+    process, thread,
     time::{Duration, Instant},
 };
 
 use anyhow::Result;
 use approval_queue::{
-    answer::Answer, entry::Entry, listed_entry::ListedEntry, outcome::Outcome,
-    queue_folder::QueueFolder, request::MAX_REQUEST_BYTES, service::Service,
+    answer::Answer,
+    entry::Entry,
+    listed_entry::ListedEntry,
+    outcome::Outcome,
+    queue_folder::QueueFolder,
+    request::MAX_REQUEST_BYTES,
+    service::{Sender, Served, Service},
 };
 use serde_json::{Value, json};
 use tempfile::TempDir;
@@ -110,12 +115,24 @@ fn exchange(case: Case) -> Exchange {
         let service = Service {
             queue: &queue,
             own_user: OWNER,
+            own_uid: 1000,
             poll_interval: Duration::from_millis(5),
             longest_wait,
             no_list_grace,
         };
         let serving = scope.spawn(move || {
-            let result = service.serve(&mut server, sender_is_own_user);
+            let result = service
+                .serve(
+                    &mut server,
+                    Sender {
+                        uid: if sender_is_own_user { 1000 } else { 1001 },
+                        pid: process::id(),
+                    },
+                )
+                .map(|served| match served {
+                    Served::Prompt(entry, outcome) => (entry, outcome),
+                    Served::Session(..) => panic!("served a report"),
+                });
             drop(server);
             result
         });
@@ -409,7 +426,7 @@ fn should_refuse_a_request_that_names_a_user_other_than_its_sender() {
             ..Case::of(line(user), Then::ReadReply)
         });
         assert_eq!(
-            result.reply, "{\"error\":\"Request names a user other than its sender\"}\n",
+            result.reply, "{\"error\":\"Line names a user other than its sender\"}\n",
             "{user}"
         );
         assert_eq!(result.listed, [], "{user}");

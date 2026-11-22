@@ -45,7 +45,7 @@ fn should_show_the_flash_icon_before_each_other_icon() {
 }
 
 #[test]
-fn should_need_attention_only_while_a_prompt_waits_or_a_ping_shows() {
+fn should_need_attention_only_while_a_prompt_or_an_idle_session_waits_or_a_ping_shows() {
     assert!(!TrayView::default().needs_attention());
     let views = [
         TrayView {
@@ -60,8 +60,27 @@ fn should_need_attention_only_while_a_prompt_waits_or_a_ping_shows() {
             is_flashing: true,
             ..TrayView::default()
         },
+        TrayView {
+            idle_sessions: 1,
+            ..TrayView::default()
+        },
     ];
     assert!(views.iter().all(TrayView::needs_attention));
+}
+
+#[test]
+fn should_show_the_idle_icon_only_while_no_prompt_waits() {
+    let idle = TrayView {
+        idle_sessions: 1,
+        ..TrayView::default()
+    };
+    assert_eq!(idle.icon_name(), "approval-queue-idle");
+    assert_eq!(idle.summary(), "idle sessions: 1");
+    let with_question = TrayView {
+        questions: 1,
+        ..idle
+    };
+    assert_eq!(with_question.icon_name(), "approval-queue-question");
 }
 
 #[test]
@@ -70,6 +89,7 @@ fn should_name_what_waits_the_mute_and_the_high_alert_in_the_summary() {
     let view = TrayView {
         permissions: 3,
         questions: 1,
+        idle_sessions: 2,
         is_flashing: false,
         muted_minutes: Some(7),
         settings: AlertSettings {
@@ -79,6 +99,6 @@ fn should_name_what_waits_the_mute_and_the_high_alert_in_the_summary() {
     };
     assert_eq!(
         view.summary(),
-        "permission prompts: 3, questions: 1, pings muted for 7 min, high alert"
+        "permission prompts: 3, questions: 1, idle sessions: 2, pings muted for 7 min, high alert"
     );
 }
