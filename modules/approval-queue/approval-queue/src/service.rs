@@ -9,15 +9,19 @@ use serde_json::json;
 
 use crate::{
     entry::Entry,
+    log_text,
     outcome::Outcome,
     queue_folder::QueueFolder,
-    request::{MAX_REQUEST_BYTES, Request},
+    request::{MAX_REQUEST_BYTES, Request, TitleUpdate},
 };
 
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
+/// Longest later line of a hook, the newline included: above a title of the
+/// longest size in JSON with each character as an escape, and its key.
+const MAX_UPDATE_BYTES: usize = 2048;
 
-/// Serves the connection of one hook: one request line in, at most one reply
-/// line out.
+/// Serves the connection of one hook: one request line in, then lines that
+/// give the waiting prompt a new title, and at most one reply line out.
 #[derive(Debug)]
 pub struct Service<'a> {
     pub queue: &'a QueueFolder,
@@ -46,8 +50,8 @@ impl Service<'_> {
     ) -> Result<(Entry, Outcome)> {
         let accepted = self
             .accept(stream, sender_is_own_user)
-            .and_then(|entry| Ok((self.queue.add(&entry)?, entry)));
-        let (waiting, entry) = match accepted {
+            .and_then(|(entry, later_bytes)| Ok((self.queue.add(&entry)?, entry, later_bytes)));
+        let (waiting, entry, mut later_bytes) = match accepted {
             Ok(accepted) => accepted,
             Err(error) => {
                 reply(stream, &json!({ "error": error.to_string() }));
@@ -56,6 +60,7 @@ impl Service<'_> {
         };
         let deadline = Instant::now() + self.longest_wait;
         let mut list_seen = Instant::now();
+        self.take_titles(waiting.id(), &mut later_bytes)?;
         stream.set_read_timeout(Some(self.poll_interval))?;
         loop {
             if let Some(answer) = self.queue.answer_for(waiting.id())? {
@@ -74,9 +79,13 @@ impl Service<'_> {
                     return Ok((entry, Outcome::NoList));
                 }
             }
-            match stream.read(&mut [0]) {
+            let mut chunk = [0; 512];
+            match stream.read(&mut chunk) {
                 Ok(0) => return Ok((entry, Outcome::ClientLeft)),
-                Ok(_) => bail!("Hook sent bytes after its request"),
+                Ok(count) => {
+                    later_bytes.extend_from_slice(&chunk[..count]);
+                    self.take_titles(waiting.id(), &mut later_bytes)?;
+                }
                 Err(error)
                     if matches!(
                         error.kind(),
@@ -90,8 +99,37 @@ impl Service<'_> {
         }
     }
 
-    fn accept(&self, stream: &mut UnixStream, sender_is_own_user: bool) -> Result<Entry> {
-        let request = Request::parse(&read_line(stream)?)?;
+    /// Takes each whole line out of the bytes that the hook sent after its
+    /// request, and stores the title of each line that gives one. A line of
+    /// another form and a title that the queue cannot store change nothing:
+    /// the prompt keeps its place and its title. Fails for a line above
+    /// `MAX_UPDATE_BYTES`.
+    fn take_titles(&self, id: &str, later_bytes: &mut Vec<u8>) -> Result<()> {
+        while let Some(end) = later_bytes.iter().position(|byte| *byte == b'\n') {
+            let line: Vec<u8> = later_bytes.drain(..=end).collect();
+            ensure!(line.len() <= MAX_UPDATE_BYTES, line_too_long());
+            let update = std::str::from_utf8(&line[..end])
+                .context("Update not UTF-8")
+                .and_then(TitleUpdate::parse);
+            if let Ok(update) = update
+                && let Err(error) = self.queue.set_title(id, &update.title)
+            {
+                eprintln!("{}", log_text::failed(&error));
+            }
+        }
+        ensure!(later_bytes.len() < MAX_UPDATE_BYTES, line_too_long());
+        Ok(())
+    }
+
+    /// Reads the request. Returns its entry and the bytes that came after
+    /// its line in the same read.
+    fn accept(
+        &self,
+        stream: &mut UnixStream,
+        sender_is_own_user: bool,
+    ) -> Result<(Entry, Vec<u8>)> {
+        let (line, later_bytes) = read_line(stream)?;
+        let request = Request::parse(&line)?;
         ensure!(
             (request.user == self.own_user) == sender_is_own_user,
             "Request names a user other than its sender"
@@ -100,8 +138,15 @@ impl Service<'_> {
             .duration_since(UNIX_EPOCH)
             .context("Clock is before 1970")?
             .as_secs();
-        Ok(Entry::of(request, received, sender_is_own_user))
+        Ok((
+            Entry::of(request, received, sender_is_own_user),
+            later_bytes,
+        ))
     }
+}
+
+fn line_too_long() -> String {
+    format!("Hook sent a line longer than {MAX_UPDATE_BYTES} bytes after its request")
 }
 
 /// The hook can close first, so a failed write only loses the reply.
@@ -109,7 +154,9 @@ fn reply(stream: &mut UnixStream, value: &serde_json::Value) {
     let _ = stream.write_all(format!("{value}\n").as_bytes());
 }
 
-fn read_line(stream: &mut UnixStream) -> Result<String> {
+/// Reads the first line, without its newline, and the bytes after it that
+/// came in the same read: a hook can send a later line at once.
+fn read_line(stream: &mut UnixStream) -> Result<(String, Vec<u8>)> {
     let deadline = Instant::now() + REQUEST_TIMEOUT;
     let mut bytes = Vec::new();
     let mut chunk = [0; 4096];
@@ -135,9 +182,10 @@ fn read_line(stream: &mut UnixStream) -> Result<String> {
                 end < MAX_REQUEST_BYTES,
                 "Request longer than {MAX_REQUEST_BYTES} bytes"
             );
-            ensure!(end + 1 == bytes.len(), "Request has bytes after its line");
+            let later_bytes = bytes.split_off(end + 1);
             bytes.truncate(end);
-            return String::from_utf8(bytes).context("Request not UTF-8");
+            let line = String::from_utf8(bytes).context("Request not UTF-8")?;
+            return Ok((line, later_bytes));
         }
         ensure!(
             bytes.len() < MAX_REQUEST_BYTES,

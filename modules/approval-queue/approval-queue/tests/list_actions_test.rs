@@ -92,7 +92,10 @@ fn should_show_a_mute_that_the_queue_cannot_store_as_a_notice() {
         .map(|item| item.unwrap().file_name().into_string().unwrap())
         .collect();
     names.sort();
-    assert_eq!(names, ["answers", "entries", "lists", "pings-muted-until"]);
+    assert_eq!(
+        names,
+        ["answers", "entries", "lists", "pings-muted-until", "titles"]
+    );
 }
 
 #[test]

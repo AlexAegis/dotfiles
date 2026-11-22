@@ -69,15 +69,7 @@ impl Request {
             );
         }
         if let Some(title) = &request.title {
-            ensure!(!title.is_empty(), "Request field title is empty");
-            ensure!(
-                title.chars().count() <= MAX_TITLE_CHARACTERS,
-                "Request field title is longer than {MAX_TITLE_CHARACTERS} characters"
-            );
-            ensure!(
-                !title.chars().any(char::is_control),
-                "Request field title has a control character"
-            );
+            check_title(title)?;
         }
         ensure!(
             is_account_name(&request.user),
@@ -85,6 +77,38 @@ impl Request {
         );
         Ok(request)
     }
+}
+
+/// A later line of the hook: a new title for its waiting prompt, such as a
+/// summary that took time to write.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TitleUpdate {
+    pub title: String,
+}
+
+impl TitleUpdate {
+    /// Parses one update line without its newline.
+    pub fn parse(line: &str) -> Result<Self> {
+        let update: Self = serde_json::from_str(line).context("Update has another form")?;
+        check_title(&update.title)?;
+        Ok(update)
+    }
+}
+
+/// Refuses a title that is no line of text of at most
+/// `MAX_TITLE_CHARACTERS` characters.
+pub fn check_title(title: &str) -> Result<()> {
+    ensure!(!title.is_empty(), "Request field title is empty");
+    ensure!(
+        title.chars().count() <= MAX_TITLE_CHARACTERS,
+        "Request field title is longer than {MAX_TITLE_CHARACTERS} characters"
+    );
+    ensure!(
+        !title.chars().any(char::is_control),
+        "Request field title has a control character"
+    );
+    Ok(())
 }
 
 /// The form of a Linux account name. A name in this form cannot only look

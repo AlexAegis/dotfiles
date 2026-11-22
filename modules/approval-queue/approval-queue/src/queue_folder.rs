@@ -12,19 +12,20 @@ use anyhow::{Context, Result, bail, ensure};
 
 use crate::{
     answer::Answer, entry::Entry, listed_entry::ListedEntry, open_list::OpenList,
-    waiting_entry::WaitingEntry,
+    request::check_title, waiting_entry::WaitingEntry,
 };
 
 /// A temporary file that no process locks is a leftover after this age.
 const LEFTOVER_AGE: Duration = Duration::from_secs(60);
 
 /// The folders through which the service processes and the lists share the
-/// waiting prompts: one file for each entry, one for each answer and one for
-/// each open list.
+/// waiting prompts: one file for each entry, one for each answer, one for
+/// each later title and one for each open list.
 #[derive(Debug, Clone)]
 pub struct QueueFolder {
     entries: PathBuf,
     answers: PathBuf,
+    titles: PathBuf,
     lists: PathBuf,
     mute: PathBuf,
 }
@@ -37,6 +38,7 @@ impl QueueFolder {
         Self {
             entries: root.join("entries"),
             answers: root.join("answers"),
+            titles: root.join("titles"),
             lists: root.join("lists"),
             mute: root.join("pings-muted-until"),
         }
@@ -44,7 +46,7 @@ impl QueueFolder {
 
     /// Creates the folders, for their owner only.
     pub fn create(&self) -> Result<()> {
-        for folder in [&self.entries, &self.answers, &self.lists] {
+        for folder in [&self.entries, &self.answers, &self.titles, &self.lists] {
             DirBuilder::new()
                 .recursive(true)
                 .mode(0o700)
@@ -63,6 +65,7 @@ impl QueueFolder {
             .with_context(|| format!("Entry {} not stored", path.display()))?;
         Ok(WaitingEntry {
             answer_path: self.answers.join(format!("{id}.json")),
+            title_path: self.titles.join(&id),
             id,
             path,
             _lock: lock,
@@ -98,8 +101,11 @@ impl QueueFolder {
                 continue;
             };
             let id = entry_id(&path);
-            let entry = serde_json::from_reader(BufReader::new(&file));
-            if let (Some(id), Ok(entry)) = (id, entry) {
+            let entry: serde_json::Result<Entry> = serde_json::from_reader(BufReader::new(&file));
+            if let (Some(id), Ok(mut entry)) = (id, entry) {
+                if let Some(title) = self.later_title(id) {
+                    entry.title = Some(title);
+                }
                 listed.push(ListedEntry {
                     id: id.to_owned(),
                     entry,
@@ -171,6 +177,29 @@ impl QueueFolder {
         UNIX_EPOCH.checked_add(Duration::from_secs(seconds))
     }
 
+    /// Stores a later title of the waiting entry, in place of an earlier
+    /// one. The lists show it in place of the title of the request.
+    pub fn set_title(&self, id: &str, title: &str) -> Result<()> {
+        ensure!(is_id(id), "Entry ID {id:?} has another form");
+        check_title(title)?;
+        let temporary = self.titles.join(format!(".{id}.{}.tmp", process::id()));
+        let path = self.titles.join(id);
+        let stored =
+            store(&temporary, title.as_bytes()).and_then(|_| Ok(fs::rename(&temporary, &path)?));
+        if stored.is_err() {
+            let _ = fs::remove_file(&temporary);
+        }
+        stored.with_context(|| format!("Title {} not stored", path.display()))
+    }
+
+    /// The later title of the entry, when its service process stored one
+    /// that is a title.
+    fn later_title(&self, id: &str) -> Option<String> {
+        let title = fs::read_to_string(self.titles.join(id)).ok()?;
+        check_title(&title).ok()?;
+        Some(title)
+    }
+
     /// Stores the owner's answer for the service process of the entry.
     pub fn answer(&self, id: &str, answer: &Answer) -> Result<()> {
         ensure!(is_id(id), "Entry ID {id:?} has another form");
@@ -213,16 +242,20 @@ impl QueueFolder {
         Ok(Some(answer))
     }
 
-    /// Removes each answer whose entry left the queue before its service
-    /// process read the answer, and each old temporary file.
-    pub fn remove_answers_without_entry(&self) -> Result<()> {
-        for path in files_of(&self.answers)? {
+    /// Removes each answer and each later title whose entry left the queue
+    /// without the end of its service process removing them, and each old
+    /// temporary file.
+    pub fn remove_leftovers(&self) -> Result<()> {
+        for path in files_of(&self.answers)?
+            .into_iter()
+            .chain(files_of(&self.titles)?)
+        {
             let name = path.file_name().and_then(OsStr::to_str).unwrap_or_default();
-            let is_leftover = match name.strip_suffix(".json") {
-                Some(id) if !name.starts_with('.') => {
-                    !self.entries.join(format!("{id}.json")).exists()
-                }
-                _ => File::open(&path).is_ok_and(|file| is_older_than(&file, LEFTOVER_AGE)),
+            let id = name.strip_suffix(".json").unwrap_or(name);
+            let is_leftover = if name.starts_with('.') {
+                File::open(&path).is_ok_and(|file| is_older_than(&file, LEFTOVER_AGE))
+            } else {
+                !self.entries.join(format!("{id}.json")).exists()
             };
             if is_leftover {
                 let _ = fs::remove_file(&path);

@@ -79,7 +79,7 @@ impl Drop for ListModes {
 fn show(terminal: &mut DefaultTerminal, queue: &QueueFolder) -> Result<()> {
     let mut state = ListState::default();
     loop {
-        queue.remove_answers_without_entry()?;
+        queue.remove_leftovers()?;
         state.refresh(queue.waiting()?, Instant::now());
         state.show_mute(queue.pings_muted_until());
         let mut scroll_limit = 0;

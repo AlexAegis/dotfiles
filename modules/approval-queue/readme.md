@@ -246,8 +246,15 @@ required. A text with a limit is not empty:
 | `reason`    | why a guard hook asked, or `null`                                 |                |
 | `list_only` | `true` or `false`: only the list can answer the prompt, see below |                |
 
-The hook keeps the connection open and sends nothing after its line. It ends its
-wait after 1 day. The reply is one JSON line:
+The hook keeps the connection open. After its request, it can send lines of the
+form `{"title":"<text>"}`: each gives the waiting prompt that title in place of
+the one before, such as a summary that took time to write. The rules of the
+request title apply. These change nothing: a line of another form, a title that
+the queue cannot store. A line of more than 2048 bytes, its newline included,
+ends the wait without a reply. A service before this version ends the wait at
+each later byte.
+
+The hook ends its wait after 1 day. The reply is one JSON line:
 
 - `{"behavior":"allow"}`, with a `message` when the owner typed one
 - `{"behavior":"allow","answers":{"<question>":"<answer>"}}` for a prompt with
@@ -287,6 +294,8 @@ request states.
 - `entries/<id>.json`: one waiting prompt. Its service process keeps a lock on
   the file. The list and `approval-queue-notify` remove an entry file that no
   process locks.
+- `titles/<id>`: the later title of that entry, when its hook sent one. The
+  service process removes it with the entry.
 - `answers/<id>.json`: the answer for that entry, in the form of the reply
   line: `{"behavior":"allow"}`, with `answers` for a prompt with questions, or
   `{"behavior":"deny"}`, each with a `message` when the owner typed one. The

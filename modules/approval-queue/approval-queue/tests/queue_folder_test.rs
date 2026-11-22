@@ -295,7 +295,7 @@ fn should_remove_only_the_answers_whose_entry_left() {
     queue.answer(stays.id(), &Answer::ALLOW).unwrap();
     queue.answer(leaves.id(), &Answer::ALLOW).unwrap();
     drop(leaves);
-    queue.remove_answers_without_entry().unwrap();
+    queue.remove_leftovers().unwrap();
     assert_eq!(
         names(&answers(&runtime_folder)),
         [format!("{}.json", stays.id())]
@@ -316,7 +316,7 @@ fn should_keep_a_new_temporary_answer_and_remove_an_old_one() {
         .unwrap()
         .set_modified(SystemTime::now() - Duration::from_secs(61))
         .unwrap();
-    queue.remove_answers_without_entry().unwrap();
+    queue.remove_leftovers().unwrap();
     assert_eq!(names(&answers(&runtime_folder)), [new]);
 }
 
@@ -463,4 +463,33 @@ fn should_store_the_answers_to_the_questions_of_a_prompt() {
     };
     assert!(queue.answer(waiting.id(), &empty).is_err());
     assert_eq!(queue.answer_for(waiting.id()).unwrap(), None);
+}
+
+#[test]
+fn should_list_an_entry_with_its_later_title_and_remove_the_title_with_the_entry() {
+    let (runtime_folder, queue) = queue();
+    let waiting = queue.add(&entry("Bash")).unwrap();
+    let other = queue.add(&entry("Bash")).unwrap();
+    queue.set_title(waiting.id(), "First").unwrap();
+    queue.set_title(waiting.id(), "Push one commit").unwrap();
+    assert!(queue.set_title(waiting.id(), "").is_err());
+    assert!(queue.set_title(waiting.id(), "a\nb").is_err());
+    assert!(queue.set_title("../x", "x").is_err());
+    let titles: Vec<Option<String>> = queue
+        .waiting()
+        .unwrap()
+        .into_iter()
+        .map(|listed| listed.entry.title)
+        .collect();
+    assert_eq!(titles, [Some("Push one commit".to_owned()), None]);
+    let folder = runtime_folder.path().join("approval-queue/titles");
+    let id = waiting.id().to_owned();
+    fs::write(folder.join(other.id()), "a\nb").unwrap();
+    assert_eq!(queue.waiting().unwrap()[1].entry.title, None);
+    drop(waiting);
+    assert!(!folder.join(&id).exists());
+    fs::write(folder.join(&id), "left").unwrap();
+    queue.remove_leftovers().unwrap();
+    assert!(!folder.join(&id).exists());
+    assert!(folder.join(other.id()).exists());
 }

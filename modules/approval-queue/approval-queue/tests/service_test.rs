@@ -1,4 +1,5 @@
 use std::{
+    fs,
     io::{Read, Write},
     net::Shutdown,
     os::unix::net::UnixStream,
@@ -19,6 +20,8 @@ const OWNER: &str = "alex";
 enum Then {
     Answer(Answer),
     Send(&'static [u8]),
+    SendInParts(&'static [u8], &'static [u8]),
+    SendWithoutTitleFolder(&'static [u8]),
     Close,
     CloseList,
     Wait,
@@ -130,6 +133,15 @@ fn exchange(case: Case) -> Exchange {
         match then {
             Then::Answer(answer) => queue.answer(&listed[0].id, &answer).unwrap(),
             Then::Send(bytes) => client.write_all(bytes).unwrap(),
+            Then::SendWithoutTitleFolder(bytes) => {
+                fs::remove_dir(runtime_folder.path().join("approval-queue/titles")).unwrap();
+                client.write_all(bytes).unwrap();
+            }
+            Then::SendInParts(first, second) => {
+                client.write_all(first).unwrap();
+                thread::sleep(Duration::from_millis(40));
+                client.write_all(second).unwrap();
+            }
             Then::Close => client.shutdown(Shutdown::Both).unwrap(),
             Then::CloseList => drop(open_list.take()),
             Then::Wait | Then::ReadReply => {}
@@ -273,14 +285,107 @@ fn should_keep_another_prompt_without_an_open_list() {
     assert_eq!(result.reply, "{\"behavior\":\"allow\"}\n");
 }
 
+fn sent_later(bytes: &'static [u8]) -> Exchange {
+    exchange(Case {
+        look_after: Duration::from_millis(100),
+        longest_wait: Duration::from_millis(400),
+        ..Case::of(line("agent"), Then::Send(bytes))
+    })
+}
+
 #[test]
-fn should_leave_the_queue_when_the_hook_sends_more_bytes() {
-    let result = waited(Then::Send(b"x"));
+fn should_give_the_waiting_prompt_the_title_of_a_later_line() {
+    let result = sent_later(b"{\"title\":\"Push one commit to master\"}\n");
+    assert_eq!(result.listed[0].entry.title, None);
+    assert_eq!(
+        result.listed_later[0].entry.title.as_deref(),
+        Some("Push one commit to master")
+    );
+    assert_eq!(result.listed_later[0].id, result.listed[0].id);
+    assert_eq!(result.served.unwrap().1, Outcome::Expired);
+    assert_eq!(result.left, []);
+}
+
+#[test]
+fn should_take_the_last_title_and_keep_the_prompt_at_a_line_of_another_form() {
+    let result = sent_later(
+        b"x\n{\"title\":\"B\"}\n{\"title\":\"\"}\n{\"title\":\"A\",\"more\":1}\n\xff\n{\"tit",
+    );
+    assert_eq!(result.listed_later[0].entry.title.as_deref(), Some("B"));
+    assert_eq!(result.served.unwrap().1, Outcome::Expired);
+}
+
+#[test]
+fn should_keep_the_prompt_with_its_title_when_the_queue_cannot_store_a_later_title() {
+    let result = exchange(Case {
+        look_after: Duration::from_millis(100),
+        longest_wait: Duration::from_millis(400),
+        ..Case::of(
+            line("agent"),
+            Then::SendWithoutTitleFolder(b"{\"title\":\"Push one\"}\n"),
+        )
+    });
+    assert_eq!(result.listed_later[0].entry.title, None);
+    assert_eq!(result.served.unwrap().1, Outcome::Expired);
+}
+
+#[test]
+fn should_take_a_title_that_comes_in_one_read_with_the_request() {
+    let mut request = line("agent");
+    request.extend_from_slice(b"{\"title\":\"Push one\"}\n");
+    let result = exchange(Case {
+        look_after: Duration::from_millis(100),
+        longest_wait: Duration::from_millis(400),
+        ..Case::of(request, Then::Wait)
+    });
+    assert_eq!(
+        result.listed_later[0].entry.title.as_deref(),
+        Some("Push one")
+    );
+    assert_eq!(result.served.unwrap().1, Outcome::Expired);
+}
+
+#[test]
+fn should_take_a_title_whose_line_comes_in_two_parts() {
+    let result = exchange(Case {
+        look_after: Duration::from_millis(100),
+        longest_wait: Duration::from_millis(400),
+        ..Case::of(
+            line("agent"),
+            Then::SendInParts(b"{\"title\":\"Pu", b"sh one\"}\n"),
+        )
+    });
+    assert_eq!(
+        result.listed_later[0].entry.title.as_deref(),
+        Some("Push one")
+    );
+}
+
+#[test]
+fn should_leave_the_queue_when_the_hook_sends_a_whole_line_above_the_limit() {
+    static LONG: [u8; 2051] = {
+        let mut lines = [b'x'; 2051];
+        lines[1] = b'\n';
+        lines[2050] = b'\n';
+        lines
+    };
+    let result = sent_later(&LONG);
+    assert_eq!(result.reply, "");
+    assert_eq!(
+        result.served.unwrap_err().to_string(),
+        "Hook sent a line longer than 2048 bytes after its request"
+    );
+}
+
+#[test]
+fn should_leave_the_queue_when_the_hook_sends_a_long_line_without_an_end() {
+    static LONG: [u8; 2048] = [b'x'; 2048];
+    let result = sent_later(&LONG);
     assert_eq!(result.listed.len(), 1);
     assert_eq!(result.reply, "");
     assert_eq!(
         result.served.unwrap_err().to_string(),
-        "Hook sent bytes after its request"
+        "Hook sent a line longer than 2048 bytes after its request"
     );
     assert_eq!(result.left, []);
 }
@@ -326,14 +431,11 @@ fn should_refuse_a_user_that_only_looks_like_the_owner() {
 
 #[test]
 fn should_refuse_a_request_of_another_form() {
-    let mut two_lines = line("agent");
-    two_lines.extend_from_slice(b"more\n");
     for (request, reason) in [
         (b"".to_vec(), "Request empty"),
         (b"{}".to_vec(), "Request ends without a newline"),
         (b"{}\n".to_vec(), "Request has another form"),
         (b"\xff\n".to_vec(), "Request not UTF-8"),
-        (two_lines, "Request has bytes after its line"),
     ] {
         let result = refused(&request);
         assert_eq!(

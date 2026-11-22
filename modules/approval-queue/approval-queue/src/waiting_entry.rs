@@ -11,6 +11,7 @@ pub struct WaitingEntry {
     pub(crate) id: String,
     pub(crate) path: PathBuf,
     pub(crate) answer_path: PathBuf,
+    pub(crate) title_path: PathBuf,
     pub(crate) _lock: File,
 }
 
@@ -27,5 +28,6 @@ impl Drop for WaitingEntry {
     fn drop(&mut self) {
         let _ = fs::remove_file(&self.path);
         let _ = fs::remove_file(&self.answer_path);
+        let _ = fs::remove_file(&self.title_path);
     }
 }
