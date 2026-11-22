@@ -4,6 +4,7 @@ pub mod alerts;
 pub mod answer;
 pub mod display_text;
 pub mod entry;
+pub mod highlight;
 pub mod key;
 pub mod list_actions;
 pub mod list_state;

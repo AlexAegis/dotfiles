@@ -3,7 +3,11 @@ use std::time::{Duration, Instant, UNIX_EPOCH};
 use approval_queue::{
     entry::Entry, key::Key, list_state::ListState, list_view, listed_entry::ListedEntry,
 };
-use ratatui::{Terminal, backend::TestBackend, style::Modifier};
+use ratatui::{
+    Terminal,
+    backend::TestBackend,
+    style::{Color, Modifier},
+};
 use serde_json::{Value, json};
 
 const RECEIVED: u64 = 1_795_000_000;
@@ -641,4 +645,140 @@ fn should_show_each_key_in_a_terminal_of_80_columns() {
     ] {
         assert_shows(&lines, key);
     }
+}
+
+fn color_at(state: &ListState, text: &str) -> Color {
+    let mut terminal = Terminal::new(TestBackend::new(80, 24)).unwrap();
+    terminal
+        .draw(|frame| {
+            list_view::draw(frame, state, UNIX_EPOCH + Duration::from_secs(RECEIVED));
+        })
+        .unwrap();
+    let buffer = terminal.backend().buffer();
+    for y in (0..buffer.area.height).rev() {
+        let line: String = (0..buffer.area.width)
+            .map(|x| buffer[(x, y)].symbol())
+            .collect();
+        if let Some(byte) = line.find(text) {
+            let x = u16::try_from(line[..byte].chars().count()).unwrap();
+            return buffer[(x, y)].fg;
+        }
+    }
+    panic!("{text:?} is not on the screen");
+}
+
+#[test]
+fn should_color_the_command_of_a_bash_call_as_a_shell_script() {
+    let script = listed(
+        "1-1",
+        "agent",
+        "Bash",
+        &json!({ "command": "if true; then\n  echo 'yes' # note\nfi", "note": "if true" }),
+        None,
+    );
+    let (state, _) = state_with(vec![script]);
+    assert_eq!(color_at(&state, "if true; then"), Color::Blue);
+    assert_eq!(color_at(&state, "yes"), Color::Green);
+    assert_eq!(color_at(&state, "note: if true"), Color::Reset);
+    let one_line = listed(
+        "1-2",
+        "agent",
+        "Bash",
+        &json!({ "command": "echo 'a'" }),
+        None,
+    );
+    let (state, _) = state_with(vec![one_line]);
+    assert_shows(&drawn_at_width(&state, 5, 80).0, "│command: echo 'a'");
+    assert_eq!(color_at(&state, "'a'"), Color::Green);
+}
+
+#[test]
+fn should_color_the_content_of_a_write_call_by_the_language_of_its_file() {
+    let input = |path: &str| json!({ "file_path": path, "content": "fn main() {}\n// done" });
+    let rust = listed("1-1", "agent", "Write", &input("/a/main.rs"), None);
+    let (state, _) = state_with(vec![rust]);
+    assert_shows(&drawn_at_width(&state, 5, 80).0, "│content:");
+    assert_eq!(color_at(&state, "fn main"), Color::Blue);
+    let text = listed("1-2", "agent", "Write", &input("/a/main"), None);
+    let (state, _) = state_with(vec![text]);
+    assert_eq!(color_at(&state, "fn main"), Color::Reset);
+    let command = listed(
+        "1-3",
+        "agent",
+        "Write",
+        &json!({ "file_path": "/a/b.rs", "command": "fn main() {}" }),
+        None,
+    );
+    let (state, _) = state_with(vec![command]);
+    assert_eq!(color_at(&state, "fn main"), Color::Reset);
+}
+
+#[test]
+fn should_show_both_texts_of_an_edit_call_as_one_diff() {
+    let edit = listed(
+        "1-1",
+        "agent",
+        "Edit",
+        &json!({
+            "file_path": "/a/main.rs",
+            "old_string": "one\ntwo",
+            "new_string": "one\n2",
+            "replace_all": false,
+        }),
+        None,
+    );
+    let (state, _) = state_with(vec![edit]);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    for part in [
+        "│file_path: /a/main.rs",
+        "│change:",
+        "│   one",
+        "│  -two",
+        "│  +2",
+        "│replace_all: false",
+    ] {
+        assert_shows(&lines, part);
+    }
+    assert!(!lines.iter().any(|line| line.contains("_string")));
+    assert_eq!(color_at(&state, "-two"), Color::Red);
+    assert_eq!(color_at(&state, "+2"), Color::Green);
+}
+
+#[test]
+fn should_show_an_edit_call_with_one_text_as_it_is() {
+    let edit = listed(
+        "1-1",
+        "agent",
+        "Edit",
+        &json!({ "file_path": "/a/main.rs", "new_string": "one", "old_string": 7 }),
+        None,
+    );
+    let (state, _) = state_with(vec![edit]);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    assert_shows(&lines, "│new_string: one");
+    assert_shows(&lines, "│old_string: 7");
+    assert!(!lines.iter().any(|line| line.contains("change:")));
+}
+
+#[test]
+fn should_show_both_texts_of_an_edit_call_as_they_are_when_the_input_names_a_change() {
+    let edit = listed(
+        "1-1",
+        "agent",
+        "Edit",
+        &json!({ "change": "-a\n+b", "old_string": "x", "new_string": "y" }),
+        None,
+    );
+    let (state, _) = state_with(vec![edit]);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    for part in [
+        "│change:",
+        "│  -a",
+        "│  +b",
+        "│old_string: x",
+        "│new_string: y",
+    ] {
+        assert_shows(&lines, part);
+    }
+    assert_eq!(color_at(&state, "-a"), Color::Reset);
 }

@@ -1,4 +1,7 @@
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::{
+    sync::{Mutex, PoisonError},
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 use ratatui::{
     Frame,
@@ -13,6 +16,7 @@ use crate::{
     answer::Answer,
     display_text::{visible_line, visible_lines},
     entry::Entry,
+    highlight::{self, Language},
     list_state::ListState,
     listed_entry::ListedEntry,
     queue_folder,
@@ -32,6 +36,8 @@ const ENTRY_HEIGHT: u16 = 4;
 const TWO_COLUMN_WIDTH: u16 = 100;
 /// The width of the longest kind and one blank after it.
 const KIND_WIDTH: u16 = 11;
+/// The name under which the pane shows both texts of an Edit call.
+const DIFF_NAME: &str = "change";
 const ACTIONS: [(&str, &str); 3] = [
     ("a", "Approve"),
     ("d", "Decline"),
@@ -182,7 +188,7 @@ fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
     let inner = pane.inner(area);
     let [detail_area, action_area] =
         Layout::vertical([Constraint::Fill(1), Constraint::Length(1)]).areas(inner);
-    let detail = Paragraph::new(detail(entry)).wrap(Wrap { trim: false });
+    let detail = Paragraph::new(detail_of(entry)).wrap(Wrap { trim: false });
     let scroll_limit = u16::try_from(detail.line_count(detail_area.width))
         .unwrap_or(u16::MAX)
         .saturating_sub(detail_area.height);
@@ -263,7 +269,26 @@ fn summary(entry: &Entry) -> String {
         )
 }
 
-fn detail<'a>(entry: &Entry) -> Vec<Line<'a>> {
+/// The lines of the pane for the prompt. The lines of the last prompt stay
+/// for the next draw of the same entry: the colors of a long script take
+/// time.
+fn detail_of(entry: &Entry) -> Vec<Line<'static>> {
+    static LAST: Mutex<Option<(String, Vec<Line<'static>>)>> = Mutex::new(None);
+    let Ok(key) = serde_json::to_string(entry) else {
+        return detail(entry);
+    };
+    let mut last = LAST.lock().unwrap_or_else(PoisonError::into_inner);
+    match &*last {
+        Some((last_key, lines)) if *last_key == key => lines.clone(),
+        _ => {
+            let lines = detail(entry);
+            *last = Some((key, lines.clone()));
+            lines
+        }
+    }
+}
+
+fn detail(entry: &Entry) -> Vec<Line<'static>> {
     let mut lines = vec![
         format!(
             "user {}   host {}   mode {}",
@@ -280,7 +305,7 @@ fn detail<'a>(entry: &Entry) -> Vec<Line<'a>> {
     if let Some(reason) = &entry.reason {
         push_field(&mut lines, "reason", reason);
     }
-    let mut lines: Vec<Line> = lines.into_iter().map(Line::from).collect();
+    let mut lines: Vec<Line<'static>> = lines.into_iter().map(Line::from).collect();
     lines.push(Line::default());
     let title = title(entry);
     lines.push(Line::from(Span::styled(
@@ -288,21 +313,77 @@ fn detail<'a>(entry: &Entry) -> Vec<Line<'a>> {
         Style::new().add_modifier(Modifier::BOLD),
     )));
     lines.push(Line::default());
-    let mut fields = Vec::new();
     for (key, value) in &entry.input {
+        let name = visible_line(key);
         match value {
             // The title above already shows this text
             Value::String(text) if key == "description" && visible_line(text) == title => {}
-            Value::String(text) => push_field(&mut fields, &visible_line(key), text),
-            other => fields.push(format!(
-                "{}: {}",
-                visible_line(key),
+            Value::String(text) => match code(entry, key, text) {
+                Some(Code::Lines(name, code)) => push_code(&mut lines, name, code),
+                Some(Code::InOtherField) => {}
+                None => {
+                    let mut field = Vec::new();
+                    push_field(&mut field, &name, text);
+                    lines.extend(field.into_iter().map(Line::from));
+                }
+            },
+            other => lines.push(Line::from(format!(
+                "{name}: {}",
                 visible_line(&other.to_string())
-            )),
+            ))),
         }
     }
-    lines.extend(fields.into_iter().map(Line::from));
     lines
+}
+
+/// An input text that the pane shows as code.
+enum Code {
+    /// The name of the field and its colored lines.
+    Lines(&'static str, Vec<Line<'static>>),
+    /// The lines of another field of the input show this text.
+    InOtherField,
+}
+
+/// The code of an input field: the command of a Bash call in the colors of
+/// a shell script, the content of a Write call in those of the language of
+/// its file, and both texts of an Edit call as one diff.
+fn code(entry: &Entry, key: &str, text: &str) -> Option<Code> {
+    let other = |key: &str| entry.input.get(key).and_then(Value::as_str);
+    // The diff shows under a name that the input does not use
+    let has_diff = !entry.input.contains_key(DIFF_NAME);
+    match (entry.tool.as_str(), key) {
+        ("Bash", "command") => Some(Code::Lines(
+            "command",
+            highlight::code_lines(text, Language::Shell),
+        )),
+        ("Write", "content") => Some(Code::Lines(
+            "content",
+            highlight::code_lines(
+                text,
+                Language::OfPath(other("file_path").unwrap_or_default()),
+            ),
+        )),
+        ("Edit", "old_string") if has_diff => {
+            other("new_string").map(|new| Code::Lines(DIFF_NAME, highlight::diff_lines(text, new)))
+        }
+        ("Edit", "new_string") if has_diff => other("old_string").map(|_| Code::InOtherField),
+        _ => None,
+    }
+}
+
+/// One line for one line of code, else the name and the code below it.
+fn push_code(lines: &mut Vec<Line<'static>>, name: &str, mut code: Vec<Line<'static>>) {
+    if code.len() == 1 {
+        let mut spans = vec![Span::raw(format!("{name}: "))];
+        spans.append(&mut code[0].spans);
+        lines.push(Line::from(spans));
+    } else {
+        lines.push(Line::from(format!("{name}:")));
+        lines.extend(code.into_iter().map(|mut line| {
+            line.spans.insert(0, Span::raw("  "));
+            line
+        }));
+    }
 }
 
 /// One line for a short text, else the name and the text below it.

@@ -42,6 +42,21 @@ above the right one.
   tool. A `description` of the input that equals the title is not shown again.
   The last line names the keys that answer. The border counts the lines above
   and below.
+  - The command of a `Bash` call has the colors of a shell script.
+  - The content of a `Write` call has the colors of the language that the
+    extension of its file names, from the default syntaxes of `syntect`. A
+    TypeScript file has the colors of JavaScript. The content of a file with
+    another extension, or without one, has no colors.
+  - The two texts of an `Edit` call show as one diff under `change`: `-` and red
+    for a line of only the old text, `+` and green for a line of only the new
+    one. A line of both texts shows after a blank. When the product of the line
+    counts of both texts without their common first and last lines is above
+    4000000, the diff shows those old lines, then those new ones. An input with
+    a field `change` shows both texts as they are.
+  - The colors are those of the terminal. A comment is dim. A tab shows as
+    `\t`. Each other control character shows as its escape. A command or a
+    content with a line above 4096 bytes has no colors. After 250 ms, the lines
+    that follow have none.
 
 | Key              | Effect                                          |
 | ---------------- | ----------------------------------------------- |
