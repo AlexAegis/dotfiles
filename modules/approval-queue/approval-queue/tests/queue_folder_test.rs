@@ -349,3 +349,19 @@ fn should_keep_the_entries_apart_from_the_marks_of_the_lists() {
     assert_eq!(queue.waiting().unwrap().len(), 1);
     assert!(queue.has_open_list().unwrap());
 }
+
+#[test]
+fn should_list_the_ids_of_the_waiting_entries_without_their_content() {
+    let (runtime_folder, queue) = queue();
+    let first = queue.add(&entry("Bash")).unwrap();
+    let second = queue.add(&entry("Write")).unwrap();
+    for path in fs::read_dir(entries(&runtime_folder)).unwrap() {
+        fs::write(path.unwrap().path(), "[").unwrap();
+    }
+    File::create(entries(&runtime_folder).join("00000000000000000001-1.json")).unwrap();
+    assert_eq!(
+        queue.waiting_ids().unwrap(),
+        vec![first.id().to_owned(), second.id().to_owned()]
+    );
+    assert_eq!(fs::read_dir(entries(&runtime_folder)).unwrap().count(), 2);
+}

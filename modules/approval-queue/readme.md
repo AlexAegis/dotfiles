@@ -65,6 +65,55 @@ lines above and below it.
 - After the last list quits, the prompts stay in the queue, except those with
   `list_only`.
 
+## Notify
+
+`approval-queue-notify.service` runs `approval-queue-notify` in the graphical
+session. It checks the entry files 2 times each second and brings the list to
+view at a cadence, so that many prompts give few pings. Each prompt counts
+for at most one ping. Until then it waits for its ping:
+
+- A prompt pings at once when no prompt waits for a ping and the last ping is
+  at least 30 seconds old.
+- After a ping, no ping comes for 30 seconds.
+- After that time, a ping comes when 4 prompts wait for a ping, or, with
+  fewer, when the oldest of them has waited 2 minutes.
+- A prompt that leaves the queue before its ping counts for none.
+
+The cadence comes from the
+[`ping_throttle`](https://github.com/AlexAegis/ping_throttle) crate. Its values
+are the `CADENCE` in `ping_watch.rs`. A restart of the service starts the
+cadence again: each waiting prompt then counts as new.
+
+A ping does this:
+
+1. It loads `focus_list.js` into KWin through D-Bus (`busctl`). The script
+   moves the window of the list to the current desktop and gives it the focus.
+   It finds the window by its caption, which must be `approval-queue`: the
+   list sets the title of its terminal to that, and clears it when it quits.
+   The script stays loaded for 10 seconds, so it also focuses one list window
+   that opens in that time. A window on all desktops stays on all desktops.
+2. When no list is open, it starts `ghostty` with the list, as a unit of its
+   own (`systemd-run --user`).
+
+The script finds no list whose window shows a caption other than that title:
+
+- a list in a tab that is not the current tab of its window
+- a list in a terminal multiplexer, or in a terminal with a fixed title format
+
+A ping then shows nothing while that list is open. The script does not move a
+window between activities. A ping also opens a list while nobody watches the
+screen.
+
+The cadence counts the time that the machine runs, without the time of a
+suspend.
+
+On a desktop without KWin, step 1 fails and the journal has the reason. Step 2
+still runs:
+
+```sh
+journalctl --user -u approval-queue-notify.service
+```
+
 ## Requests
 
 One JSON line, at most 65536 bytes with the newline. Each field is required. A
@@ -117,17 +166,20 @@ request states.
 `$XDG_RUNTIME_DIR/approval-queue`, for the owner only:
 
 - `entries/<id>.json`: one waiting prompt. Its service process keeps a lock on
-  the file. The list removes an entry file that no process locks.
+  the file. The list and `approval-queue-notify` remove an entry file that no
+  process locks.
 - `answers/<id>.json`: the answer for that entry, `{"behavior":"allow"}` or
   `{"behavior":"deny","message":"<text>"}`. The message is one line of at most
   500 characters. The file stays until its entry leaves, so the queue refuses a
   second answer.
 - `lists/<id>`: the mark of one open list. Its list keeps a lock on the file. A
-  service process removes a mark that no process locks.
+  service process and `approval-queue-notify` remove a mark that no process
+  locks.
+- `focus-list.js`: the KWin script of the last ping.
 
 ## Install
 
-`pont -fx approval-queue` builds both programs with the locked dependencies and
+`pont -fx approval-queue` builds the programs with the locked dependencies and
 installs them to `$XDG_DATA_HOME/approval-queue`. Its root step creates
 `/run/approval-queue` through `/etc/tmpfiles.d/approval-queue.conf`. The module
 applies only to writable dotfiles on a systemd machine where the `agent` group
@@ -167,3 +219,8 @@ prints the reply and ends the command. `cargo test` in `approval-queue` tests
 the request form, the files of the queue, whole connections, the keys of the
 list and what the list draws. The tests give the list its terminal events
 directly. No test runs a real terminal, so none covers its bracketed paste mode.
+The tests of `approval-queue-notify` run it with stand-ins for `busctl` and
+`systemd-run`. No test runs KWin, `ghostty` or `focus_list.js`.
+
+To see a ping, close each list, send the request above and wait: a terminal
+with the list opens and gets the focus.

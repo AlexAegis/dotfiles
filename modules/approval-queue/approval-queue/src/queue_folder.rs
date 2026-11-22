@@ -95,11 +95,7 @@ impl QueueFolder {
             let Some(file) = locked(&path) else {
                 continue;
             };
-            let id = path
-                .file_name()
-                .and_then(OsStr::to_str)
-                .and_then(|name| name.strip_suffix(".json"))
-                .filter(|id| is_id(id));
+            let id = entry_id(&path);
             let entry = serde_json::from_reader(BufReader::new(&file));
             if let (Some(id), Ok(entry)) = (id, entry) {
                 listed.push(ListedEntry {
@@ -110,6 +106,19 @@ impl QueueFolder {
         }
         listed.sort_by(|a, b| a.id.cmp(&b.id));
         Ok(listed)
+    }
+
+    /// The IDs of the waiting entries, oldest first, without a read of their
+    /// content. Removes each entry whose service process ended without
+    /// removing it.
+    pub fn waiting_ids(&self) -> Result<Vec<String>> {
+        let mut ids: Vec<String> = files_of(&self.entries)?
+            .iter()
+            .filter(|path| locked(path).is_some())
+            .filter_map(|path| entry_id(path).map(str::to_owned))
+            .collect();
+        ids.sort();
+        Ok(ids)
     }
 
     /// Stores the owner's answer for the service process of the entry.
@@ -240,6 +249,13 @@ fn is_older_than(file: &File, age: Duration) -> bool {
         .ok()
         .and_then(|modified| modified.elapsed().ok())
         .is_some_and(|elapsed| elapsed > age)
+}
+
+fn entry_id(path: &Path) -> Option<&str> {
+    path.file_name()
+        .and_then(OsStr::to_str)
+        .and_then(|name| name.strip_suffix(".json"))
+        .filter(|id| is_id(id))
 }
 
 fn is_id(text: &str) -> bool {

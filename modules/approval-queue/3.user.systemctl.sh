@@ -6,4 +6,9 @@ systemctl --user daemon-reload || exit 1
 systemctl --user reset-failed approval-queue.socket 2>/dev/null
 systemctl --user enable approval-queue.socket || exit 1
 # The service processes of the waiting prompts keep their connections
-systemctl --user restart approval-queue.socket
+systemctl --user restart approval-queue.socket || exit 1
+systemctl --user enable approval-queue-notify.service || exit 1
+# Outside a graphical session, the next login starts it
+if systemctl --user is-active --quiet graphical-session.target; then
+	systemctl --user restart approval-queue-notify.service
+fi

@@ -19,6 +19,7 @@ name = "approval-queue"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "ping_throttle",
  "ratatui",
  "rustix",
  "serde",
@@ -465,6 +466,11 @@ dependencies = [
  "smallvec",
  "windows-link",
 ]
+
+[[package]]
+name = "ping_throttle"
+version = "0.1.0"
+source = "git+https://github.com/AlexAegis/ping_throttle#7d1ddc9a2a2fa4628f0b7f8b518032c89719c7fc"
 
 [[package]]
 name = "portable-atomic"

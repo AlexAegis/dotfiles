@@ -1,0 +1,37 @@
+[Unit]
+Description=Brings the list of the permission prompts to view when prompts wait
+PartOf=graphical-session.target
+After=graphical-session.target
+
+# Checks the locks of the entry files of the owner's queue and removes
+# leftovers there, without a read of their content. Writes the KWin script to
+# the folder of the queue. Starts busctl for KWin and systemd-run for the
+# terminal, so it needs the session bus.
+[Service]
+ExecStart=%D/approval-queue/bin/approval-queue-notify
+# KWin keeps a loaded script when the process that loaded it ends
+ExecStopPost=-busctl --user --timeout=2 call org.kde.KWin /Scripting org.kde.kwin.Scripting unloadScript s approval-queue-focus-list
+RuntimeDirectory=approval-queue
+RuntimeDirectoryMode=0700
+# The folder belongs to the service processes and to the list too
+RuntimeDirectoryPreserve=yes
+Restart=on-failure
+RestartSec=5
+MemoryMax=32M
+MemorySwapMax=0
+TasksMax=8
+NoNewPrivileges=yes
+PrivateUsers=self
+ProtectSystem=strict
+PrivateTmp=yes
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=graphical-session.target

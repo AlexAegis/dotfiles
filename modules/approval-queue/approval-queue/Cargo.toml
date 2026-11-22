@@ -6,6 +6,7 @@ publish = false
 
 [dependencies]
 anyhow = "1.0.104"
+ping_throttle = { git = "https://github.com/AlexAegis/ping_throttle" }
 # unstable-rendered-line-info: Paragraph::line_count, for the count of the
 # lines below the pane of the selected prompt
 ratatui = { version = "0.30.2", default-features = false, features = [

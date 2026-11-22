@@ -7,7 +7,7 @@ use std::{
 
 use anyhow::{Context, Result, ensure};
 use approval_queue::{
-    action::Action, list_state::ListState, list_view, queue_folder::QueueFolder,
+    action::Action, list_state::ListState, list_view, list_window, queue_folder::QueueFolder,
     terminal_event::take_event,
 };
 use ratatui::{
@@ -15,6 +15,7 @@ use ratatui::{
     crossterm::{
         event::{self, DisableBracketedPaste, EnableBracketedPaste},
         execute,
+        terminal::SetTitle,
     },
 };
 
@@ -42,8 +43,12 @@ fn run() -> Result<()> {
     let mut terminal = ratatui::try_init().context("Terminal not usable")?;
     // A terminal without this mode sends pasted text as keys
     let _ = execute!(io::stdout(), EnableBracketedPaste);
+    // The window title by which approval-queue-notify finds the list
+    let _ = execute!(io::stdout(), SetTitle(list_window::TITLE));
     let result = show(&mut terminal, &queue);
     let _ = execute!(io::stdout(), DisableBracketedPaste);
+    // A shell that sets no title of its own would keep the title of the list
+    let _ = execute!(io::stdout(), SetTitle(""));
     ratatui::restore();
     result
 }
