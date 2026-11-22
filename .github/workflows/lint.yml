@@ -35,6 +35,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends inotify-tools
+      - name: Check out pont for the tests
+        if: ${{ !cancelled() }}
+        run: git submodule update --init --depth 1 modules/pont
       - name: Test
         if: ${{ !cancelled() }}
         run: make test
