@@ -49,7 +49,7 @@ fn should_answer_on_a_plain_key() {
         take_event(&mut state, plain('a'), now),
         Some(Action::Answer {
             id: "1-1".to_owned(),
-            answer: Answer::Allow
+            answer: Answer::ALLOW
         })
     );
 }
@@ -165,7 +165,7 @@ fn should_take_no_answer_right_after_the_window_got_the_focus() {
         take_event(&mut state, plain('a'), now + Duration::from_millis(1000)),
         Some(Action::Answer {
             id: "1-1".to_owned(),
-            answer: Answer::Allow
+            answer: Answer::ALLOW
         })
     );
 }

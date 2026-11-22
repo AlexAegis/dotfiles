@@ -19,7 +19,7 @@ pub enum Outcome {
 impl Display for Outcome {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         formatter.write_str(match self {
-            Self::Answered(Answer::Allow) => "allowed",
+            Self::Answered(Answer::Allow { .. }) => "allowed",
             Self::Answered(Answer::Deny { .. }) => "denied",
             Self::ClientLeft => "left the queue",
             Self::Expired => "expired",

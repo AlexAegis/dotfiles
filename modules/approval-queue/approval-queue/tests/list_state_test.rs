@@ -145,7 +145,7 @@ fn should_move_the_selection_between_the_first_and_the_last_entry() {
 #[test]
 fn should_answer_the_selected_entry_after_the_quiet_time() {
     let start = Instant::now();
-    for (key, given) in [('a', Answer::Allow), ('d', Answer::Deny { message: None })] {
+    for (key, given) in [('a', Answer::ALLOW), ('d', Answer::Deny { message: None })] {
         let mut state = state_with(&["1-1", "2-1"], start);
         assert_eq!(
             state.press(Key::Character(key), start + milliseconds(999)),
@@ -174,7 +174,7 @@ fn should_answer_at_the_first_key_after_the_quiet_time() {
     assert_answers(
         state.press(Key::Character('a'), start + milliseconds(1000)),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
 }
 
@@ -195,7 +195,7 @@ fn should_start_the_quiet_time_again_at_each_refused_key() {
     assert_answers(
         state.press(Key::Character('a'), start + milliseconds(3499)),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
 }
 
@@ -206,7 +206,7 @@ fn should_take_no_answer_for_the_next_entry_right_after_the_selected_one_left() 
     assert_answers(
         state.press(Key::Character('a'), start + milliseconds(2000)),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
     state.refresh(entries(&["2-1"]), start + milliseconds(2100));
     assert_eq!(selected_id(&state), Some("2-1"));
@@ -218,7 +218,7 @@ fn should_take_no_answer_for_the_next_entry_right_after_the_selected_one_left() 
     assert_answers(
         state.press(Key::Character('a'), start + milliseconds(4099)),
         "2-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
 }
 
@@ -254,7 +254,7 @@ fn should_start_the_quiet_time_at_each_key_outside_a_message() {
         assert_answers(
             state.press(Key::Character('a'), later + milliseconds(1000)),
             selected,
-            Answer::Allow,
+            Answer::ALLOW,
         );
     }
 }
@@ -267,7 +267,7 @@ fn should_take_no_answer_for_another_entry_right_after_an_answer() {
     assert_answers(
         state.press(Key::Character('a'), later),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
     state.press(Key::Down, later);
     assert_eq!(
@@ -310,7 +310,7 @@ fn should_take_no_key_of_text_typed_at_5_keys_per_second() {
         assert_answers(
             state.press(Key::Character('a'), last + milliseconds(1999)),
             selected.as_deref().unwrap_or_default(),
-            Answer::Allow,
+            Answer::ALLOW,
         );
     }
 }
@@ -320,9 +320,9 @@ fn should_answer_one_prompt_at_most_from_text_that_starts_with_a_key_of_the_list
     let start = Instant::now();
     let later = start + milliseconds(5000);
     for (text, answered, answer) in [
-        ("add a test and add a doc", "1-1", Answer::Allow),
+        ("add a test and add a doc", "1-1", Answer::ALLOW),
         ("do a dance, madam", "1-1", Answer::Deny { message: None }),
-        ("ajkjkjkjkjkja", "1-1", Answer::Allow),
+        ("ajkjkjkjkjkja", "1-1", Answer::ALLOW),
         ("dada", "1-1", Answer::Deny { message: None }),
     ] {
         let mut waiting = vec!["1-1", "2-1", "3-1"];
@@ -359,7 +359,7 @@ fn should_take_no_key_of_text_that_starts_on_an_empty_queue() {
     assert_answers(
         state.press(Key::Character('a'), last + milliseconds(1000)),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
 }
 
@@ -394,14 +394,14 @@ fn should_answer_an_entry_one_time() {
     assert_answers(
         state.press(Key::Character('a'), later),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
     for key in ['a', 'd', 'm'] {
         assert_eq!(state.press(Key::Character(key), later), None);
         assert_eq!(state.notice(), Some("The prompt has its answer"));
     }
     assert_eq!(state.message(), None);
-    assert_eq!(state.answer_of("1-1"), Some(&Answer::Allow));
+    assert_eq!(state.answer_of("1-1"), Some(&Answer::ALLOW));
 }
 
 #[test]
@@ -563,7 +563,7 @@ fn should_cancel_the_message_with_escape() {
     assert_answers(
         state.press(Key::Character('a'), closed + milliseconds(1999)),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
 }
 
@@ -589,7 +589,7 @@ fn should_keep_the_message_open_as_text_when_its_prompt_left() {
     assert_answers(
         state.press(Key::Character('a'), end + milliseconds(1000)),
         "2-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
 }
 
@@ -734,6 +734,6 @@ fn should_start_the_quiet_time_when_the_window_gets_the_focus() {
     assert_answers(
         state.press(Key::Character('a'), later + milliseconds(1000)),
         "1-1",
-        Answer::Allow,
+        Answer::ALLOW,
     );
 }

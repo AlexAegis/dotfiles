@@ -181,7 +181,7 @@ fn should_refuse_an_answer_after_the_service_read_one() {
     assert_eq!(queue.answer_for(waiting.id()).unwrap(), Some(denial));
     assert_eq!(
         queue
-            .answer(waiting.id(), &Answer::Allow)
+            .answer(waiting.id(), &Answer::ALLOW)
             .unwrap_err()
             .to_string(),
         "Prompt has its answer"
@@ -192,7 +192,7 @@ fn should_refuse_an_answer_after_the_service_read_one() {
 fn should_refuse_a_second_answer_and_keep_the_first() {
     let (runtime_folder, queue) = queue();
     let waiting = queue.add(&entry("Bash")).unwrap();
-    queue.answer(waiting.id(), &Answer::Allow).unwrap();
+    queue.answer(waiting.id(), &Answer::ALLOW).unwrap();
     assert_eq!(
         queue
             .answer(waiting.id(), &Answer::Deny { message: None })
@@ -204,7 +204,7 @@ fn should_refuse_a_second_answer_and_keep_the_first() {
         names(&answers(&runtime_folder)),
         [format!("{}.json", waiting.id())]
     );
-    assert_eq!(queue.answer_for(waiting.id()).unwrap(), Some(Answer::Allow));
+    assert_eq!(queue.answer_for(waiting.id()).unwrap(), Some(Answer::ALLOW));
 }
 
 #[test]
@@ -214,7 +214,7 @@ fn should_refuse_an_answer_for_an_entry_that_left() {
     let id = waiting.id().to_owned();
     drop(waiting);
     assert_eq!(
-        queue.answer(&id, &Answer::Allow).unwrap_err().to_string(),
+        queue.answer(&id, &Answer::ALLOW).unwrap_err().to_string(),
         "Prompt left the queue"
     );
     assert_eq!(names(&answers(&runtime_folder)), [] as [&str; 0]);
@@ -230,7 +230,7 @@ fn should_refuse_an_answer_for_an_id_of_another_form() {
     .unwrap();
     for id in ["", "../outside", "a", "1/2"] {
         assert_eq!(
-            queue.answer(id, &Answer::Allow).unwrap_err().to_string(),
+            queue.answer(id, &Answer::ALLOW).unwrap_err().to_string(),
             format!("Entry ID {id:?} has another form")
         );
     }
@@ -292,8 +292,8 @@ fn should_remove_only_the_answers_whose_entry_left() {
     let (runtime_folder, queue) = queue();
     let stays = queue.add(&entry("Bash")).unwrap();
     let leaves = queue.add(&entry("Write")).unwrap();
-    queue.answer(stays.id(), &Answer::Allow).unwrap();
-    queue.answer(leaves.id(), &Answer::Allow).unwrap();
+    queue.answer(stays.id(), &Answer::ALLOW).unwrap();
+    queue.answer(leaves.id(), &Answer::ALLOW).unwrap();
     drop(leaves);
     queue.remove_answers_without_entry().unwrap();
     assert_eq!(
@@ -440,4 +440,25 @@ fn should_count_a_part_of_a_minute_of_a_mute_as_a_whole_minute() {
         queue_folder::muted_minutes(now - Duration::from_secs(1), now),
         None
     );
+}
+
+#[test]
+fn should_store_the_answers_to_the_questions_of_a_prompt() {
+    let (_runtime_folder, queue) = queue();
+    let waiting = queue.add(&entry("AskUserQuestion")).unwrap();
+    let answers = [("Why?".to_owned(), "a, b".to_owned())]
+        .into_iter()
+        .collect();
+    let answer = Answer::Allow {
+        answers: Some(answers),
+    };
+    queue.answer(waiting.id(), &answer).unwrap();
+    assert_eq!(queue.answer_for(waiting.id()).unwrap(), Some(answer));
+    let (_runtime_folder, queue) = self::queue();
+    let waiting = queue.add(&entry("AskUserQuestion")).unwrap();
+    let empty = Answer::Allow {
+        answers: Some([("Why?".to_owned(), String::new())].into_iter().collect()),
+    };
+    assert!(queue.answer(waiting.id(), &empty).is_err());
+    assert_eq!(queue.answer_for(waiting.id()).unwrap(), None);
 }

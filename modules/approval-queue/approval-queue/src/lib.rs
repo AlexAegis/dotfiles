@@ -16,6 +16,8 @@ mod message_draft;
 pub mod open_list;
 pub mod outcome;
 pub mod ping_watch;
+pub mod question;
+pub mod question_draft;
 pub mod queue_folder;
 pub mod request;
 pub mod service;

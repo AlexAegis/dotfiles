@@ -19,6 +19,7 @@ use crate::{
     highlight::{self, Language},
     list_state::ListState,
     listed_entry::ListedEntry,
+    question_draft::QuestionDraft,
     queue_folder,
     request::MAX_TITLE_CHARACTERS,
     tray_view::EntryKind,
@@ -38,6 +39,19 @@ const TWO_COLUMN_WIDTH: u16 = 100;
 const KIND_WIDTH: u16 = 11;
 /// The name under which the pane shows both texts of an Edit call.
 const DIFF_NAME: &str = "change";
+const QUESTION_ACTIONS: [(&str, &str); 4] = [
+    ("1-9", "Pick"),
+    ("t", "Own answer"),
+    ("d", "Decline"),
+    ("m", "Decline with a message"),
+];
+const MULTI_QUESTION_ACTIONS: [(&str, &str); 5] = [
+    ("1-9", "Pick"),
+    ("Enter", "Confirm"),
+    ("t", "Own answer"),
+    ("d", "Decline"),
+    ("m", "Decline with a message"),
+];
 const ACTIONS: [(&str, &str); 3] = [
     ("a", "Approve"),
     ("d", "Decline"),
@@ -65,9 +79,13 @@ pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
     draw_list(frame, list_area, state, now);
     let scroll_limit = draw_pane(frame, pane_area, state);
     let notice = state.notice().map(visible_line);
-    let footer = match state.message() {
-        Some(message) => [
-            format!("Message of the decline: {}_", visible_line(message)),
+    let typed = state
+        .message()
+        .map(|message| ("Message of the decline", message))
+        .or_else(|| state.question_text().map(|text| ("Own answer", text)));
+    let footer = match typed {
+        Some((name, text)) => [
+            format!("{name}: {}_", visible_line(text)),
             notice.unwrap_or_else(|| MESSAGE_KEYS.to_owned()),
         ],
         None => [notice.unwrap_or_default(), KEYS.to_owned()],
@@ -135,7 +153,7 @@ fn draw_entry(
         Style::new()
     };
     let waits = match state.answer_of(&listed.id) {
-        Some(Answer::Allow) => "approved".to_owned(),
+        Some(Answer::Allow { .. }) => "approved".to_owned(),
         Some(Answer::Deny { .. }) => "declined".to_owned(),
         None => age(now.saturating_sub(entry.received)),
     };
@@ -188,7 +206,16 @@ fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
     let inner = pane.inner(area);
     let [detail_area, action_area] =
         Layout::vertical([Constraint::Fill(1), Constraint::Length(1)]).areas(inner);
-    let detail = Paragraph::new(detail_of(entry)).wrap(Wrap { trim: false });
+    let questions = state.question_draft();
+    let lines = match &questions {
+        Some(draft) => {
+            let mut lines = head(entry);
+            lines.extend(question_lines(draft));
+            lines
+        }
+        None => detail_of(entry),
+    };
+    let detail = Paragraph::new(lines).wrap(Wrap { trim: false });
     let scroll_limit = u16::try_from(detail.line_count(detail_area.width))
         .unwrap_or(u16::MAX)
         .saturating_sub(detail_area.height);
@@ -201,8 +228,13 @@ fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
     }
     frame.render_widget(pane, area);
     frame.render_widget(detail.scroll((scroll, 0)), detail_area);
-    let actions: Vec<Span> = ACTIONS
-        .into_iter()
+    let actions = match &questions {
+        Some(draft) if draft.current().multi_select => &MULTI_QUESTION_ACTIONS[..],
+        Some(_) => &QUESTION_ACTIONS[..],
+        None => &ACTIONS[..],
+    };
+    let actions: Vec<Span> = actions
+        .iter()
         .flat_map(|(key, name)| {
             [
                 Span::styled(
@@ -288,7 +320,8 @@ fn detail_of(entry: &Entry) -> Vec<Line<'static>> {
     }
 }
 
-fn detail(entry: &Entry) -> Vec<Line<'static>> {
+/// The first lines of the pane: who asks and where, why, and the title.
+fn head(entry: &Entry) -> Vec<Line<'static>> {
     let mut lines = vec![
         format!(
             "user {}   host {}   mode {}",
@@ -313,6 +346,64 @@ fn detail(entry: &Entry) -> Vec<Line<'static>> {
         Style::new().add_modifier(Modifier::BOLD),
     )));
     lines.push(Line::default());
+    lines
+}
+
+/// The lines of the pane for the questions of a prompt: the current
+/// question with its options by number, and the answers so far.
+fn question_lines(draft: &QuestionDraft) -> Vec<Line<'static>> {
+    let question = draft.current();
+    let (number, count) = draft.position();
+    let mut lines = vec![
+        Line::from(if question.header.is_empty() {
+            format!("Question {number} of {count}")
+        } else {
+            format!(
+                "Question {number} of {count}: {}",
+                visible_line(&question.header)
+            )
+        }),
+        Line::from(Span::styled(
+            visible_line(&question.question),
+            Style::new().add_modifier(Modifier::BOLD),
+        )),
+        Line::default(),
+    ];
+    for (index, choice) in question.options.iter().enumerate() {
+        let mark = match (question.multi_select, draft.is_picked(index)) {
+            (false, _) => "",
+            (true, false) => "[ ] ",
+            (true, true) => "[x] ",
+        };
+        let description = if choice.description.is_empty() {
+            String::new()
+        } else {
+            format!(": {}", visible_line(&choice.description))
+        };
+        lines.push(Line::from(format!(
+            "  {}  {mark}{}{description}",
+            index + 1,
+            visible_line(&choice.label)
+        )));
+    }
+    lines.push(Line::from("  t  an own answer as text"));
+    if draft.answered().next().is_some() {
+        lines.push(Line::default());
+        lines.push(Line::from("Answers so far, Esc starts again:"));
+        for (question, answer) in draft.answered() {
+            lines.push(Line::from(format!(
+                "  {}: {}",
+                visible_line(question),
+                visible_line(answer)
+            )));
+        }
+    }
+    lines
+}
+
+fn detail(entry: &Entry) -> Vec<Line<'static>> {
+    let mut lines = head(entry);
+    let title = title(entry);
     for (key, value) in &entry.input {
         let name = visible_line(key);
         match value {

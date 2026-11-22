@@ -1,9 +1,6 @@
 //! What the tray icon shows, from the waiting prompts and the settings.
 
-use crate::alert_settings::AlertSettings;
-
-/// The tool of a question dialog.
-const QUESTION_TOOL: &str = "AskUserQuestion";
+use crate::{alert_settings::AlertSettings, question::QUESTION_TOOL};
 
 /// What a waiting entry asks for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

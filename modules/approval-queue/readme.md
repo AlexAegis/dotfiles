@@ -83,8 +83,8 @@ above the right one.
   a denial.
 - A ping gives the window of the list the focus. Keys that the owner types for
   another window in the second after that answer no prompt, open no message,
-  change no mute and do not quit with `q`. An open message then takes a key or
-  pasted text only after 1 second without either. The keys that select and
+  change no mute and do not quit with `q`. An open message or own
+  answer then takes a key or pasted text only after 1 second without either. The keys that select and
   scroll, and Ctrl-C, act at once. A terminal that does not report the focus
   gives no such second.
 - A key without a function gets a notice with its name, such as
@@ -93,13 +93,30 @@ above the right one.
 - After `m`, each key is text of the message, also when the prompt leaves the
   queue in that time. Esc closes the message.
 - A key with Ctrl or Alt is not its plain key: Ctrl-D is no `d`. Ctrl-C quits.
-- Pasted text is text of an open message and no key. A terminal without
-  bracketed paste sends pasted text as keys.
+- Pasted text is text of an open message or own answer and no key. A terminal
+  without bracketed paste sends pasted text as keys.
 - `?` before a user name: the service could not verify the name. It verifies
   only the name of the owner.
 - Control characters of a request show as escapes, such as `\u{1b}`. So do the
   blank and invisible characters that `display_text.rs` lists, such as the
   direction overrides. Unicode has more such characters than that list.
+- A prompt of the tool `AskUserQuestion` with 1 to 4 questions, each with a
+  text of its own and at most 9 options, shows one question after the other:
+  - `1` to `9` pick an option. For a question with one answer, the option is
+    the answer. For a question with several answers, the key marks the option
+    or takes the mark away, and Enter answers with the marked options.
+  - `t` opens an own answer as text. Enter gives it, Esc closes it. After
+    `t`, each key is text of the answer, also when the prompt leaves the queue
+    in that time. Enter and Esc then close the text.
+  - Esc starts the questions of the selected prompt again. The answers so far
+    stay while another prompt is selected.
+  - After the last question, the list sends the answers. `d` and `m` decline
+    the prompt, as for a permission prompt. `a` does not answer a question.
+  - `1` to `9`, `t`, Enter and Esc obey the rule of 1 second without a key.
+    Enter in an open text does not.
+  - Another prompt of that tool, such as one with an option that the queue
+    does not take as an answer, shows as its input, with the keys of a
+    permission prompt. An `a` there leaves the dialog to the terminal.
 - Several lists can run at the same time. The queue takes the first answer to a
   prompt and refuses a later one.
 - After the last list quits, the prompts stay in the queue, except those with
@@ -222,6 +239,10 @@ The hook keeps the connection open and sends nothing after its line. It ends its
 wait after 1 day. The reply is one JSON line:
 
 - `{"behavior":"allow"}`
+- `{"behavior":"allow","answers":{"<question>":"<answer>"}}` for a prompt with
+  questions: one answer for each question, by the text of the question. An
+  answer is the label of the picked option, the labels of several picked
+  options joined with `, `, or the owner's own text of at most 500 characters.
 - `{"behavior":"deny"}`, with a `message` when the owner typed one
 - `{"error":"<reason>"}` for a refused request and for a `list_only` prompt
   while no list is open. The journal of `approval-queue@.service` has the whole
@@ -254,7 +275,8 @@ request states.
 - `entries/<id>.json`: one waiting prompt. Its service process keeps a lock on
   the file. The list and `approval-queue-notify` remove an entry file that no
   process locks.
-- `answers/<id>.json`: the answer for that entry, `{"behavior":"allow"}` or
+- `answers/<id>.json`: the answer for that entry, in the form of the reply
+  line: `{"behavior":"allow"}`, with `answers` for a prompt with questions, or
   `{"behavior":"deny","message":"<text>"}`. The message is one line of at most
   500 characters. The file stays until its entry leaves, so the queue refuses a
   second answer.

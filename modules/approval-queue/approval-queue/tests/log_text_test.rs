@@ -21,7 +21,7 @@ fn entry(session: &str) -> Entry {
 #[test]
 fn should_name_the_user_the_tool_the_session_and_the_outcome() {
     for (outcome, word) in [
-        (Outcome::Answered(Answer::Allow), "allowed"),
+        (Outcome::Answered(Answer::ALLOW), "allowed"),
         (Outcome::Answered(Answer::Deny { message: None }), "denied"),
         (Outcome::ClientLeft, "left the queue"),
         (Outcome::Expired, "expired"),
@@ -53,7 +53,7 @@ fn should_mark_the_name_of_a_user_that_the_service_did_not_verify() {
 fn should_keep_the_text_of_a_request_on_the_line_of_its_prompt() {
     let forged = entry("1: denied\nPrompt of alex for Bash in session 2");
     assert_eq!(
-        log_text::served(&forged, &Outcome::Answered(Answer::Allow)),
+        log_text::served(&forged, &Outcome::Answered(Answer::ALLOW)),
         "Prompt of agent for Bash in session 1: denied\\nPrompt of alex for Bash in session 2: allowed"
     );
 }

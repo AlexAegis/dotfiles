@@ -158,7 +158,7 @@ fn refused(request: &[u8]) -> Exchange {
 
 #[test]
 fn should_list_the_request_while_it_waits() {
-    let result = waited(Then::Answer(Answer::Allow));
+    let result = waited(Then::Answer(Answer::ALLOW));
     assert_eq!(result.listed.len(), 1);
     let entry = &result.listed[0].entry;
     assert_eq!(entry.user, "agent");
@@ -178,9 +178,9 @@ fn should_list_the_request_while_it_waits() {
 
 #[test]
 fn should_reply_allow_when_the_owner_allows() {
-    let result = waited(Then::Answer(Answer::Allow));
+    let result = waited(Then::Answer(Answer::ALLOW));
     assert_eq!(result.reply, "{\"behavior\":\"allow\"}\n");
-    assert_eq!(result.served.unwrap().1, Outcome::Answered(Answer::Allow));
+    assert_eq!(result.served.unwrap().1, Outcome::Answered(Answer::ALLOW));
     assert_eq!(result.left, []);
 }
 
@@ -244,7 +244,7 @@ fn should_keep_a_list_only_prompt_while_a_list_is_open() {
         with_open_list: true,
         pause: Duration::from_millis(150),
         no_list_grace: Duration::from_millis(40),
-        ..Case::of(list_only_line(), Then::Answer(Answer::Allow))
+        ..Case::of(list_only_line(), Then::Answer(Answer::ALLOW))
     });
     assert_eq!(result.reply, "{\"behavior\":\"allow\"}\n");
 }
@@ -268,7 +268,7 @@ fn should_keep_another_prompt_without_an_open_list() {
     let result = exchange(Case {
         pause: Duration::from_millis(150),
         no_list_grace: Duration::from_millis(40),
-        ..Case::of(line("agent"), Then::Answer(Answer::Allow))
+        ..Case::of(line("agent"), Then::Answer(Answer::ALLOW))
     });
     assert_eq!(result.reply, "{\"behavior\":\"allow\"}\n");
 }
@@ -289,7 +289,7 @@ fn should_leave_the_queue_when_the_hook_sends_more_bytes() {
 fn should_take_the_request_of_the_owner_from_the_owner() {
     let result = exchange(Case {
         sender_is_own_user: true,
-        ..Case::of(line(OWNER), Then::Answer(Answer::Allow))
+        ..Case::of(line(OWNER), Then::Answer(Answer::ALLOW))
     });
     assert_eq!(result.listed[0].entry.user, OWNER);
     assert!(result.listed[0].entry.user_is_verified);
@@ -359,7 +359,7 @@ fn should_take_a_request_of_the_longest_size_and_refuse_a_longer_one() {
     };
     let longest = exchange(Case::of(
         padded(MAX_REQUEST_BYTES),
-        Then::Answer(Answer::Allow),
+        Then::Answer(Answer::ALLOW),
     ));
     assert_eq!(longest.reply, "{\"behavior\":\"allow\"}\n");
     let longer = refused(&padded(MAX_REQUEST_BYTES + 1));

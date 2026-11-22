@@ -103,14 +103,14 @@ fn should_store_the_answer_of_the_owner() {
     let quits = carry_out(
         Action::Answer {
             id: waiting.id().to_owned(),
-            answer: Answer::Allow,
+            answer: Answer::ALLOW,
         },
         &queue,
         &mut state,
         time(),
     );
     assert!(!quits);
-    assert_eq!(queue.answer_for(waiting.id()).unwrap(), Some(Answer::Allow));
+    assert_eq!(queue.answer_for(waiting.id()).unwrap(), Some(Answer::ALLOW));
 }
 
 #[test]
@@ -121,7 +121,7 @@ fn should_show_a_refused_answer_as_a_notice() {
     carry_out(
         Action::Answer {
             id: "1-1".to_owned(),
-            answer: Answer::Allow,
+            answer: Answer::ALLOW,
         },
         &queue,
         &mut state,

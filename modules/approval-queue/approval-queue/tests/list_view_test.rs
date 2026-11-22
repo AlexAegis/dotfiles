@@ -782,3 +782,96 @@ fn should_show_both_texts_of_an_edit_call_as_they_are_when_the_input_names_a_cha
     }
     assert_eq!(color_at(&state, "-a"), Color::Reset);
 }
+
+fn question_prompt() -> ListedEntry {
+    let mut prompt = listed(
+        "1-1",
+        "agent",
+        "AskUserQuestion",
+        &json!({ "questions": [
+            {
+                "question": "Which library\u{1b}?",
+                "header": "Library",
+                "options": [
+                    { "label": "date-fns", "description": "small" },
+                    { "label": "luxon" },
+                ],
+                "multiSelect": false,
+            },
+            {
+                "question": "Which features?",
+                "header": "Features",
+                "options": [{ "label": "zones" }, { "label": "locales" }],
+                "multiSelect": true,
+            },
+        ] }),
+        None,
+    );
+    prompt.entry.title = Some("Which library?".to_owned());
+    prompt
+}
+
+#[test]
+fn should_show_the_current_question_with_its_options_by_number() {
+    let (state, _) = state_with(vec![question_prompt()]);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    for part in [
+        "│Question 1 of 2: Library",
+        "│Which library\\u{1b}?",
+        "│  1  date-fns: small",
+        "│  2  luxon ",
+        "│  t  an own answer as text",
+        " 1-9  Pick    t  Own answer    d  Decline    m  Decline with a message",
+    ] {
+        assert_shows(&lines, part);
+    }
+    assert!(!lines.iter().any(|line| line.contains("questions:")));
+    assert!(!lines.iter().any(|line| line.contains("Answers so far")));
+    assert!(!lines.iter().any(|line| line.contains("Approve")));
+}
+
+#[test]
+fn should_show_the_picked_options_and_the_answers_so_far_of_a_question() {
+    let (mut state, later) = state_with(vec![question_prompt()]);
+    state.press(Key::Character('2'), later);
+    state.press(Key::Character('2'), later + Duration::from_secs(2));
+    let (lines, scroll_limit) = drawn_at_width(&state, 5, 80);
+    for part in [
+        "│Question 2 of 2: Features",
+        "│  1  [ ] zones",
+        "│  2  [x] locales",
+        " 1-9  Pick    Enter  Confirm    t  Own answer    d  Decline",
+    ] {
+        assert_shows(&lines, part);
+    }
+    state.limit_scroll(scroll_limit);
+    state.press(Key::PageDown, later);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    assert_shows(&lines, "│Answers so far, Esc starts again:");
+    assert_shows(&lines, "│  Which library\\u{1b}?: luxon");
+}
+
+#[test]
+fn should_show_the_own_answer_to_a_question_while_the_owner_types_it() {
+    let (mut state, later) = state_with(vec![question_prompt()]);
+    state.press(Key::Character('t'), later);
+    state.press(Key::Character('x'), later);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    assert_eq!(lines[22], "Own answer: x_");
+    assert_eq!(lines[23], "Enter send   Esc cancel");
+}
+
+#[test]
+fn should_show_a_question_prompt_that_the_list_cannot_answer_as_its_input() {
+    let odd = listed(
+        "1-1",
+        "agent",
+        "AskUserQuestion",
+        &json!({ "questions": [] }),
+        None,
+    );
+    let (state, _) = state_with(vec![odd]);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    assert_shows(&lines, "│questions: []");
+    assert_shows(&lines, " a  Approve ");
+}
