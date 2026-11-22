@@ -1,2 +1,2 @@
-rust ? [ ! $brew ] && [ ! $pacman ]
+rust ? ! command -v brew >/dev/null && [ ! $pacman ]
 :aur-helper ? [ $pacman ]
