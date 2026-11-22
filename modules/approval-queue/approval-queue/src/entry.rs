@@ -17,6 +17,9 @@ pub struct Entry {
     pub folder: String,
     pub mode: String,
     pub tool: String,
+    /// The title that the request had.
+    #[serde(default)]
+    pub title: Option<String>,
     pub input: Map<String, Value>,
     pub reason: Option<String>,
     pub list_only: bool,
@@ -34,6 +37,7 @@ impl Entry {
             folder: request.folder,
             mode: request.mode,
             tool: request.tool,
+            title: request.title,
             input: request.input,
             reason: request.reason,
             list_only: request.list_only,

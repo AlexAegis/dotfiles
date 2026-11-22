@@ -5,6 +5,8 @@ use serde_json::{Map, Value};
 /// Longest request line, the newline included.
 pub const MAX_REQUEST_BYTES: usize = 65_536;
 pub const VERSION: u32 = 1;
+/// Longest title of a request, in characters.
+pub const MAX_TITLE_CHARACTERS: usize = 144;
 
 /// One permission prompt of a harness session, as the hook of the harness
 /// sends it.
@@ -22,6 +24,10 @@ pub struct Request {
     /// The permission mode of the session.
     pub mode: String,
     pub tool: String,
+    /// What the call is for, in one line that the sender wrote. A request
+    /// may leave it out.
+    #[serde(default)]
+    pub title: Option<String>,
     pub input: Map<String, Value>,
     /// Why a guard hook asked, or `null`.
     #[serde(deserialize_with = "required_or_null")]
@@ -60,6 +66,17 @@ impl Request {
             ensure!(
                 value.len() <= limit,
                 "Request field {name} is longer than {limit} bytes"
+            );
+        }
+        if let Some(title) = &request.title {
+            ensure!(!title.is_empty(), "Request field title is empty");
+            ensure!(
+                title.chars().count() <= MAX_TITLE_CHARACTERS,
+                "Request field title is longer than {MAX_TITLE_CHARACTERS} characters"
+            );
+            ensure!(
+                !title.chars().any(char::is_control),
+                "Request field title has a control character"
             );
         }
         ensure!(

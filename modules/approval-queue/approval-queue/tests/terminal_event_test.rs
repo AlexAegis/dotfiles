@@ -19,6 +19,7 @@ fn listed(id: &str) -> ListedEntry {
             folder: "/home/agent".to_owned(),
             mode: "auto".to_owned(),
             tool: "Bash".to_owned(),
+            title: None,
             input: Map::new(),
             reason: None,
             list_only: false,

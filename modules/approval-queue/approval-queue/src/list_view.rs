@@ -2,10 +2,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use ratatui::{
     Frame,
-    layout::{Constraint, Layout},
-    style::{Modifier, Style},
-    text::Line,
-    widgets::{Block, Paragraph, Row, Table, TableState, Wrap},
+    layout::{Constraint, Layout, Rect},
+    style::{Color, Modifier, Style},
+    text::{Line, Span},
+    widgets::{Block, Paragraph, Wrap},
 };
 use serde_json::Value;
 
@@ -16,113 +16,239 @@ use crate::{
     list_state::ListState,
     listed_entry::ListedEntry,
     queue_folder,
+    request::MAX_TITLE_CHARACTERS,
+    tray_view::EntryKind,
 };
 
-const KEYS: &str = "a allow   d deny   m deny with a message   j/k select   PgUp/PgDn scroll";
-const MORE_KEYS: &str = "s mute pings 10 min   S mute pings 1 hour   u unmute   q quit";
+const KEYS: &str =
+    "j/k select   PgUp/PgDn scroll   s/S mute pings 10 min/1 hour   u unmute   q quit";
 const MESSAGE_KEYS: &str = "Enter send   Esc cancel";
 const LIST_ONLY: &str = "only in this list: its terminal shows the prompt when no list is open";
-/// The width of the session column, which shows the start of the ID.
-const SESSION_START: u16 = 8;
+/// The count of the characters of a session ID that an entry of the list shows.
+const SESSION_START: usize = 8;
+/// The lines of one entry in the list: kind, title, details and a gap.
+const ENTRY_HEIGHT: u16 = 4;
+/// From this width on, the list and the selected prompt are side by side.
+const TWO_COLUMN_WIDTH: u16 = 100;
+/// The width of the longest kind and one blank after it.
+const KIND_WIDTH: u16 = 11;
+const ACTIONS: [(&str, &str); 3] = [
+    ("a", "Approve"),
+    ("d", "Decline"),
+    ("m", "Decline with a message"),
+];
 
-/// Draws the list: the waiting prompts, the selected one in full and the keys.
-/// Returns how far the pane of the selected prompt scrolls: the count of its
-/// lines below the pane.
+/// Draws the waiting prompts as a list of entries, the selected one in full
+/// with its actions and the keys. Returns how far the pane of the selected
+/// prompt scrolls: the count of its lines below the pane.
 pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
+    let [body_area, footer_area] =
+        Layout::vertical([Constraint::Min(6), Constraint::Length(2)]).areas(frame.area());
+    let [list_area, pane_area] = if body_area.width >= TWO_COLUMN_WIDTH {
+        Layout::horizontal([Constraint::Percentage(40), Constraint::Fill(1)]).areas(body_area)
+    } else {
+        let list_height = (body_area.height / 2).min(
+            u16::try_from(state.entries().len())
+                .unwrap_or(u16::MAX)
+                .saturating_mul(ENTRY_HEIGHT)
+                .saturating_add(2)
+                .max(ENTRY_HEIGHT + 2),
+        );
+        Layout::vertical([Constraint::Length(list_height), Constraint::Fill(1)]).areas(body_area)
+    };
+    draw_list(frame, list_area, state, now);
+    let scroll_limit = draw_pane(frame, pane_area, state);
+    let notice = state.notice().map(visible_line);
+    let footer = match state.message() {
+        Some(message) => [
+            format!("Message of the decline: {}_", visible_line(message)),
+            notice.unwrap_or_else(|| MESSAGE_KEYS.to_owned()),
+        ],
+        None => [notice.unwrap_or_default(), KEYS.to_owned()],
+    };
+    frame.render_widget(Paragraph::new(footer.map(Line::from).to_vec()), footer_area);
+    scroll_limit
+}
+
+fn draw_list(frame: &mut Frame, area: Rect, state: &ListState, now: SystemTime) {
     let mute = state
         .pings_muted_until()
-        .and_then(|until| queue_folder::muted_minutes(until, now))
-        .map_or_else(String::new, |minutes| {
-            format!(", pings muted for {minutes} min")
-        });
+        .and_then(|until| queue_folder::muted_minutes(until, now));
     let now = now
         .duration_since(UNIX_EPOCH)
         .map_or(0, |since| since.as_secs());
     let count = state.entries().len();
-    let table_height = u16::try_from(count)
-        .unwrap_or(u16::MAX)
-        .saturating_add(3)
-        .min(frame.area().height / 2);
-    let [table_area, detail_area, footer_area] = Layout::vertical([
-        Constraint::Length(table_height),
-        Constraint::Min(3),
-        Constraint::Length(3),
-    ])
-    .areas(frame.area());
+    let mut block = Block::bordered().title(format!(" approval-queue: {count} waiting "));
+    if let Some(minutes) = mute {
+        block = block.title_bottom(format!(" pings muted for {minutes} min "));
+    }
+    let inner = block.inner(area);
+    let shown = usize::from((inner.height.saturating_add(1) / ENTRY_HEIGHT).max(1));
+    let selected = state.selected_index();
+    let first = selected.map_or(0, |index| (index + 1).saturating_sub(shown));
+    if first > 0 {
+        block = block.title_top(Line::from(format!(" above: {first} ")).right_aligned());
+    }
+    let below = count.saturating_sub(first + shown);
+    if below > 0 {
+        block = block.title_bottom(Line::from(format!(" below: {below} ")).right_aligned());
+    }
+    frame.render_widget(block, area);
+    if count == 0 {
+        frame.render_widget(Paragraph::new("No prompt waits"), inner);
+        return;
+    }
+    let mut top = inner.y;
+    for (index, listed) in state.entries().iter().enumerate().skip(first).take(shown) {
+        let height = (ENTRY_HEIGHT - 1).min(inner.bottom().saturating_sub(top));
+        let entry_area = Rect::new(inner.x, top, inner.width, height);
+        draw_entry(
+            frame,
+            entry_area,
+            listed,
+            state,
+            now,
+            selected == Some(index),
+        );
+        top = top.saturating_add(ENTRY_HEIGHT);
+    }
+}
 
-    let rows = state.entries().iter().map(|listed| row(listed, state, now));
-    let table = Table::new(
-        rows,
-        [
-            Constraint::Length(7),
-            Constraint::Length(12),
-            Constraint::Length(SESSION_START),
-            Constraint::Length(12),
-            Constraint::Percentage(30),
-            Constraint::Fill(1),
-        ],
-    )
-    .header(Row::new([
-        "waits", "user", "session", "tool", "folder", "prompt",
-    ]))
-    .row_highlight_style(Style::new().add_modifier(Modifier::REVERSED))
-    .block(Block::bordered().title(format!(" approval-queue: {count} waiting{mute} ")));
-    let mut table_state = TableState::new().with_selected(state.selected_index());
-    frame.render_stateful_widget(table, table_area, &mut table_state);
+fn draw_entry(
+    frame: &mut Frame,
+    area: Rect,
+    listed: &ListedEntry,
+    state: &ListState,
+    now: u64,
+    is_selected: bool,
+) {
+    let entry = &listed.entry;
+    let base = if is_selected {
+        Style::new().add_modifier(Modifier::REVERSED)
+    } else {
+        Style::new()
+    };
+    let waits = match state.answer_of(&listed.id) {
+        Some(Answer::Allow) => "approved".to_owned(),
+        Some(Answer::Deny { .. }) => "declined".to_owned(),
+        None => age(now.saturating_sub(entry.received)),
+    };
+    let session: String = visible_line(&entry.session)
+        .chars()
+        .take(SESSION_START)
+        .collect();
+    let lines = vec![
+        Line::from(kind_span(entry)),
+        Line::from(Span::styled(
+            title(entry),
+            Style::new().add_modifier(Modifier::BOLD),
+        )),
+        Line::from(format!(
+            "{}  {}  {}  {session}",
+            entry.user_text(),
+            visible_line(&entry.tool),
+            folder_name(&entry.folder),
+        )),
+    ];
+    frame.render_widget(Paragraph::new(lines).style(base), area);
+    let waits_width = u16::try_from(waits.chars().count()).unwrap_or(u16::MAX);
+    if area.height > 0 && area.width >= KIND_WIDTH.saturating_add(waits_width) {
+        frame.render_widget(
+            Paragraph::new(waits).style(base),
+            Rect {
+                x: area.x + area.width - waits_width,
+                width: waits_width,
+                height: 1,
+                ..area
+            },
+        );
+    }
+}
 
-    let detail = state.selected().map_or_else(
-        || vec![Line::from("No prompt waits")],
-        |listed| detail(&listed.entry),
-    );
-    let detail = Paragraph::new(detail).wrap(Wrap { trim: false });
-    let mut pane = Block::bordered();
-    let inner = pane.inner(detail_area);
-    let scroll_limit = u16::try_from(detail.line_count(inner.width))
+fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
+    let Some(listed) = state.selected() else {
+        frame.render_widget(
+            Paragraph::new("No prompt waits").block(Block::bordered()),
+            area,
+        );
+        return 0;
+    };
+    let entry = &listed.entry;
+    let mut pane = Block::bordered().title(Line::from(vec![
+        Span::raw(" "),
+        kind_span(entry),
+        Span::raw(format!(": {} ", visible_line(&entry.tool))),
+    ]));
+    let inner = pane.inner(area);
+    let [detail_area, action_area] =
+        Layout::vertical([Constraint::Fill(1), Constraint::Length(1)]).areas(inner);
+    let detail = Paragraph::new(detail(entry)).wrap(Wrap { trim: false });
+    let scroll_limit = u16::try_from(detail.line_count(detail_area.width))
         .unwrap_or(u16::MAX)
-        .saturating_sub(inner.height);
+        .saturating_sub(detail_area.height);
     let scroll = state.scroll().min(scroll_limit);
     if scroll > 0 {
-        pane = pane.title_top(format!(" lines above: {scroll}, PgUp "));
+        pane = pane.title_top(Line::from(format!(" lines above: {scroll}, PgUp ")).right_aligned());
     }
     if scroll < scroll_limit {
         pane = pane.title_bottom(format!(" lines below: {}, PgDn ", scroll_limit - scroll));
     }
-    frame.render_widget(detail.scroll((scroll, 0)).block(pane), detail_area);
-
-    let notice = state.notice().map(visible_line);
-    let footer = match state.message() {
-        Some(message) => vec![
-            format!("Message of the denial: {}_", visible_line(message)),
-            notice.unwrap_or_else(|| MESSAGE_KEYS.to_owned()),
-        ],
-        None => vec![
-            notice.unwrap_or_default(),
-            KEYS.to_owned(),
-            MORE_KEYS.to_owned(),
-        ],
-    };
-    frame.render_widget(
-        Paragraph::new(footer.into_iter().map(Line::from).collect::<Vec<_>>()),
-        footer_area,
-    );
+    frame.render_widget(pane, area);
+    frame.render_widget(detail.scroll((scroll, 0)), detail_area);
+    let actions: Vec<Span> = ACTIONS
+        .into_iter()
+        .flat_map(|(key, name)| {
+            [
+                Span::styled(
+                    format!(" {key} "),
+                    Style::new().add_modifier(Modifier::REVERSED),
+                ),
+                Span::raw(format!(" {name}   ")),
+            ]
+        })
+        .collect();
+    frame.render_widget(Paragraph::new(Line::from(actions)), action_area);
     scroll_limit
 }
 
-fn row<'a>(listed: &ListedEntry, state: &ListState, now: u64) -> Row<'a> {
-    let entry = &listed.entry;
-    let waits = match state.answer_of(&listed.id) {
-        Some(Answer::Allow) => "allowed".to_owned(),
-        Some(Answer::Deny { .. }) => "denied".to_owned(),
-        None => age(now.saturating_sub(entry.received)),
+fn kind_span<'a>(entry: &Entry) -> Span<'a> {
+    let (name, color) = match EntryKind::of_tool(&entry.tool) {
+        EntryKind::Permission => ("PERMISSION", Color::Yellow),
+        EntryKind::Question => ("QUESTION", Color::Blue),
     };
-    Row::new([
-        waits,
-        entry.user_text(),
-        visible_line(&entry.session),
-        visible_line(&entry.tool),
-        visible_line(&entry.folder),
-        summary(entry),
-    ])
+    Span::styled(name, Style::new().fg(color).add_modifier(Modifier::BOLD))
+}
+
+/// The title that the request had. Without one: the tool and the part of
+/// the input that names the call, on one line of at most
+/// `MAX_TITLE_CHARACTERS` characters.
+fn title(entry: &Entry) -> String {
+    if let Some(title) = &entry.title {
+        return visible_line(title);
+    }
+    let summary = summary(entry);
+    let words: Vec<&str> = entry
+        .tool
+        .split_whitespace()
+        .chain(summary.split_whitespace())
+        .collect();
+    let title = visible_line(&words.join(" "));
+    if title.chars().count() <= MAX_TITLE_CHARACTERS {
+        return title;
+    }
+    let start: String = title.chars().take(MAX_TITLE_CHARACTERS - 3).collect();
+    format!("{start}...")
+}
+
+/// The last part of the path of the folder.
+fn folder_name(folder: &str) -> String {
+    let name = folder
+        .trim_end_matches('/')
+        .rsplit('/')
+        .next()
+        .filter(|name| !name.is_empty())
+        .unwrap_or(folder);
+    visible_line(name)
 }
 
 /// The part of the input that names the call: the command, else the file,
@@ -132,20 +258,20 @@ fn summary(entry: &Entry) -> String {
         .into_iter()
         .find_map(|key| entry.input.get(key).and_then(Value::as_str))
         .map_or_else(
-            || visible_line(&Value::Object(entry.input.clone()).to_string()),
-            visible_line,
+            || Value::Object(entry.input.clone()).to_string(),
+            str::to_owned,
         )
 }
 
 fn detail<'a>(entry: &Entry) -> Vec<Line<'a>> {
     let mut lines = vec![
         format!(
-            "user {}   host {}   mode {}   session {}",
+            "user {}   host {}   mode {}",
             entry.user_text(),
             visible_line(&entry.host),
             visible_line(&entry.mode),
-            visible_line(&entry.session),
         ),
+        format!("session {}", visible_line(&entry.session)),
         format!("folder {}", visible_line(&entry.folder)),
     ];
     if entry.list_only {
@@ -154,18 +280,29 @@ fn detail<'a>(entry: &Entry) -> Vec<Line<'a>> {
     if let Some(reason) = &entry.reason {
         push_field(&mut lines, "reason", reason);
     }
-    lines.push(format!("tool {}", visible_line(&entry.tool)));
+    let mut lines: Vec<Line> = lines.into_iter().map(Line::from).collect();
+    lines.push(Line::default());
+    let title = title(entry);
+    lines.push(Line::from(Span::styled(
+        title.clone(),
+        Style::new().add_modifier(Modifier::BOLD),
+    )));
+    lines.push(Line::default());
+    let mut fields = Vec::new();
     for (key, value) in &entry.input {
         match value {
-            Value::String(text) => push_field(&mut lines, &visible_line(key), text),
-            other => lines.push(format!(
+            // The title above already shows this text
+            Value::String(text) if key == "description" && visible_line(text) == title => {}
+            Value::String(text) => push_field(&mut fields, &visible_line(key), text),
+            other => fields.push(format!(
                 "{}: {}",
                 visible_line(key),
                 visible_line(&other.to_string())
             )),
         }
     }
-    lines.into_iter().map(Line::from).collect()
+    lines.extend(fields.into_iter().map(Line::from));
+    lines
 }
 
 /// One line for a short text, else the name and the text below it.

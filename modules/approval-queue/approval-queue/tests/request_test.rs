@@ -1,4 +1,4 @@
-use approval_queue::request::Request;
+use approval_queue::{entry::Entry, request::Request};
 use serde_json::{Value, json};
 
 fn request() -> Value {
@@ -149,4 +149,45 @@ fn should_refuse_a_user_that_only_looks_like_an_account_name() {
             "{user:?}"
         );
     }
+}
+
+#[test]
+fn should_parse_a_request_with_a_title_and_one_without() {
+    assert_eq!(Request::parse(&request().to_string()).unwrap().title, None);
+    let title = "é".repeat(144);
+    let parsed = Request::parse(&changed("title", json!(title))).unwrap();
+    assert_eq!(parsed.title, Some(title));
+}
+
+#[test]
+fn should_refuse_a_title_that_is_empty_too_long_or_has_a_control_character() {
+    assert_eq!(
+        refusal(&changed("title", json!(""))),
+        "Request field title is empty"
+    );
+    assert_eq!(
+        refusal(&changed("title", json!("a".repeat(145)))),
+        "Request field title is longer than 144 characters"
+    );
+    for title in ["Push\nit", "Push\u{1b}[2J", "Push\tit", "Push\u{9b}2J"] {
+        assert_eq!(
+            refusal(&changed("title", json!(title))),
+            "Request field title has a control character"
+        );
+    }
+    assert!(Request::parse(&changed("title", json!(7))).is_err());
+}
+
+#[test]
+fn should_keep_the_title_of_the_request_in_its_entry() {
+    let request = Request::parse(&changed("title", json!("Push the fix"))).unwrap();
+    let entry = Entry::of(request, 1_795_000_000, true);
+    assert_eq!(entry.title.as_deref(), Some("Push the fix"));
+    let stored = serde_json::to_string(&entry).unwrap();
+    assert_eq!(serde_json::from_str::<Entry>(&stored).unwrap(), entry);
+    let without_title = stored.replace(r#""title":"Push the fix","#, "");
+    assert_eq!(
+        serde_json::from_str::<Entry>(&without_title).unwrap().title,
+        None
+    );
 }

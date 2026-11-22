@@ -3,7 +3,7 @@ use std::time::{Duration, Instant, UNIX_EPOCH};
 use approval_queue::{
     entry::Entry, key::Key, list_state::ListState, list_view, listed_entry::ListedEntry,
 };
-use ratatui::{Terminal, backend::TestBackend};
+use ratatui::{Terminal, backend::TestBackend, style::Modifier};
 use serde_json::{Value, json};
 
 const RECEIVED: u64 = 1_795_000_000;
@@ -20,6 +20,7 @@ fn listed(id: &str, user: &str, tool: &str, input: &Value, reason: Option<&str>)
             folder: "/home/agent/git/pont".to_owned(),
             mode: "auto".to_owned(),
             tool: tool.to_owned(),
+            title: None,
             input: input.as_object().unwrap().clone(),
             reason: reason.map(str::to_owned),
             list_only: false,
@@ -98,7 +99,7 @@ fn assert_shows(lines: &[String], part: &str) {
 }
 
 #[test]
-fn should_show_each_waiting_prompt_in_one_row() {
+fn should_show_each_waiting_prompt_as_an_entry_with_its_kind_title_and_details() {
     let write = listed(
         "2-1",
         "alex",
@@ -109,17 +110,241 @@ fn should_show_each_waiting_prompt_in_one_row() {
     let (state, _) = state_with(vec![push(), write]);
     let lines = screen(&state, 125);
     assert_shows(&lines, " approval-queue: 2 waiting ");
-    assert_shows(&lines, "waits   user         session  tool         folder");
-    assert_shows(
-        &lines,
-        "2m      agent        0a1b     Bash         /home/agent/git/pont",
+    let kinds: Vec<&String> = lines
+        .iter()
+        .filter(|line| line.starts_with("│PERMISSION") && line.contains(" 2m││"))
+        .collect();
+    assert_eq!(kinds.len(), 2, "{}", lines.join("\n"));
+    assert_shows(&lines, "│Bash git push origin 1a2b:master ");
+    assert_shows(&lines, "│agent  Bash  pont  0a1b ");
+    assert_shows(&lines, "│Write /home/alex/notes.md ");
+    assert_shows(&lines, "│alex  Write  pont  0a1b ");
+}
+
+#[test]
+fn should_show_the_title_of_the_request_and_name_a_question() {
+    let mut question = listed(
+        "1-1",
+        "agent",
+        "AskUserQuestion",
+        &json!({ "questions": [] }),
+        None,
     );
-    assert_shows(&lines, "git push origin 1a2b:master");
-    assert_shows(
-        &lines,
-        "2m      alex         0a1b     Write        /home/agent/git/pont",
+    question.entry.title = Some("Which library\u{1b} formats dates?".to_owned());
+    let (state, _) = state_with(vec![question]);
+    let lines = screen(&state, 5);
+    assert_shows(&lines, "│QUESTION ");
+    assert_shows(&lines, "│Which library\\u{1b} formats dates? ");
+    assert_shows(&lines, " QUESTION: AskUserQuestion ");
+    assert!(!lines.iter().any(|line| line.contains("PERMISSION")));
+}
+
+#[test]
+fn should_cut_the_title_of_a_request_without_one_to_one_line_of_144_characters() {
+    let long = listed(
+        "1-1",
+        "agent",
+        "Bash",
+        &json!({ "command": format!("echo  a\n{}", "b".repeat(300)) }),
+        None,
     );
-    assert_shows(&lines, "/home/alex/notes.md");
+    let (state, _) = state_with(vec![long]);
+    let lines = drawn_at_width(&state, 5, 400).0;
+    assert_shows(&lines, &format!("││Bash echo a {}... ", "b".repeat(129)));
+}
+
+#[test]
+fn should_show_the_command_also_when_the_title_equals_it() {
+    let mut prompt = listed(
+        "1-1",
+        "agent",
+        "Bash",
+        &json!({ "command": "echo hi\nrm -r x", "description": "other" }),
+        None,
+    );
+    prompt.entry.title = Some("echo hi\\nrm -r x".to_owned());
+    let (state, _) = state_with(vec![prompt]);
+    let lines = drawn_at_width(&state, 5, 80).0;
+    assert_shows(&lines, "│command:");
+    assert_shows(&lines, "│  rm -r x");
+    assert_shows(&lines, "│description: other");
+}
+
+#[test]
+fn should_cut_a_title_of_characters_of_many_bytes_by_characters() {
+    let long = listed(
+        "1-1",
+        "agent",
+        "Bash",
+        &json!({ "command": "é".repeat(300) }),
+        None,
+    );
+    let (state, _) = state_with(vec![long]);
+    let lines = drawn_at_width(&state, 5, 400).0;
+    assert_shows(&lines, &format!("││Bash {}... ", "é".repeat(136)));
+}
+
+#[test]
+fn should_show_the_control_and_direction_characters_of_each_field_as_escapes() {
+    let evil = "x\u{1b}[2J\u{202e}\u{9b}y";
+    let mut prompt = listed(
+        "1-1",
+        evil,
+        evil,
+        &json!({ evil: evil, "list": [evil], "object": { evil: evil }, "command": evil }),
+        Some(evil),
+    );
+    prompt.entry.host = evil.to_owned();
+    prompt.entry.session = evil.to_owned();
+    prompt.entry.folder = format!("/home/{evil}");
+    prompt.entry.mode = evil.to_owned();
+    let shown = "x\\u{1b}[2J\\u{202e}\\u{9b}y";
+    let lines = drawn_at_width(&state_with(vec![prompt.clone()]).0, 5, 400).0;
+    for part in [
+        format!("│{shown}  {shown}  {shown}  x\\u{{1b}}[ "),
+        format!(" PERMISSION: {shown} "),
+        format!("││user {shown}   host {shown}   mode {shown} "),
+        format!("││session {shown} "),
+        format!("││folder /home/{shown} "),
+        format!("││reason: {shown} "),
+        format!("││command: {shown} "),
+        format!("││{shown}: {shown} "),
+    ] {
+        assert_shows(&lines, &part);
+    }
+    for title in [None, Some(evil.to_owned())] {
+        prompt.entry.title = title;
+        let (state, _) = state_with(vec![prompt.clone()]);
+        for width in [60, 110, 400] {
+            let lines = drawn_at_width(&state, 5, width).0;
+            assert!(lines.iter().all(|line| {
+                !line
+                    .chars()
+                    .any(|character| character.is_control() || character == '\u{202e}')
+            }));
+        }
+    }
+}
+
+#[test]
+fn should_show_only_the_selected_entry_reversed() {
+    let second = listed("1-2", "agent", "Bash", &json!({ "command": "ls" }), None);
+    let (mut state, later) = state_with(vec![push(), second]);
+    state.press(Key::Down, later);
+    let mut terminal = Terminal::new(TestBackend::new(110, 24)).unwrap();
+    terminal
+        .draw(|frame| {
+            list_view::draw(frame, &state, UNIX_EPOCH + Duration::from_secs(RECEIVED));
+        })
+        .unwrap();
+    let buffer = terminal.backend().buffer();
+    let is_reversed = |row| buffer[(1, row)].modifier.contains(Modifier::REVERSED);
+    let reversed: Vec<u16> = (0..24).filter(|row| is_reversed(*row)).collect();
+    assert_eq!(reversed, [5, 6, 7]);
+}
+
+#[test]
+fn should_draw_at_each_small_size_without_a_panic() {
+    let entries: Vec<ListedEntry> = (1..=9)
+        .map(|number| {
+            listed(
+                &format!("1-{number}"),
+                "agent",
+                "Bash",
+                &json!({ "command": "ls" }),
+                None,
+            )
+        })
+        .collect();
+    for count in [0, 1, 9] {
+        let (mut state, later) = state_with(entries[..count].to_vec());
+        for _ in 0..count {
+            state.press(Key::Down, later);
+        }
+        for width in 1..=110 {
+            for height in 1..=12 {
+                let mut terminal = Terminal::new(TestBackend::new(width, height)).unwrap();
+                terminal
+                    .draw(|frame| {
+                        list_view::draw(frame, &state, UNIX_EPOCH);
+                    })
+                    .unwrap();
+            }
+        }
+    }
+}
+
+#[test]
+fn should_not_draw_the_wait_over_the_kind_in_a_narrow_list() {
+    let (state, _) = state_with(vec![push()]);
+    let narrow = drawn_at_width(&state, 5, 14).0;
+    assert_shows(&narrow, "│PERMISSION  │");
+    let wide = drawn_at_width(&state, 5, 15).0;
+    assert_shows(&wide, "│PERMISSION 5s│");
+}
+
+#[test]
+fn should_not_repeat_the_input_text_that_is_the_title() {
+    let mut prompt = listed(
+        "1-1",
+        "agent",
+        "Bash",
+        &json!({ "command": "ls", "description": "List the files" }),
+        None,
+    );
+    prompt.entry.title = Some("List the files".to_owned());
+    let (state, _) = state_with(vec![prompt]);
+    let lines = screen(&state, 5);
+    assert_shows(&lines, "││List the files ");
+    assert_shows(&lines, "command: ls");
+    assert!(!lines.iter().any(|line| line.contains("description")));
+}
+
+#[test]
+fn should_keep_the_selected_entry_in_view_and_count_the_entries_out_of_view() {
+    let entries: Vec<ListedEntry> = (1..=9)
+        .map(|number| {
+            listed(
+                &format!("1-{number}"),
+                "agent",
+                "Bash",
+                &json!({ "command": format!("echo {number}") }),
+                None,
+            )
+        })
+        .collect();
+    let (mut state, later) = state_with(entries);
+    let top = screen(&state, 5);
+    assert_shows(&top, "│Bash echo 1 ");
+    assert_shows(&top, "│Bash echo 5 ");
+    assert_shows(&top, " below: 4 ");
+    assert!(!top.iter().any(|line| line.contains("above: ")));
+    for _ in 0..8 {
+        state.press(Key::Down, later);
+    }
+    let end = screen(&state, 5);
+    assert!(end.iter().any(|line| line.starts_with("│Bash echo 5 ")));
+    assert!(end.iter().any(|line| line.starts_with("│Bash echo 9 ")));
+    assert_shows(&end, " above: 4 ");
+    assert!(!end.iter().any(|line| line.contains("│Bash echo 4 ")));
+    assert!(!end.iter().any(|line| line.contains("below: ")));
+}
+
+#[test]
+fn should_put_the_list_above_the_selected_prompt_in_a_narrow_terminal() {
+    let (state, _) = state_with(vec![push()]);
+    let lines = drawn_at_width(&state, 5, 99).0;
+    let list = lines
+        .iter()
+        .position(|line| line.starts_with("│PERMISSION"))
+        .unwrap();
+    let pane = lines
+        .iter()
+        .position(|line| line.starts_with("│user agent"))
+        .unwrap();
+    assert!(list < pane);
+    let wide = drawn_at_width(&state, 5, 100).0;
+    assert_shows(&wide, "││user agent");
 }
 
 #[test]
@@ -127,14 +352,16 @@ fn should_show_the_selected_prompt_in_full() {
     let (state, _) = state_with(vec![push()]);
     let lines = screen(&state, 5);
     for part in [
-        "user agent   host claude-code   mode auto   session 0a1b",
+        " PERMISSION: Bash ",
+        "user agent   host claude-code   mode auto",
+        "session 0a1b",
         "folder /home/agent/git/pont",
         "reason: Push to master",
-        "tool Bash",
+        "││Bash git push origin 1a2b:master ",
         "command: git push origin 1a2b:master",
         "timeout: 5000",
-        "a allow   d deny   m deny with a message   j/k select   PgUp/PgDn scroll",
-        "s mute pings 10 min   S mute pings 1 hour   u unmute   q quit",
+        " a  Approve    d  Decline    m  Decline with a message",
+        "j/k select   PgUp/PgDn scroll   s/S mute pings 10 min/1 hour   u unmute   q quit",
     ] {
         assert_shows(&lines, part);
     }
@@ -152,7 +379,7 @@ fn should_show_the_age_in_its_largest_whole_unit() {
         (86_399, "23h"),
         (86_400, "1d"),
     ] {
-        assert_shows(&screen(&state, seconds), &format!("│{age:<8}agent"));
+        assert_shows(&screen(&state, seconds), &format!("  {age}││"));
     }
 }
 
@@ -166,8 +393,8 @@ fn should_show_a_command_of_many_lines_line_by_line() {
         None,
     );
     let (state, _) = state_with(vec![script]);
-    let lines = screen(&state, 5);
-    assert_shows(&lines, "echo a\\necho b");
+    let lines = drawn_at_width(&state, 5, 80).0;
+    assert_shows(&lines, "│Bash echo a echo b ");
     let command = lines
         .iter()
         .position(|line| line.contains("│command:"))
@@ -218,10 +445,10 @@ fn should_show_an_input_without_a_command_or_a_file_as_json() {
 
 #[test]
 fn should_show_the_answer_in_place_of_the_age() {
-    for (key, shown) in [('a', "allowed"), ('d', "denied")] {
+    for (key, shown) in [('a', "approved"), ('d', "declined")] {
         let (mut state, later) = state_with(vec![push()]);
         state.press(Key::Character(key), later);
-        assert_shows(&screen(&state, 5), &format!("│{shown:<8}agent"));
+        assert_shows(&screen(&state, 5), &format!("  {shown}││"));
     }
 }
 
@@ -230,7 +457,8 @@ fn should_show_that_no_prompt_waits() {
     let (state, _) = state_with(Vec::new());
     let lines = screen(&state, 5);
     assert_shows(&lines, " approval-queue: 0 waiting ");
-    assert_shows(&lines, "No prompt waits");
+    assert_shows(&lines, "│No prompt waits");
+    assert_shows(&lines, "││No prompt waits");
 }
 
 #[test]
@@ -241,7 +469,7 @@ fn should_show_the_message_while_the_owner_types_it() {
         state.press(Key::Character(character), later);
     }
     let lines = screen(&state, 5);
-    assert_shows(&lines, "Message of the denial: Use a branch_");
+    assert_shows(&lines, "Message of the decline: Use a branch_");
     assert_shows(&lines, "Enter send   Esc cancel");
 }
 
@@ -253,11 +481,10 @@ fn should_show_the_notice_above_the_keys() {
     state.press(Key::Character('a'), start);
     let lines = screen(&state, 5);
     assert_eq!(
-        lines[21],
+        lines[22],
         "Too early. Press the key after 1 second without a key."
     );
-    assert!(lines[22].starts_with("a allow"));
-    assert!(lines[23].starts_with("s mute"));
+    assert!(lines[23].starts_with("j/k select"));
 }
 
 #[test]
@@ -276,19 +503,19 @@ fn should_show_the_later_lines_of_the_selected_prompt_after_a_scroll() {
 #[test]
 fn should_count_the_lines_above_and_below_the_pane_of_the_selected_prompt() {
     let (mut state, later) = state_with(vec![long_command()]);
-    assert_eq!(drawn(&state, 5).1, 29);
+    assert_eq!(drawn(&state, 5).1, 30);
     let top = screen_as_the_list_draws_it(&mut state);
-    assert_shows(&top, " lines below: 29, PgDn ");
+    assert_shows(&top, " lines below: 30, PgDn ");
     assert!(!top.iter().any(|line| line.contains("lines above")));
     state.press(Key::PageDown, later);
     state.press(Key::PageDown, later);
     let middle = screen_as_the_list_draws_it(&mut state);
     assert_shows(&middle, " lines above: 20, PgUp ");
-    assert_shows(&middle, " lines below: 9, PgDn ");
+    assert_shows(&middle, " lines below: 10, PgDn ");
     state.press(Key::PageDown, later);
     state.press(Key::PageDown, later);
     let end = screen_as_the_list_draws_it(&mut state);
-    assert_shows(&end, " lines above: 29, PgUp ");
+    assert_shows(&end, " lines above: 30, PgUp ");
     assert_shows(&end, "│  line 40");
     assert!(!end.iter().any(|line| line.contains("lines below")));
 }
@@ -333,7 +560,7 @@ fn should_show_the_last_lines_of_a_prompt_for_a_scroll_past_its_end() {
         state.press(Key::PageDown, later);
     }
     let lines = screen(&state, 5);
-    assert_shows(&lines, " lines above: 29, PgUp ");
+    assert_shows(&lines, " lines above: 30, PgUp ");
     assert_shows(&lines, "│  line 40");
 }
 
@@ -343,7 +570,7 @@ fn should_mark_the_name_of_a_user_that_the_service_did_not_verify() {
     prompt.entry.user_is_verified = false;
     let (state, _) = state_with(vec![prompt]);
     let lines = screen(&state, 5);
-    assert_shows(&lines, "5s      ?agent       0a1b     Bash");
+    assert_shows(&lines, "│?agent  Bash  pont  0a1b ");
     assert_shows(&lines, "user ?agent   host claude-code");
 }
 
@@ -352,12 +579,13 @@ fn should_name_a_prompt_that_only_the_list_can_answer() {
     let mut prompt = push();
     let line = "only in this list: its terminal shows the prompt when no list is open";
     assert!(
-        !screen(&state_with(vec![prompt.clone()]).0, 5)
+        !drawn_at_width(&state_with(vec![prompt.clone()]).0, 5, 80)
+            .0
             .iter()
             .any(|shown| shown.contains(line))
     );
     prompt.entry.list_only = true;
-    assert_shows(&screen(&state_with(vec![prompt]).0, 5), line);
+    assert_shows(&drawn_at_width(&state_with(vec![prompt]).0, 5, 80).0, line);
 }
 
 #[test]
@@ -367,9 +595,9 @@ fn should_show_the_notice_below_the_message_while_the_owner_types_it() {
     state.press(Key::Character('x'), later);
     state.refresh(Vec::new(), later);
     let lines = screen(&state, 5);
-    assert_eq!(lines[21], "Message of the denial: x_");
+    assert_eq!(lines[22], "Message of the decline: x_");
     assert_eq!(
-        lines[22],
+        lines[23],
         "The prompt left the queue. Esc closes the message."
     );
 }
@@ -380,23 +608,21 @@ fn should_show_the_start_of_a_long_session_id_in_the_row_and_the_whole_id_below(
     prompt.entry.session = "0a1b2c3d-0000-4000-8000-000000000001".to_owned();
     let (state, _) = state_with(vec![prompt]);
     let lines = screen(&state, 5);
-    assert_shows(&lines, "agent        0a1b2c3d Bash");
+    assert_shows(&lines, "│agent  Bash  pont  0a1b2c3d ");
     assert_shows(&lines, "session 0a1b2c3d-0000-4000-8000-000000000001");
 }
 
 #[test]
-fn should_show_in_the_title_how_long_the_pings_are_muted() {
+fn should_show_below_the_list_how_long_the_pings_are_muted() {
     let (mut state, _) = state_with(vec![push()]);
     state.show_mute(Some(UNIX_EPOCH + Duration::from_secs(RECEIVED + 5 + 541)));
-    assert_shows(
-        &screen(&state, 5),
-        " approval-queue: 1 waiting, pings muted for 10 min ",
+    assert_shows(&screen(&state, 5), "└ pings muted for 10 min ");
+    assert_shows(&screen(&state, 5 + 481), "└ pings muted for 1 min ");
+    assert!(
+        !screen(&state, 5 + 542)
+            .iter()
+            .any(|line| line.contains("muted"))
     );
-    assert_shows(
-        &screen(&state, 5 + 481),
-        " approval-queue: 1 waiting, pings muted for 1 min ",
-    );
-    assert_shows(&screen(&state, 5 + 542), " approval-queue: 1 waiting ");
 }
 
 #[test]
@@ -404,13 +630,12 @@ fn should_show_each_key_in_a_terminal_of_80_columns() {
     let (state, _) = state_with(vec![push()]);
     let lines = drawn_at_width(&state, 5, 80).0;
     for key in [
-        "a allow",
-        "d deny",
-        "m deny with a message",
+        " a  Approve",
+        " d  Decline",
+        " m  Decline with a message",
         "j/k select",
         "PgUp/PgDn scroll",
-        "s mute pings 10 min",
-        "S mute pings 1 hour",
+        "s/S mute pings 10 min/1 hour",
         "u unmute",
         "q quit",
     ] {

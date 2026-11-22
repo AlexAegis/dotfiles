@@ -24,18 +24,30 @@ hook of a session -> /run/approval-queue/request.sock -> approval-queue@.service
 
 ## List
 
-`approval-queue` opens the list in a terminal. The upper part has one row for
-each waiting prompt, the oldest first: how long it waits, user, start of the
-session ID, tool, folder, command or file of the call. The lower part shows the
-selected prompt in full: user, harness, permission mode, session, folder, the
-reason of a guard hook that asked, the tool and its input. Its border counts the
-lines above and below it.
+`approval-queue` opens the list in a terminal. In a terminal of at least 100
+columns, the list has two columns. In a narrower terminal, the left column is
+above the right one.
+
+- Left: one entry for each waiting prompt, the oldest first.
+  - Line 1: the kind, `PERMISSION` or `QUESTION`. At the right: how long the
+    prompt waits, or its answer, `approved` or `declined`.
+  - Line 2: the title of the request. For a request without one: the tool with
+    the command or the file of the call, else with the whole input, at most
+    144 characters.
+  - Line 3: user, tool, name of the folder, start of the session ID.
+  - The border counts the entries above and below the shown ones. Its lower
+    edge shows how long the pings are muted.
+- Right: the selected prompt in full: user, harness, permission mode, session,
+  folder, the reason of a guard hook that asked, the title and the input of the
+  tool. A `description` of the input that equals the title is not shown again.
+  The last line names the keys that answer. The border counts the lines above
+  and below.
 
 | Key              | Effect                                          |
 | ---------------- | ----------------------------------------------- |
-| `a`              | allows the selected prompt                      |
-| `d`              | denies it                                       |
-| `m`              | denies it with a message, which the agent reads |
+| `a`              | approves the selected prompt                    |
+| `d`              | declines it                                     |
+| `m`              | declines it with a message for the agent        |
 | `j`, `k`, arrows | select                                          |
 | PgUp, PgDn       | scroll the selected prompt                      |
 | `s`              | mutes the pings for 10 minutes                  |
@@ -102,7 +114,7 @@ prompt then counts as new.
 The cadence counts the time that the machine runs, without the time of a
 suspend.
 
-`s` and `S` in the list mute the pings, as the menu of the icon does. The upper
+`s` and `S` in the list mute the pings, as the menu of the icon does. The lower
 border of the list and the tooltip of the icon show the minutes left. A later
 mute sets a new time. While the mute lasts, no ping comes. The icon still shows
 what waits. The prompts keep their wait: when the mute ends, one ping comes for
@@ -174,21 +186,22 @@ journalctl --user -u approval-queue-notify.service
 
 ## Requests
 
-One JSON line, at most 65536 bytes with the newline. Each field is required. A
-text with a limit is not empty:
+One JSON line, at most 65536 bytes with the newline. Each field but `title` is
+required. A text with a limit is not empty:
 
-| Field       | Content                                                           | Limit      |
-| ----------- | ----------------------------------------------------------------- | ---------- |
-| `version`   | `1`                                                               |            |
-| `host`      | the harness, such as `claude-code`                                | 32 bytes   |
-| `user`      | the user that the hook runs as                                    | 64 bytes   |
-| `session`   | the ID of the session                                             | 128 bytes  |
-| `folder`    | the working folder of the session                                 | 4096 bytes |
-| `mode`      | the permission mode of the session                                | 32 bytes   |
-| `tool`      | the name of the tool                                              | 256 bytes  |
-| `input`     | the input of the tool call, an object                             |            |
-| `reason`    | why a guard hook asked, or `null`                                 |            |
-| `list_only` | `true` or `false`: only the list can answer the prompt, see below |            |
+| Field       | Content                                                           | Limit          |
+| ----------- | ----------------------------------------------------------------- | -------------- |
+| `version`   | `1`                                                               |                |
+| `host`      | the harness, such as `claude-code`                                | 32 bytes       |
+| `user`      | the user that the hook runs as                                    | 64 bytes       |
+| `session`   | the ID of the session                                             | 128 bytes      |
+| `folder`    | the working folder of the session                                 | 4096 bytes     |
+| `mode`      | the permission mode of the session                                | 32 bytes       |
+| `tool`      | the name of the tool                                              | 256 bytes      |
+| `title`     | what the call is for, on one line, written by the sender          | 144 characters |
+| `input`     | the input of the tool call, an object                             |                |
+| `reason`    | why a guard hook asked, or `null`                                 |                |
+| `list_only` | `true` or `false`: only the list can answer the prompt, see below |                |
 
 The hook keeps the connection open and sends nothing after its line. It ends its
 wait after 1 day. The reply is one JSON line:
