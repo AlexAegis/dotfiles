@@ -2,7 +2,7 @@ use std::time::{Duration, Instant};
 
 use ping_throttle::{Cadence, Notifier, Ping};
 
-/// The cadence of the pings for the owner. A prompt that arrives while no
+/// The cadence of the preset `Normal`. A prompt that arrives while no
 /// prompt waits for a ping pings at once, when the last ping is 30 seconds
 /// old. After a ping, no ping comes for 30 seconds. Then 4 prompts that wait
 /// for a ping get one, or fewer when the oldest of them waited 2 minutes.
@@ -29,6 +29,12 @@ impl PingWatch {
             notifier,
             known: Vec::new(),
         }
+    }
+
+    /// Replaces the cadence. The waiting prompts keep their wait and the
+    /// quiet time after the last ping keeps its start.
+    pub fn set_cadence(&mut self, cadence: Cadence) {
+        self.notifier.set_cadence(cadence);
     }
 
     /// Takes the IDs of the prompts that wait at `now`, oldest first, and

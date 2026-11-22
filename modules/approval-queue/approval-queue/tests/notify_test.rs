@@ -25,7 +25,26 @@ impl Drop for Notify {
 
 impl Notify {
     fn start(busctl_reply: &str) -> Self {
-        let folder = TempDir::new().unwrap();
+        Self::start_with_settings(busctl_reply, r#"{"high_alert":true}"#)
+    }
+
+    fn start_with_settings(busctl_reply: &str, settings: &str) -> Self {
+        Self::start_in(TempDir::new().unwrap(), busctl_reply, settings)
+    }
+
+    fn start_in(folder: TempDir, busctl_reply: &str, settings: &str) -> Self {
+        let state = folder.path().join("state");
+        fs::create_dir(&state).unwrap();
+        fs::write(state.join("settings.json"), settings).unwrap();
+        let state = state.to_str().unwrap().to_owned();
+        Self::start_with(folder, busctl_reply, &[("STATE_DIRECTORY", &state)])
+    }
+
+    fn start_with_state(folder: TempDir, state: &[(&str, &str)]) -> Self {
+        Self::start_with(folder, "i 3", state)
+    }
+
+    fn start_with(folder: TempDir, busctl_reply: &str, state: &[(&str, &str)]) -> Self {
         let programs = folder.path().join("programs");
         fs::create_dir(&programs).unwrap();
         write_program(
@@ -39,8 +58,10 @@ impl Notify {
             "echo \"systemd-run $*\" >>\"$CALLS\"\n",
         );
         let process = Command::new(env!("CARGO_BIN_EXE_approval-queue-notify"))
+            .current_dir(folder.path())
             .env_clear()
             .env("XDG_RUNTIME_DIR", folder.path())
+            .envs(state.iter().copied())
             .env("PATH", &programs)
             .env("CALLS", folder.path().join("calls"))
             .stdin(Stdio::null())
@@ -202,6 +223,63 @@ fn should_ping_when_the_time_of_the_mute_is_over() {
     queue
         .mute_pings_until(SystemTime::now() - Duration::from_secs(1))
         .unwrap();
+    let _waiting = queue.add(&entry()).unwrap();
+    assert_eq!(notify.calls_after(4).len(), 4);
+}
+
+#[test]
+fn should_bring_the_list_to_view_at_a_ping_without_high_alert_when_it_has_no_tray() {
+    let notify = Notify::start_with_settings("i 3", "{}");
+    let queue = notify.queue();
+    let _waiting = queue.add(&entry()).unwrap();
+    assert_eq!(notify.calls_after(4).len(), 4);
+}
+
+fn folder_mode(path: &Path) -> u32 {
+    fs::metadata(path).unwrap().permissions().mode() & 0o777
+}
+
+#[test]
+fn should_make_the_state_folder_of_the_user_for_the_owner_only() {
+    let folder = TempDir::new().unwrap();
+    let state_home = folder.path().join("state-home");
+    let notify = Notify::start_with_state(
+        folder,
+        &[
+            ("STATE_DIRECTORY", ""),
+            ("XDG_STATE_HOME", state_home.to_str().unwrap()),
+        ],
+    );
+    let queue = notify.queue();
+    let _waiting = queue.add(&entry()).unwrap();
+    assert_eq!(notify.calls_after(4).len(), 4);
+    assert_eq!(folder_mode(&state_home.join("approval-queue")), 0o700);
+}
+
+#[test]
+fn should_take_the_state_folder_below_the_home_folder_for_a_relative_state_home() {
+    let folder = TempDir::new().unwrap();
+    let home = folder.path().join("home");
+    let notify = Notify::start_with_state(
+        folder,
+        &[
+            ("XDG_STATE_HOME", "relative"),
+            ("HOME", home.to_str().unwrap()),
+        ],
+    );
+    let queue = notify.queue();
+    let _waiting = queue.add(&entry()).unwrap();
+    assert_eq!(notify.calls_after(4).len(), 4);
+    assert_eq!(
+        folder_mode(&home.join(".local/state/approval-queue")),
+        0o700
+    );
+}
+
+#[test]
+fn should_ping_without_a_state_folder() {
+    let notify = Notify::start_with_state(TempDir::new().unwrap(), &[("HOME", "")]);
+    let queue = notify.queue();
     let _waiting = queue.add(&entry()).unwrap();
     assert_eq!(notify.calls_after(4).len(), 4);
 }

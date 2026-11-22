@@ -5,7 +5,11 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use approval_queue::{answer::Answer, entry::Entry, queue_folder::QueueFolder};
+use approval_queue::{
+    answer::Answer,
+    entry::Entry,
+    queue_folder::{self, QueueFolder},
+};
 use serde_json::{Map, json};
 use tempfile::TempDir;
 
@@ -393,4 +397,46 @@ fn should_read_a_mute_file_without_a_count_of_seconds_as_no_mute() {
     }
     fs::write(&path, format!("{}", u64::MAX)).unwrap();
     assert_eq!(queue.pings_muted_until(), None);
+}
+
+#[test]
+fn should_read_the_tool_of_a_waiting_entry() {
+    let (_runtime_folder, queue) = queue();
+    let waiting = queue.add(&entry("AskUserQuestion")).unwrap();
+    assert_eq!(
+        queue.tool_of(waiting.id()),
+        Some("AskUserQuestion".to_owned())
+    );
+}
+
+#[test]
+fn should_read_no_tool_for_an_entry_that_left_or_has_another_form_and_for_no_id() {
+    let (runtime_folder, queue) = queue();
+    let waiting = queue.add(&entry("Bash")).unwrap();
+    let id = waiting.id().to_owned();
+    fs::write(entries(&runtime_folder).join(format!("{id}.json")), "[").unwrap();
+    assert_eq!(queue.tool_of(&id), None);
+    drop(waiting);
+    assert_eq!(queue.tool_of(&id), None);
+    fs::write(
+        runtime_folder.path().join("approval-queue/x.json"),
+        r#"{"tool":"Bash"}"#,
+    )
+    .unwrap();
+    assert_eq!(queue.tool_of("../x"), None);
+}
+
+#[test]
+fn should_count_a_part_of_a_minute_of_a_mute_as_a_whole_minute() {
+    let now = SystemTime::now();
+    let minutes = |millis| queue_folder::muted_minutes(now + Duration::from_millis(millis), now);
+    assert_eq!(minutes(0), None);
+    assert_eq!(minutes(1), Some(1));
+    assert_eq!(minutes(60_000), Some(1));
+    assert_eq!(minutes(60_001), Some(2));
+    assert_eq!(minutes(600_000), Some(10));
+    assert_eq!(
+        queue_folder::muted_minutes(now - Duration::from_secs(1), now),
+        None
+    );
 }

@@ -1,12 +1,13 @@
 [Unit]
-Description=Brings the list of the permission prompts to view when prompts wait
+Description=Tray icon of the waiting permission prompts, with its pings
 PartOf=graphical-session.target
 After=graphical-session.target
 
 # Checks the locks of the entry files of the owner's queue and removes
-# leftovers there, without a read of their content. Writes the KWin script to
-# the folder of the queue. Starts busctl for KWin and systemd-run for the
-# terminal, so it needs the session bus.
+# leftovers there. Reads each new entry one time, for its tool. Writes the
+# KWin script and the icons of the tray to the folder of the queue. Shows the
+# tray icon through the session bus. Starts busctl for KWin and systemd-run
+# for the terminal, which need that bus too.
 [Service]
 ExecStart=%D/approval-queue/bin/approval-queue-notify
 # KWin keeps a loaded script when the process that loaded it ends
@@ -15,11 +16,14 @@ RuntimeDirectory=approval-queue
 RuntimeDirectoryMode=0700
 # The folder belongs to the service processes and to the list too
 RuntimeDirectoryPreserve=yes
+# The settings of the tray menu
+StateDirectory=approval-queue
+StateDirectoryMode=0700
 Restart=on-failure
 RestartSec=5
 MemoryMax=32M
 MemorySwapMax=0
-TasksMax=8
+TasksMax=16
 NoNewPrivileges=yes
 PrivateUsers=self
 ProtectSystem=strict

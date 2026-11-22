@@ -1,4 +1,6 @@
 pub mod action;
+pub mod alert_settings;
+pub mod alerts;
 pub mod answer;
 pub mod display_text;
 pub mod entry;
@@ -18,4 +20,6 @@ pub mod request;
 pub mod service;
 pub mod terminal_event;
 pub mod terminal_key;
+pub mod tray_icons;
+pub mod tray_view;
 pub mod waiting_entry;

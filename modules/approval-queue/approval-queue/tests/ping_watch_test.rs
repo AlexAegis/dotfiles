@@ -4,6 +4,7 @@ use std::{
 };
 
 use approval_queue::ping_watch::{CADENCE, PingWatch};
+use ping_throttle::Cadence;
 
 fn seconds(count: u64) -> Duration {
     Duration::from_secs(count)
@@ -119,4 +120,21 @@ fn should_not_ping_again_after_a_mute_for_a_prompt_that_had_its_ping() {
     watch.refresh(ids(&["a"]), start + seconds(5), true);
     watch.refresh(ids(&["a"]), start + seconds(600), false);
     assert_eq!(pings.lock().unwrap().len(), 1);
+}
+
+#[test]
+fn should_keep_the_wait_of_the_prompts_at_a_new_cadence() {
+    let start = Instant::now();
+    let (mut watch, pings) = recording_watch();
+    watch.refresh(ids(&["a"]), start, false);
+    watch.refresh(ids(&["a", "b"]), start + seconds(5), false);
+    watch.set_cadence(Cadence {
+        quiet_time: seconds(120),
+        batch_size: 8,
+        longest_wait: seconds(600),
+    });
+    watch.refresh(ids(&["a", "b"]), start + seconds(604), false);
+    assert_eq!(pings.lock().unwrap().len(), 1);
+    watch.refresh(ids(&["a", "b"]), start + seconds(605), false);
+    assert_eq!(*pings.lock().unwrap(), vec![ids(&["a"]), ids(&["b"])]);
 }

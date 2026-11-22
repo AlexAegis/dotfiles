@@ -15,6 +15,7 @@ use crate::{
     entry::Entry,
     list_state::ListState,
     listed_entry::ListedEntry,
+    queue_folder,
 };
 
 const KEYS: &str = "a allow   d deny   m deny with a message   j/k select   PgUp/PgDn scroll";
@@ -30,9 +31,9 @@ const SESSION_START: u16 = 8;
 pub fn draw(frame: &mut Frame, state: &ListState, now: SystemTime) -> u16 {
     let mute = state
         .pings_muted_until()
-        .and_then(|until| until.duration_since(now).ok())
-        .map_or_else(String::new, |left| {
-            format!(", pings muted for {} min", left.as_secs().div_ceil(60))
+        .and_then(|until| queue_folder::muted_minutes(until, now))
+        .map_or_else(String::new, |minutes| {
+            format!(", pings muted for {minutes} min")
         });
     let now = now
         .duration_since(UNIX_EPOCH)

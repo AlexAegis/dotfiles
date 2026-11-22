@@ -123,6 +123,22 @@ impl QueueFolder {
         Ok(ids)
     }
 
+    /// The tool of a waiting entry. Keeps no other field. `None` when the
+    /// entry left or has another form.
+    #[must_use]
+    pub fn tool_of(&self, id: &str) -> Option<String> {
+        #[derive(serde::Deserialize)]
+        struct Tool {
+            tool: String,
+        }
+        if !is_id(id) {
+            return None;
+        }
+        let file = File::open(self.entries.join(format!("{id}.json"))).ok()?;
+        let entry: Tool = serde_json::from_reader(BufReader::new(file)).ok()?;
+        Some(entry.tool)
+    }
+
     /// Mutes the pings until the time. A later call replaces the time.
     pub fn mute_pings_until(&self, until: SystemTime) -> Result<()> {
         let seconds = until
@@ -297,4 +313,15 @@ fn is_id(text: &str) -> bool {
         && text
             .bytes()
             .all(|byte| byte.is_ascii_digit() || byte == b'-')
+}
+
+/// The minutes that a mute until `until` still lasts at `now`, a part of a
+/// minute as a whole one. `None` when the mute is over.
+#[must_use]
+pub fn muted_minutes(until: SystemTime, now: SystemTime) -> Option<u64> {
+    let left = until
+        .duration_since(now)
+        .ok()
+        .filter(|left| !left.is_zero())?;
+    Some(u64::try_from(left.as_millis().div_ceil(60_000)).unwrap_or(u64::MAX))
 }

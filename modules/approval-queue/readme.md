@@ -81,8 +81,8 @@ lines above and below it.
 ## Notify
 
 `approval-queue-notify.service` runs `approval-queue-notify` in the graphical
-session. It checks the entry files 2 times each second and brings the list to
-view at a cadence, so that many prompts give few pings. Each prompt counts
+session. It shows a tray icon and checks the entry files 2 times each second.
+It pings at a cadence, so that many prompts give few pings. Each prompt counts
 for at most one ping. Until then it waits for its ping:
 
 - A prompt pings at once when no prompt waits for a ping and the last ping is
@@ -93,11 +93,59 @@ for at most one ping. Until then it waits for its ping:
 - A prompt that leaves the queue before its ping counts for none.
 
 The cadence comes from the
-[`ping_throttle`](https://github.com/AlexAegis/ping_throttle) crate. Its values
-are the `CADENCE` in `ping_watch.rs`. A restart of the service starts the
-cadence again: each waiting prompt then counts as new.
+[`ping_throttle`](https://github.com/AlexAegis/ping_throttle) crate. The values
+above are those of the preset `Normal`. The menu of the tray icon sets another
+preset. At a new preset, the waiting prompts keep their wait. The quiet time
+keeps its start. A restart of the service starts the cadence again: each waiting
+prompt then counts as new.
 
-A ping does this:
+The cadence counts the time that the machine runs, without the time of a
+suspend.
+
+`s` and `S` in the list mute the pings, as the menu of the icon does. The upper
+border of the list and the tooltip of the icon show the minutes left. A later
+mute sets a new time. While the mute lasts, no ping comes. The icon still shows
+what waits. The prompts keep their wait: when the mute ends, one ping comes for
+those that still wait for theirs. A mute ends at a clock time: the time of a
+suspend counts. It also lasts after the list quits.
+
+### Tray Icon
+
+The icon is a StatusNotifierItem on the session bus, an inbox:
+
+| Icon                          | Shows                      |
+| ----------------------------- | -------------------------- |
+| outline in the text color     | nothing waits              |
+| white with a yellow border    | a ping, for 400 ms         |
+| yellow with an attention mark | a permission prompt waits  |
+| blue with a question mark     | only question dialogs wait |
+
+A question dialog is a prompt of the `AskUserQuestion` tool.
+
+While a prompt waits, the icon has the status `NeedsAttention`, so a desktop
+that hides idle icons shows it. The tooltip has the counts. A click on the icon
+brings the list to view, as steps 1 and 2 below describe. The menu of the icon:
+
+- Open the list
+- High alert: a ping also brings the list to view. Off by default.
+- Mute the pings: for 10 minutes, for 1 hour, unmute
+- Cadence of the pings:
+
+  | Preset | Quiet time | Ping for  | Or when the oldest waited |
+  | ------ | ---------- | --------- | ------------------------- |
+  | Often  | 10 seconds | 2 prompts | 30 seconds                |
+  | Normal | 30 seconds | 4 prompts | 2 minutes                 |
+  | Seldom | 2 minutes  | 8 prompts | 10 minutes                |
+
+The high alert and the cadence do not depend on each other. Both stay over a
+restart, in `settings.json` of `$XDG_STATE_HOME/approval-queue`. While no
+desktop service takes the icon, or the program cannot show it, such as without a
+session bus, each ping brings the list to view, as with high alert. The journal
+has the reason.
+
+### High Alert
+
+With high alert, a ping also does this:
 
 1. It loads `focus_list.js` into KWin through D-Bus (`busctl`). The script
    moves the window of the list to the current desktop and gives it the focus.
@@ -113,18 +161,9 @@ The script finds no list whose window shows a caption other than that title:
 - a list in a tab that is not the current tab of its window
 - a list in a terminal multiplexer, or in a terminal with a fixed title format
 
-A ping then shows nothing while that list is open. The script does not move a
-window between activities. A ping also opens a list while nobody watches the
-screen.
-
-The cadence counts the time that the machine runs, without the time of a
-suspend.
-
-`s` and `S` in the list mute the pings. The upper border of the list shows the
-minutes left. A later `s` or `S` sets a new time. While the mute lasts, no ping
-comes and no list opens. The prompts keep their wait: when the mute ends, one
-ping comes for those that still wait for theirs. A mute ends at a clock time:
-the time of a suspend counts. It also lasts after the list quits.
+A ping then shows nothing more than the icon while that list is open. The script
+does not move a window between activities. A ping also opens a list while nobody
+watches the screen.
 
 On a desktop without KWin, step 1 fails and the journal has the reason. Step 2
 still runs:
@@ -195,7 +234,12 @@ request states.
   service process and `approval-queue-notify` remove a mark that no process
   locks.
 - `focus-list.js`: the KWin script of the last ping.
+- `icons/`: the icons of the tray, as an icon theme folder.
 - `pings-muted-until`: the end of a mute, in seconds since 1970.
+
+`$XDG_STATE_HOME/approval-queue`:
+
+- `settings.json`: the high alert and the cadence preset of the menu.
 
 ## Install
 
@@ -210,6 +254,9 @@ that is `approval-queue.ts` of the `ai-prompts` module.
 
 ## Limits
 
+- The program knows whether a desktop service takes tray icons, not whether a
+  panel draws them. While the panel is down and that service runs, a ping
+  without high alert shows nothing.
 - A process of the owner can write an answer file. The folder of the queue has
   the protection of the owner's other files, not more. A user of the `agent`
   group cannot read or write it.
@@ -241,7 +288,11 @@ list and what the list draws. The tests give the list its terminal events
 directly. No test runs a real terminal, so none covers its bracketed paste and
 focus reporting modes.
 The tests of `approval-queue-notify` run it with stand-ins for `busctl` and
-`systemd-run`. No test runs KWin, `ghostty` or `focus_list.js`.
+`systemd-run`. The tests of the tray run it on a session bus of their own
+(`dbus-daemon`) and click its menu through D-Bus (`busctl`). They fail where a
+sandbox refuses unix sockets. No test runs KWin, `ghostty`, `focus_list.js` or a
+desktop that draws the icon.
 
-To see a ping, close each list, send the request above and wait: a terminal
-with the list opens and gets the focus.
+To see a ping, send the request above: the icon flashes, then turns yellow.
+With high alert and no open list, a terminal with the list also opens and gets
+the focus.
