@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Approval queue
+Comment=List of the waiting permission prompts of coding agent sessions
+Icon=approval-queue
+Exec=ghostty --class=io.github.alexaegis.approval-queue --title=approval-queue -e approval-queue
+Terminal=false
+Categories=Development;
+StartupWMClass=io.github.alexaegis.approval-queue

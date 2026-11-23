@@ -45,7 +45,7 @@ fn should_show_the_flash_icon_before_each_other_icon() {
 }
 
 #[test]
-fn should_need_attention_only_while_a_prompt_or_an_idle_session_waits_or_a_ping_shows() {
+fn should_need_attention_only_while_a_prompt_waits_or_a_ping_shows() {
     assert!(!TrayView::default().needs_attention());
     let views = [
         TrayView {
@@ -60,12 +60,14 @@ fn should_need_attention_only_while_a_prompt_or_an_idle_session_waits_or_a_ping_
             is_flashing: true,
             ..TrayView::default()
         },
-        TrayView {
-            idle_sessions: 1,
-            ..TrayView::default()
-        },
     ];
     assert!(views.iter().all(TrayView::needs_attention));
+    let idle = TrayView {
+        idle_sessions: 1,
+        ..TrayView::default()
+    };
+    assert!(!idle.needs_attention());
+    assert_eq!(idle.icon_name(), "approval-queue-idle");
 }
 
 #[test]

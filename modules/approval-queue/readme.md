@@ -197,10 +197,12 @@ The icon is a StatusNotifierItem on the session bus, an inbox:
 
 A question dialog is a prompt of the `AskUserQuestion` tool.
 
-While a prompt waits or a session is idle for 1 minute, the icon has the status
-`NeedsAttention`, so a desktop that hides idle icons shows it. The tooltip has
-the counts. A click on the icon
-brings the list to view, as steps 1 and 2 below describe. The menu of the icon:
+While a prompt waits or a ping shows, the icon has the status `NeedsAttention`,
+so a desktop that hides idle icons shows it and can animate it. A session that
+is idle for 1 minute pings one time. After the ping it shows only in the icon
+and in the counts, without that status: a session can stay idle for hours. The
+tooltip has the counts. A click on the icon brings the list to view, as steps 1
+and 2 below describe. The menu of the icon:
 
 - Open the list
 - High alert: a ping also brings the list to view. Off by default.
@@ -231,7 +233,7 @@ With high alert, a ping also does this:
    The script stays loaded for 10 seconds, so it also focuses one list window
    that opens in that time. A window on all desktops stays on all desktops.
 2. When no list is open, it starts `ghostty` with the list, as a unit of its
-   own (`systemd-run --user`).
+   own (`systemd-run --user`). See [Window Icon](#window-icon).
 
 The script finds no list whose window shows a caption other than that title:
 
@@ -416,6 +418,28 @@ exists.
 
 A session needs the hook of its harness to send its prompts. For Claude Code,
 that is `approval-queue.ts` of the `ai-prompts` module.
+
+## Window Icon
+
+For a list that the tray program or the desktop entry opens, `ghostty` starts
+with the application ID `io.github.alexaegis.approval-queue`. The module
+installs the desktop file of that name to `$XDG_DATA_HOME/applications`. It
+names the icon of the queue, which the module installs to
+`$XDG_DATA_HOME/icons`: the shape of the empty queue in fixed colors, so it
+says nothing about what waits. A desktop that takes the icon of a window from
+its desktop file shows that icon in place of the icon of the terminal. The
+desktop entry `Approval queue` also opens the list from the
+application menu. It runs the `approval-queue` script of the module, which must
+be on the `PATH` of the desktop session.
+
+Limits:
+
+- Not tested on a desktop. `ghostty` also sends its own icon to the compositor,
+  so a part of the desktop that prefers the icon of the program, such as the
+  window switcher, can still show the icon of the terminal.
+- The icon of the window does not change with what waits, as the tray icon
+  does. `ghostty` has no option that sets the icon of its window.
+- A list that runs in another terminal window keeps the icon of that terminal.
 
 ## Stop And Start
 

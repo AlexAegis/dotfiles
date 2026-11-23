@@ -52,11 +52,13 @@ impl TrayView {
         }
     }
 
-    /// True while a prompt or an idle session waits or a ping shows. The
-    /// desktop then shows the icon also when it hides idle icons.
+    /// True while a prompt waits or a ping shows. The desktop then shows the
+    /// icon also when it hides idle icons, and can animate it. An idle
+    /// session pings one time and then only shows in the icon: it can stay
+    /// idle for hours.
     #[must_use]
     pub fn needs_attention(&self) -> bool {
-        self.is_flashing || self.permissions > 0 || self.questions > 0 || self.idle_sessions > 0
+        self.is_flashing || self.permissions > 0 || self.questions > 0
     }
 
     /// One line on what waits, for the tooltip.

@@ -16,6 +16,10 @@ pub const TITLE: &str = "approval-queue";
 /// The `KWin` script. It finds the window by a caption that is `TITLE`.
 pub const FOCUS_SCRIPT: &str = include_str!("focus_list.js");
 
+/// The application ID of the terminal window of the list. The desktop finds
+/// the icon of the window in the desktop file of that name.
+pub const APPLICATION_ID: &str = "io.github.alexaegis.approval-queue";
+
 const SCRIPT_NAME: &str = "approval-queue-focus-list";
 
 /// The command that opens a terminal window with the list, as a unit of its
@@ -29,6 +33,7 @@ pub fn terminal_command(list_program: &Path) -> Vec<OsString> {
         "--quiet",
         "--description=List of the waiting permission prompts",
         "ghostty",
+        "--class=io.github.alexaegis.approval-queue",
         "--title=approval-queue",
         "-e",
     ]

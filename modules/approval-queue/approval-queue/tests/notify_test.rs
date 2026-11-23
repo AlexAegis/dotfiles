@@ -132,7 +132,7 @@ fn should_load_the_focus_script_and_open_a_terminal_for_the_first_prompt() {
             ),
             format!("{scripting} start"),
             format!(
-                "systemd-run --user --collect --quiet --description=List of the waiting permission prompts ghostty --title=approval-queue -e {}",
+                "systemd-run --user --collect --quiet --description=List of the waiting permission prompts ghostty --class=io.github.alexaegis.approval-queue --title=approval-queue -e {}",
                 list_program.display()
             ),
         ]
