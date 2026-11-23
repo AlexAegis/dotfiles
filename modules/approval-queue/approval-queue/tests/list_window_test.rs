@@ -35,7 +35,7 @@ fn should_name_the_window_of_the_list_and_its_icon_in_the_desktop_file() {
             .join(format!("{APPLICATION_ID}.desktop")),
     )
     .unwrap();
-    assert!(entry.contains("\nIcon=approval-queue\n"));
+    assert!(entry.contains(&format!("\nIcon={APPLICATION_ID}\n")));
     assert!(entry.contains(&format!("\nStartupWMClass={APPLICATION_ID}\n")));
     assert!(entry.contains(&format!(
         "\nExec=ghostty --class={APPLICATION_ID} --title={TITLE} -e "
@@ -46,7 +46,8 @@ fn should_name_the_window_of_the_list_and_its_icon_in_the_desktop_file() {
 fn should_draw_the_window_icon_as_the_empty_queue_in_fixed_colors() {
     let icon = std::fs::read_to_string(
         Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../XDG_DATA_HOME.approval-queue/icons/hicolor/scalable/apps/approval-queue.svg"),
+            .join("../XDG_DATA_HOME.approval-queue/icons/hicolor/scalable/apps")
+            .join(format!("{APPLICATION_ID}.svg")),
     )
     .unwrap();
     let empty = ICONS

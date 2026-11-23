@@ -425,12 +425,18 @@ For a list that the tray program or the desktop entry opens, `ghostty` starts
 with the application ID `io.github.alexaegis.approval-queue`. The module
 installs the desktop file of that name to `$XDG_DATA_HOME/applications`. It
 names the icon of the queue, which the module installs to
-`$XDG_DATA_HOME/icons`: the shape of the empty queue in fixed colors, so it
-says nothing about what waits. A desktop that takes the icon of a window from
-its desktop file shows that icon in place of the icon of the terminal. The
-desktop entry `Approval queue` also opens the list from the
+`$XDG_DATA_HOME/icons` under the same name: the shape of the empty queue in
+fixed colors, so it says nothing about what waits. A desktop that takes the icon
+of a window from its desktop file shows that icon in place of the icon of the
+terminal. The desktop entry `Approval queue` also opens the list from the
 application menu. It runs the `approval-queue` script of the module, which must
 be on the `PATH` of the desktop session.
+
+The name of the window icon is no tray icon name and no such name cut at a `-`,
+such as `approval-queue`, also with `-symbolic`. For a name that a theme does
+not have, the icon loader of KDE tries the name cut at each `-` in that theme.
+It does so in each theme before the folder of the tray icons. An installed icon
+`approval-queue` then shows in place of each tray icon.
 
 Limits:
 

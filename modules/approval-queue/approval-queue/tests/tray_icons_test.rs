@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, path::Path};
 
 use approval_queue::{
     alert_settings::AlertSettings,
@@ -47,4 +47,58 @@ fn should_have_an_icon_for_each_name_that_the_tray_shows() {
     for view in views {
         assert!(ICONS.iter().any(|(name, _)| *name == view.icon_name()));
     }
+}
+
+fn icon_names_below(folder: &Path, names: &mut Vec<String>) {
+    for entry in fs::read_dir(folder).unwrap() {
+        let entry = entry.unwrap();
+        if entry.file_type().unwrap().is_dir() {
+            icon_names_below(&entry.path(), names);
+        } else if let Some(stem) = entry.path().file_stem() {
+            names.push(stem.to_string_lossy().into_owned());
+        }
+    }
+}
+
+fn names_with_cut_ends(name: &str) -> Vec<String> {
+    let mut names = Vec::new();
+    let mut rest = name;
+    loop {
+        names.push(rest.to_owned());
+        names.push(format!("{rest}-symbolic"));
+        match rest.rfind('-').filter(|index| *index > 1) {
+            Some(index) => rest = &rest[..index],
+            None => return names,
+        }
+    }
+}
+
+#[test]
+fn should_install_no_icon_that_the_desktop_finds_for_a_tray_name_with_a_cut_end() {
+    let mut installed = Vec::new();
+    icon_names_below(
+        &Path::new(env!("CARGO_MANIFEST_DIR")).join("../XDG_DATA_HOME.approval-queue/icons"),
+        &mut installed,
+    );
+    assert!(!installed.is_empty());
+    for (name, _) in ICONS {
+        for found in names_with_cut_ends(name) {
+            assert!(!installed.iter().any(|icon| *icon == found), "{found}");
+        }
+    }
+}
+
+#[test]
+fn should_count_each_name_cut_at_a_dash_also_with_the_symbolic_end() {
+    assert_eq!(
+        names_with_cut_ends("approval-queue-flash"),
+        [
+            "approval-queue-flash",
+            "approval-queue-flash-symbolic",
+            "approval-queue",
+            "approval-queue-symbolic",
+            "approval",
+            "approval-symbolic",
+        ]
+    );
 }
