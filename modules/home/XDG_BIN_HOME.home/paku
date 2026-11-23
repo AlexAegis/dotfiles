@@ -34,6 +34,8 @@ if command -v aura > /dev/null; then
     echo "Updating AUR packages using aura..."
     aura_log=$(mktemp)
     trap 'rm -f -- "$aura_log"' EXIT
+    # Pull the clones: -Ayu ignores -y and resolves from stale .SRCINFO files.
+    as_user aura -Ay
     # Clean successful builds so a later release cannot reuse stale binaries.
     as_user env LANG=en_US.UTF-8 aura -Ayu --clean --noconfirm 2>&1 | tee "$aura_log"
     # Aura can return zero even when individual packages failed to build.
