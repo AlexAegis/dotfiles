@@ -77,6 +77,7 @@ fn entry(tool: &str) -> Entry {
         mode: "auto".to_owned(),
         tool: tool.to_owned(),
         title: None,
+        risk: None,
         input: Map::new(),
         reason: None,
         list_only: false,
@@ -161,7 +162,7 @@ fn connect_watcher(folder: &Path, items: &Arc<Mutex<Vec<String>>>) -> zbus::bloc
 fn start_notify(folder: &Path, state: &[(&str, &str)]) -> Child {
     let programs = folder.join("programs");
     fs::create_dir(&programs).unwrap();
-    for program in ["busctl", "systemd-run"] {
+    for program in ["busctl", "systemd-run", "systemctl"] {
         write_program(
             &programs.join(program),
             &format!("echo \"{program} $*\" >>\"$CALLS\"\necho 'i 3'\n"),
@@ -470,6 +471,19 @@ fn should_show_the_list_at_a_click_on_the_icon_and_at_the_menu_item() {
     assert!(calls[3].starts_with("systemd-run "));
     tray.click("Open the list");
     until(|| Some(tray.calls()).filter(|calls| calls.len() >= 8));
+}
+
+#[test]
+fn should_stop_the_units_of_the_queue_at_the_quit_item_of_the_menu() {
+    let tray = Tray::start();
+    tray.click("Quit: stop the queue");
+    let calls = until(|| Some(tray.calls()).filter(|calls| !calls.is_empty()));
+    assert_eq!(
+        calls,
+        [
+            "systemctl --user --no-block stop approval-queue.socket approval-queue@*.service approval-queue-notify.service"
+        ]
+    );
 }
 
 const HIGH_ALERT: &str = "High alert: a ping shows the list";

@@ -14,7 +14,7 @@ use approval_queue::{
     listed_entry::ListedEntry,
     outcome::Outcome,
     queue_folder::QueueFolder,
-    request::MAX_REQUEST_BYTES,
+    request::{MAX_REQUEST_BYTES, Risk},
     service::{Sender, Served, Service},
 };
 use serde_json::{Value, json};
@@ -321,6 +321,16 @@ fn should_give_the_waiting_prompt_the_title_of_a_later_line() {
     assert_eq!(result.listed_later[0].id, result.listed[0].id);
     assert_eq!(result.served.unwrap().1, Outcome::Expired);
     assert_eq!(result.left, []);
+}
+
+#[test]
+fn should_give_the_waiting_prompt_the_risk_of_a_later_line() {
+    let result = sent_later(
+        b"{\"title\":\"A\",\"risk\":\"dangerous\"}\n{\"title\":\"B\",\"risk\":\"unknown\"}\n{\"title\":\"C\"}\n",
+    );
+    assert_eq!(result.listed[0].entry.risk, None);
+    assert_eq!(result.listed_later[0].entry.risk, Some(Risk::Dangerous));
+    assert_eq!(result.listed_later[0].entry.title.as_deref(), Some("C"));
 }
 
 #[test]

@@ -2,6 +2,10 @@
 Description=Tray icon of the waiting permission prompts, with its pings
 PartOf=graphical-session.target
 After=graphical-session.target
+# A stopped socket starts again with the tray program, such as at a login
+# while the user manager still runs
+Wants=approval-queue.socket
+After=approval-queue.socket
 
 # Checks the locks of the entry files of the owner's queue and removes
 # leftovers there. Reads each new entry one time, for its tool. Writes the

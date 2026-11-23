@@ -19,6 +19,7 @@ fn listed(id: &str) -> ListedEntry {
             mode: "auto".to_owned(),
             tool: "Bash".to_owned(),
             title: None,
+            risk: None,
             input: Map::new(),
             reason: None,
             list_only: false,

@@ -21,6 +21,7 @@ fn entry() -> Entry {
         mode: "auto".to_owned(),
         tool: "Bash".to_owned(),
         title: None,
+        risk: None,
         input: Map::new(),
         reason: None,
         list_only: false,
@@ -99,6 +100,7 @@ fn should_show_a_mute_that_the_queue_cannot_store_as_a_notice() {
             "entries",
             "lists",
             "pings-muted-until",
+            "risks",
             "sessions",
             "titles"
         ]

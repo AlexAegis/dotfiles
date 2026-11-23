@@ -33,7 +33,8 @@ above the right one.
     prompt waits, or its answer, `approved` or `declined`.
   - Line 2: the title of the request. For a request without one: the tool with
     the command or the file of the call, else with the whole input, at most
-    144 characters.
+    144 characters. At the right: how risky the call looks, when the hook said
+    it, see [Risk](#risk).
   - Line 3: user, tool, name of the folder, start of the session ID.
   - The border counts the entries above and below the shown ones. Its lower
     edge shows how long the pings are muted.
@@ -71,17 +72,17 @@ above the right one.
     content with a line above 4096 bytes has no colors. After 250 ms, the lines
     that follow have none.
 
-| Key              | Effect                                          |
-| ---------------- | ----------------------------------------------- |
-| `a`              | approves the selected prompt                    |
-| `d`              | declines it                                     |
-| `m`              | opens the message for the answer to the prompt  |
-| `j`, `k`, arrows | select                                          |
-| PgUp, PgDn       | scroll the selected prompt                      |
-| `s`              | mutes the pings for 10 minutes                  |
-| `S`              | mutes the pings for 1 hour                      |
-| `u`              | ends the mute                                   |
-| `q`, Ctrl-C      | quit                                            |
+| Key              | Effect                                         |
+| ---------------- | ---------------------------------------------- |
+| `a`              | approves the selected prompt                   |
+| `d`              | declines it                                    |
+| `m`              | opens the message for the answer to the prompt |
+| `j`, `k`, arrows | select                                         |
+| PgUp, PgDn       | scroll the selected prompt                     |
+| `s`              | mutes the pings for 10 minutes                 |
+| `S`              | mutes the pings for 1 hour                     |
+| `u`              | ends the mute                                  |
+| `q`, Ctrl-C      | quit                                           |
 
 - An answer names its entry by ID. The selection stays on its entry while other
   entries come and go.
@@ -204,6 +205,7 @@ brings the list to view, as steps 1 and 2 below describe. The menu of the icon:
 - Open the list
 - High alert: a ping also brings the list to view. Off by default.
 - Mute the pings: for 10 minutes, for 1 hour, unmute
+- Quit: stop the queue. See [Stop And Start](#stop-and-start).
 - Cadence of the pings:
 
   | Preset | Quiet time | Ping for  | Or when the oldest waited |
@@ -307,6 +309,23 @@ a request of another user does not show as a request of the owner. The service
 cannot tell two other users apart: for them, the list shows the name that the
 request states.
 
+### Risk
+
+A later line of a request can also say how risky the call looks:
+`{"title":"<text>","risk":"<word>"}`. The list shows the risk at the right of
+the title of the entry and in the title bar of the pane of the prompt:
+
+| `risk`       | Mark         | Colors             |
+| ------------ | ------------ | ------------------ |
+| `ok`         | `looks okay` | black on green     |
+| `suspicious` | `suspicious` | black on yellow    |
+| `dangerous`  | `DANGEROUS`  | bold, white on red |
+
+A line with another word is a line of another form. A service before this
+version takes no line with a `risk`. The mark is a hint and no check: the
+program that chose it read text that the session wrote. That text can try to
+mislead it. A later line without a `risk` keeps the risk before.
+
 ### Session Reports
 
 A hook can also report the state of its session, on a connection of its own.
@@ -366,6 +385,8 @@ takes it for a wrong process.
   process locks.
 - `titles/<id>`: the later title of that entry, when its hook sent one. The
   service process removes it with the entry.
+- `risks/<id>`: the risk of that entry, when its hook sent one. The service
+  process removes it with the entry.
 - `answers/<id>.json`: the answer for that entry, in the form of the reply
   line: `{"behavior":"allow"}`, with `answers` for a prompt with questions, or
   `{"behavior":"deny"}`, each with a `message` when the owner typed one. The
@@ -395,6 +416,26 @@ exists.
 
 A session needs the hook of its harness to send its prompts. For Claude Code,
 that is `approval-queue.ts` of the `ai-prompts` module.
+
+## Stop And Start
+
+`Quit: stop the queue` in the menu of the tray icon stops the socket, the
+service process of each waiting prompt and the tray program. No new prompt comes
+to the queue. Each waiting prompt stays in the terminal of its session. An
+open list stays open and shows no prompt.
+
+The stop lasts until the tray program starts again, such as at the next login.
+Its unit starts the socket too. To start the queue before that:
+
+```sh
+systemctl --user start approval-queue.socket approval-queue-notify.service
+```
+
+To stop it from a shell:
+
+```sh
+systemctl --user stop approval-queue.socket 'approval-queue@*.service' approval-queue-notify.service
+```
 
 ## Limits
 

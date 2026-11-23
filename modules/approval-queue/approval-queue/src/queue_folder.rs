@@ -16,7 +16,7 @@ use crate::{
     listed_entry::ListedEntry,
     open_list::OpenList,
     process_tree::process_folder,
-    request::check_title,
+    request::{Risk, check_title},
     session_state::{
         Change, ListedSession, SessionReport, SessionState, is_session_id, latest_sent_at,
     },
@@ -38,6 +38,7 @@ pub struct QueueFolder {
     entries: PathBuf,
     answers: PathBuf,
     titles: PathBuf,
+    risks: PathBuf,
     lists: PathBuf,
     sessions: PathBuf,
     mute: PathBuf,
@@ -52,6 +53,7 @@ impl QueueFolder {
             entries: root.join("entries"),
             answers: root.join("answers"),
             titles: root.join("titles"),
+            risks: root.join("risks"),
             lists: root.join("lists"),
             sessions: root.join("sessions"),
             mute: root.join("pings-muted-until"),
@@ -64,6 +66,7 @@ impl QueueFolder {
             &self.entries,
             &self.answers,
             &self.titles,
+            &self.risks,
             &self.lists,
             &self.sessions,
         ] {
@@ -86,6 +89,7 @@ impl QueueFolder {
         Ok(WaitingEntry {
             answer_path: self.answers.join(format!("{id}.json")),
             title_path: self.titles.join(&id),
+            risk_path: self.risks.join(&id),
             id,
             path,
             _lock: lock,
@@ -126,6 +130,7 @@ impl QueueFolder {
                 if let Some(title) = self.later_title(id) {
                     entry.title = Some(title);
                 }
+                entry.risk = self.risk_of(id);
                 listed.push(ListedEntry {
                     id: id.to_owned(),
                     entry,
@@ -210,6 +215,25 @@ impl QueueFolder {
             let _ = fs::remove_file(&temporary);
         }
         stored.with_context(|| format!("Title {} not stored", path.display()))
+    }
+
+    /// Stores how risky the call of the waiting entry looks, in place of an
+    /// earlier risk. The lists show it with the entry.
+    pub fn set_risk(&self, id: &str, risk: Risk) -> Result<()> {
+        ensure!(is_id(id), "Entry ID {id:?} has another form");
+        let temporary = self.risks.join(format!(".{id}.{}.tmp", process::id()));
+        let path = self.risks.join(id);
+        let stored = store(&temporary, risk.name().as_bytes())
+            .and_then(|_| Ok(fs::rename(&temporary, &path)?));
+        if stored.is_err() {
+            let _ = fs::remove_file(&temporary);
+        }
+        stored.with_context(|| format!("Risk {} not stored", path.display()))
+    }
+
+    /// The risk of the entry, when its service process stored one.
+    fn risk_of(&self, id: &str) -> Option<Risk> {
+        Risk::of_name(&fs::read_to_string(self.risks.join(id)).ok()?)
     }
 
     /// The later title of the entry, when its service process stored one
@@ -369,13 +393,14 @@ impl QueueFolder {
         Ok(Some(answer))
     }
 
-    /// Removes each answer and each later title whose entry left the queue
+    /// Removes each answer, later title and risk whose entry left the queue
     /// without the end of its service process removing them, and each old
     /// temporary file.
     pub fn remove_leftovers(&self) -> Result<()> {
         for path in files_of(&self.answers)?
             .into_iter()
             .chain(files_of(&self.titles)?)
+            .chain(files_of(&self.risks)?)
         {
             let name = path.file_name().and_then(OsStr::to_str).unwrap_or_default();
             let id = name.strip_suffix(".json").unwrap_or(name);

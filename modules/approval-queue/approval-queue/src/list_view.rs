@@ -21,7 +21,7 @@ use crate::{
     listed_entry::ListedEntry,
     question_draft::QuestionDraft,
     queue_folder,
-    request::MAX_TITLE_CHARACTERS,
+    request::{MAX_TITLE_CHARACTERS, Risk},
     session_state::{Activity, ListedSession},
     tray_view::EntryKind,
 };
@@ -282,6 +282,22 @@ fn draw_entry(
             },
         );
     }
+    if let Some(risk) = entry.risk {
+        let mark = risk_span(risk);
+        let mark_width = u16::try_from(mark.width()).unwrap_or(u16::MAX);
+        if area.height > 1 && area.width >= KIND_WIDTH.saturating_add(mark_width) {
+            frame.render_widget(
+                Paragraph::new(Line::from(mark))
+                    .style(Style::new().remove_modifier(Modifier::REVERSED)),
+                Rect {
+                    x: area.x + area.width - mark_width,
+                    y: area.y + 1,
+                    width: mark_width,
+                    height: 1,
+                },
+            );
+        }
+    }
 }
 
 fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
@@ -293,11 +309,20 @@ fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
         return 0;
     };
     let entry = &listed.entry;
-    let mut pane = Block::bordered().title(Line::from(vec![
+    let pane_title = Line::from(vec![
         Span::raw(" "),
         kind_span(entry),
         Span::raw(format!(": {} ", visible_line(&entry.tool))),
-    ]));
+    ]);
+    let pane_title_width = pane_title.width();
+    let mut pane = Block::bordered().title(pane_title);
+    if let Some(risk) = entry.risk {
+        let mark = risk_span(risk);
+        // The mark does not hide the kind and the tool
+        if usize::from(area.width) >= pane_title_width + mark.width() + 3 {
+            pane = pane.title_top(Line::from(mark).right_aligned());
+        }
+    }
     let inner = pane.inner(area);
     let (message, is_typed) = message_field(state);
     let has_message = !message.is_empty();
@@ -388,6 +413,29 @@ fn message_field(state: &ListState) -> (String, bool) {
         (_, Some(kept)) => (format!("Message: {}", visible_line(kept)), false),
         _ => (String::new(), false),
     }
+}
+
+/// The mark of how risky the call looks, each risk with its own text and
+/// colors.
+fn risk_span<'a>(risk: Risk) -> Span<'a> {
+    let (text, style) = match risk {
+        Risk::Ok => (
+            " looks okay ",
+            Style::new().fg(Color::Black).bg(Color::Green),
+        ),
+        Risk::Suspicious => (
+            " suspicious ",
+            Style::new().fg(Color::Black).bg(Color::Yellow),
+        ),
+        Risk::Dangerous => (
+            " DANGEROUS ",
+            Style::new()
+                .fg(Color::White)
+                .bg(Color::Red)
+                .add_modifier(Modifier::BOLD),
+        ),
+    };
+    Span::styled(text, style)
 }
 
 fn kind_span<'a>(entry: &Entry) -> Span<'a> {

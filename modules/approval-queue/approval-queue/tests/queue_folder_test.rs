@@ -9,6 +9,7 @@ use approval_queue::{
     answer::Answer,
     entry::Entry,
     queue_folder::{self, QueueFolder},
+    request::Risk,
 };
 use serde_json::{Map, json};
 use tempfile::TempDir;
@@ -26,6 +27,7 @@ fn entry(tool: &str) -> Entry {
         mode: "auto".to_owned(),
         tool: tool.to_owned(),
         title: None,
+        risk: None,
         input,
         reason: None,
         list_only: false,
@@ -463,6 +465,32 @@ fn should_store_the_answers_to_the_questions_of_a_prompt() {
     };
     assert!(queue.answer(waiting.id(), &empty).is_err());
     assert_eq!(queue.answer_for(waiting.id()).unwrap(), None);
+}
+
+#[test]
+fn should_list_an_entry_with_its_risk_and_remove_the_risk_with_the_entry() {
+    let (runtime_folder, queue) = queue();
+    let waiting = queue.add(&entry("Bash")).unwrap();
+    let other = queue.add(&entry("Bash")).unwrap();
+    queue.set_risk(waiting.id(), Risk::Ok).unwrap();
+    queue.set_risk(waiting.id(), Risk::Dangerous).unwrap();
+    assert!(queue.set_risk("../x", Risk::Ok).is_err());
+    let folder = runtime_folder.path().join("approval-queue/risks");
+    fs::write(folder.join(other.id()), "safe").unwrap();
+    let risks: Vec<Option<Risk>> = queue
+        .waiting()
+        .unwrap()
+        .into_iter()
+        .map(|listed| listed.entry.risk)
+        .collect();
+    assert_eq!(risks, [Some(Risk::Dangerous), None]);
+    let id = waiting.id().to_owned();
+    drop(waiting);
+    assert!(!folder.join(&id).exists());
+    fs::write(folder.join(&id), "ok").unwrap();
+    queue.remove_leftovers().unwrap();
+    assert!(!folder.join(&id).exists());
+    assert!(folder.join(other.id()).exists());
 }
 
 #[test]

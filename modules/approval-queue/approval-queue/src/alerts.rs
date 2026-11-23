@@ -33,6 +33,8 @@ pub enum TrayCommand {
     Mute(Duration),
     Unmute,
     SetCadence(CadencePreset),
+    /// Stop the whole queue. The tray program carries it out.
+    Quit,
 }
 
 /// The result of one read of the queue.
@@ -92,6 +94,7 @@ impl Alerts {
     pub fn carry_out(&mut self, command: TrayCommand, now: SystemTime) -> Result<bool> {
         match command {
             TrayCommand::OpenList => return Ok(true),
+            TrayCommand::Quit => {}
             TrayCommand::ToggleHighAlert => {
                 self.settings.high_alert = !self.settings.high_alert;
                 self.settings.store(&self.settings_path)?;

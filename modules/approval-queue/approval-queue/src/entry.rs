@@ -1,7 +1,10 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 
-use crate::{display_text::user_text, request::Request};
+use crate::{
+    display_text::user_text,
+    request::{Request, Risk},
+};
 
 /// One waiting prompt, as the service stores it for the list.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -20,6 +23,10 @@ pub struct Entry {
     /// The title that the request had.
     #[serde(default)]
     pub title: Option<String>,
+    /// How risky the call looks, when a later line of the hook said it. The
+    /// queue folder keeps it apart from the entry.
+    #[serde(skip)]
+    pub risk: Option<Risk>,
     pub input: Map<String, Value>,
     pub reason: Option<String>,
     pub list_only: bool,
@@ -38,6 +45,7 @@ impl Entry {
             mode: request.mode,
             tool: request.tool,
             title: request.title,
+            risk: None,
             input: request.input,
             reason: request.reason,
             list_only: request.list_only,

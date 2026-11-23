@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, ensure};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::{Map, Value};
 
 /// Longest request line, the newline included.
@@ -79,12 +79,45 @@ impl Request {
     }
 }
 
+/// How risky a call looks to the program that wrote its title. It is a
+/// hint for the owner and no check: the program reads text that the session
+/// wrote.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Risk {
+    Ok,
+    Suspicious,
+    Dangerous,
+}
+
+impl Risk {
+    /// The word of the risk, as an update line writes it.
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Ok => "ok",
+            Self::Suspicious => "suspicious",
+            Self::Dangerous => "dangerous",
+        }
+    }
+
+    /// The risk that the word names.
+    #[must_use]
+    pub fn of_name(name: &str) -> Option<Self> {
+        [Self::Ok, Self::Suspicious, Self::Dangerous]
+            .into_iter()
+            .find(|risk| risk.name() == name)
+    }
+}
+
 /// A later line of the hook: a new title for its waiting prompt, such as a
-/// summary that took time to write.
+/// summary that took time to write, and how risky the call looks.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TitleUpdate {
     pub title: String,
+    #[serde(default)]
+    pub risk: Option<Risk>,
 }
 
 impl TitleUpdate {

@@ -122,8 +122,9 @@ impl Service<'_> {
     }
 
     /// Takes each whole line out of the bytes that the hook sent after its
-    /// request, and stores the title of each line that gives one. A line of
-    /// another form and a title that the queue cannot store change nothing:
+    /// request, and stores the title and the risk of each line that gives
+    /// them. A line of another form and a title that the queue cannot store
+    /// change nothing:
     /// the prompt keeps its place and its title. Fails for a line above
     /// `MAX_UPDATE_BYTES`.
     fn take_titles(&self, id: &str, later_bytes: &mut Vec<u8>) -> Result<()> {
@@ -133,9 +134,15 @@ impl Service<'_> {
             let update = std::str::from_utf8(&line[..end])
                 .context("Update not UTF-8")
                 .and_then(TitleUpdate::parse);
-            if let Ok(update) = update
-                && let Err(error) = self.queue.set_title(id, &update.title)
-            {
+            let Ok(update) = update else {
+                continue;
+            };
+            let stored = self.queue.set_title(id, &update.title).and_then(|()| {
+                update
+                    .risk
+                    .map_or(Ok(()), |risk| self.queue.set_risk(id, risk))
+            });
+            if let Err(error) = stored {
                 eprintln!("{}", log_text::failed(&error));
             }
         }

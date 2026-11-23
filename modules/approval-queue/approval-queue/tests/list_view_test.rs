@@ -6,6 +6,7 @@ use approval_queue::{
     list_state::ListState,
     list_view,
     listed_entry::ListedEntry,
+    request::Risk,
     session_state::{Activity, ListedSession, SessionState},
 };
 use ratatui::{
@@ -30,6 +31,7 @@ fn listed(id: &str, user: &str, tool: &str, input: &Value, reason: Option<&str>)
             mode: "auto".to_owned(),
             tool: tool.to_owned(),
             title: None,
+            risk: None,
             input: input.as_object().unwrap().clone(),
             reason: reason.map(str::to_owned),
             list_only: false,
@@ -755,6 +757,78 @@ fn should_show_each_key_in_a_terminal_of_80_columns() {
         "q quit",
     ] {
         assert_shows(&lines, key);
+    }
+}
+
+fn colors_of(state: &ListState, text: &str) -> Vec<(Color, Color)> {
+    let mut terminal = Terminal::new(TestBackend::new(110, 24)).unwrap();
+    terminal
+        .draw(|frame| {
+            list_view::draw(frame, state, UNIX_EPOCH + Duration::from_secs(RECEIVED));
+        })
+        .unwrap();
+    let buffer = terminal.backend().buffer();
+    let mut colors = Vec::new();
+    for y in 0..buffer.area.height {
+        let line: String = (0..buffer.area.width)
+            .map(|x| buffer[(x, y)].symbol())
+            .collect();
+        if let Some(byte) = line.find(text) {
+            let x = u16::try_from(line[..byte].chars().count()).unwrap();
+            colors.push((buffer[(x, y)].fg, buffer[(x, y)].bg));
+        }
+    }
+    colors
+}
+
+fn reversed_marks(state: &ListState, text: &str) -> usize {
+    let mut terminal = Terminal::new(TestBackend::new(110, 24)).unwrap();
+    terminal
+        .draw(|frame| {
+            list_view::draw(frame, state, UNIX_EPOCH + Duration::from_secs(RECEIVED));
+        })
+        .unwrap();
+    let buffer = terminal.backend().buffer();
+    (0..buffer.area.height)
+        .filter(|y| {
+            let line: String = (0..buffer.area.width)
+                .map(|x| buffer[(x, *y)].symbol())
+                .collect();
+            line.find(text).is_some_and(|byte| {
+                let x = u16::try_from(line[..byte].chars().count()).unwrap();
+                buffer[(x, *y)].modifier.contains(Modifier::REVERSED)
+            })
+        })
+        .count()
+}
+
+#[test]
+fn should_mark_the_risk_of_a_call_with_its_own_text_and_colors_in_the_list_and_the_pane() {
+    let marks = [
+        (Risk::Ok, " looks okay ", (Color::Black, Color::Green)),
+        (
+            Risk::Suspicious,
+            " suspicious ",
+            (Color::Black, Color::Yellow),
+        ),
+        (Risk::Dangerous, " DANGEROUS ", (Color::White, Color::Red)),
+    ];
+    for (risk, text, colors) in marks {
+        let mut prompt = push();
+        prompt.entry.risk = Some(risk);
+        let (state, _) = state_with(vec![prompt]);
+        assert_eq!(colors_of(&state, text), [colors, colors], "{text}");
+        assert_eq!(reversed_marks(&state, text), 0, "{text}");
+        let narrow = drawn_at_width(&state, 5, 26).0;
+        assert_shows(&narrow, "PERMISSION");
+        assert_shows(&narrow, text);
+        let narrower = drawn_at_width(&state, 5, 20).0.join("\n");
+        assert!(narrower.contains("PERMISSION"), "{narrower}");
+        assert!(!narrower.contains(text.trim()), "{narrower}");
+    }
+    let (state, _) = state_with(vec![push()]);
+    for (_, text, _) in marks {
+        assert_eq!(colors_of(&state, text), [], "{text}");
     }
 }
 

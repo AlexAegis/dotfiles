@@ -24,6 +24,7 @@ fn entry(tool: &str, input: &Value) -> Entry {
         mode: "auto".to_owned(),
         tool: tool.to_owned(),
         title: None,
+        risk: None,
         input: input.as_object().unwrap().clone(),
         reason: None,
         list_only: false,

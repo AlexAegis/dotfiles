@@ -19,7 +19,7 @@ use approval_queue::{
     alerts::{Alerts, TrayCommand},
     list_window,
     queue_folder::QueueFolder,
-    tray_icons,
+    queue_units, tray_icons,
     tray_view::TrayView,
 };
 use ksni::{
@@ -162,6 +162,8 @@ impl Tray for QueueTray {
                 ..Default::default()
             }
             .into(),
+            MenuItem::Separator,
+            Self::item("Quit: stop the queue", TrayCommand::Quit),
         ]
     }
 }
@@ -220,6 +222,13 @@ fn run() -> Result<()> {
         let now = Instant::now();
         let mut shows_list = false;
         for command in command.take().into_iter().chain(commands.try_iter()) {
+            if command == TrayCommand::Quit {
+                // The stop of the own unit ends this program
+                if let Err(error) = queue_units::stop() {
+                    eprintln!("Queue not stopped: {error:#}");
+                }
+                continue;
+            }
             match alerts.carry_out(command, SystemTime::now()) {
                 Ok(asks_for_list) => shows_list |= asks_for_list,
                 Err(error) => eprintln!("{error:#}"),

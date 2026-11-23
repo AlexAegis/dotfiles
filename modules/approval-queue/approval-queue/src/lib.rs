@@ -20,6 +20,7 @@ pub mod process_tree;
 pub mod question;
 pub mod question_draft;
 pub mod queue_folder;
+pub mod queue_units;
 pub mod request;
 pub mod service;
 pub mod session_state;
