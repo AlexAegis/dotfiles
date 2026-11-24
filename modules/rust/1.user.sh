@@ -8,7 +8,7 @@ else
 
 	rustup target install wasm32-unknown-unknown
 
-	rustup component add rustfmt
+	rustup component add rustfmt rust-analyzer
 fi
 
 # Cargo extensions
