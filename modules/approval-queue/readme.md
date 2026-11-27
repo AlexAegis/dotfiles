@@ -317,11 +317,11 @@ A later line of a request can also say how risky the call looks:
 `{"title":"<text>","risk":"<word>"}`. The list shows the risk at the right of
 the title of the entry and in the title bar of the pane of the prompt:
 
-| `risk`       | Mark         | Colors             |
-| ------------ | ------------ | ------------------ |
-| `ok`         | `looks okay` | black on green     |
-| `suspicious` | `suspicious` | black on yellow    |
-| `dangerous`  | `DANGEROUS`  | bold, white on red |
+| `risk`       | Mark         | Colors          |
+| ------------ | ------------ | --------------- |
+| `ok`         | `okay`       | black on green  |
+| `suspicious` | `suspicious` | black on yellow |
+| `dangerous`  | `dangerous`  | white on red    |
 
 A line with another word is a line of another form. A service before this
 version takes no line with a `risk`. The mark is a hint and no check: the

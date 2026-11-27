@@ -80,10 +80,10 @@ fn should_install_no_icon_that_the_desktop_finds_for_a_tray_name_with_a_cut_end(
         &Path::new(env!("CARGO_MANIFEST_DIR")).join("../XDG_DATA_HOME.approval-queue/icons"),
         &mut installed,
     );
-    assert!(!installed.is_empty());
+    assert_ne!(installed, Vec::<String>::new());
     for (name, _) in ICONS {
         for found in names_with_cut_ends(name) {
-            assert!(!installed.iter().any(|icon| *icon == found), "{found}");
+            assert!(!installed.contains(&found), "{found}");
         }
     }
 }

@@ -416,26 +416,20 @@ fn message_field(state: &ListState) -> (String, bool) {
 }
 
 /// The mark of how risky the call looks, each risk with its own text and
-/// colors.
+/// colors. It is not bold, also where it covers the bold title of the entry.
 fn risk_span<'a>(risk: Risk) -> Span<'a> {
-    let (text, style) = match risk {
-        Risk::Ok => (
-            " looks okay ",
-            Style::new().fg(Color::Black).bg(Color::Green),
-        ),
-        Risk::Suspicious => (
-            " suspicious ",
-            Style::new().fg(Color::Black).bg(Color::Yellow),
-        ),
-        Risk::Dangerous => (
-            " DANGEROUS ",
-            Style::new()
-                .fg(Color::White)
-                .bg(Color::Red)
-                .add_modifier(Modifier::BOLD),
-        ),
+    let (text, foreground, background) = match risk {
+        Risk::Ok => (" okay ", Color::Black, Color::Green),
+        Risk::Suspicious => (" suspicious ", Color::Black, Color::Yellow),
+        Risk::Dangerous => (" dangerous ", Color::White, Color::Red),
     };
-    Span::styled(text, style)
+    Span::styled(
+        text,
+        Style::new()
+            .fg(foreground)
+            .bg(background)
+            .remove_modifier(Modifier::BOLD),
+    )
 }
 
 fn kind_span<'a>(entry: &Entry) -> Span<'a> {

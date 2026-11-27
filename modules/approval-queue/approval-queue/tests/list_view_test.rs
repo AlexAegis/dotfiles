@@ -781,7 +781,7 @@ fn colors_of(state: &ListState, text: &str) -> Vec<(Color, Color)> {
     colors
 }
 
-fn reversed_marks(state: &ListState, text: &str) -> usize {
+fn marks_with_modifier(state: &ListState, text: &str, modifier: Modifier) -> usize {
     let mut terminal = Terminal::new(TestBackend::new(110, 24)).unwrap();
     terminal
         .draw(|frame| {
@@ -796,38 +796,57 @@ fn reversed_marks(state: &ListState, text: &str) -> usize {
                 .collect();
             line.find(text).is_some_and(|byte| {
                 let x = u16::try_from(line[..byte].chars().count()).unwrap();
-                buffer[(x, *y)].modifier.contains(Modifier::REVERSED)
+                buffer[(x, *y)].modifier.contains(modifier)
             })
         })
         .count()
 }
 
 #[test]
-fn should_mark_the_risk_of_a_call_with_its_own_text_and_colors_in_the_list_and_the_pane() {
+fn should_mark_the_risk_of_a_call_with_its_own_calm_text_and_colors_in_the_list_and_the_pane() {
     let marks = [
-        (Risk::Ok, " looks okay ", (Color::Black, Color::Green)),
+        (Risk::Ok, " okay ", (Color::Black, Color::Green), 19),
         (
             Risk::Suspicious,
             " suspicious ",
             (Color::Black, Color::Yellow),
+            25,
         ),
-        (Risk::Dangerous, " DANGEROUS ", (Color::White, Color::Red)),
+        (
+            Risk::Dangerous,
+            " dangerous ",
+            (Color::White, Color::Red),
+            24,
+        ),
     ];
-    for (risk, text, colors) in marks {
+    for (risk, text, colors, first_width) in marks {
         let mut prompt = push();
         prompt.entry.risk = Some(risk);
+        prompt.entry.title = Some(
+            "Push the commit of the release branch to the master branch of origin with tags"
+                .repeat(2),
+        );
         let (state, _) = state_with(vec![prompt]);
         assert_eq!(colors_of(&state, text), [colors, colors], "{text}");
-        assert_eq!(reversed_marks(&state, text), 0, "{text}");
-        let narrow = drawn_at_width(&state, 5, 26).0;
+        assert_eq!(
+            marks_with_modifier(&state, text, Modifier::REVERSED),
+            0,
+            "{text}"
+        );
+        assert_eq!(
+            marks_with_modifier(&state, text, Modifier::BOLD),
+            0,
+            "{text}"
+        );
+        let narrow = drawn_at_width(&state, 5, first_width).0;
         assert_shows(&narrow, "PERMISSION");
         assert_shows(&narrow, text);
-        let narrower = drawn_at_width(&state, 5, 20).0.join("\n");
+        let narrower = drawn_at_width(&state, 5, first_width - 1).0.join("\n");
         assert!(narrower.contains("PERMISSION"), "{narrower}");
         assert!(!narrower.contains(text.trim()), "{narrower}");
     }
     let (state, _) = state_with(vec![push()]);
-    for (_, text, _) in marks {
+    for (_, text, _, _) in marks {
         assert_eq!(colors_of(&state, text), [], "{text}");
     }
 }
