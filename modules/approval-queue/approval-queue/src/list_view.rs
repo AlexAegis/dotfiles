@@ -21,6 +21,7 @@ use crate::{
     listed_entry::ListedEntry,
     question_draft::QuestionDraft,
     queue_folder,
+    queue_units::START_COMMAND,
     request::{MAX_TITLE_CHARACTERS, Risk},
     session_state::{Activity, ListedSession},
     tray_view::EntryKind,
@@ -133,7 +134,10 @@ fn draw_list(frame: &mut Frame, area: Rect, state: &ListState, now: SystemTime) 
         .map_or(0, |since| since.as_secs());
     let count = state.entries().len();
     let mut block = Block::bordered().title(format!(" approval-queue: {count} waiting "));
-    if let Some(minutes) = mute {
+    // A stopped queue sends no pings, so the border leaves out the mute
+    if state.queue_stopped() {
+        block = block.title_bottom(" queue stopped ");
+    } else if let Some(minutes) = mute {
         block = block.title_bottom(format!(" pings muted for {minutes} min "));
     }
     let inner = block.inner(area);
@@ -300,12 +304,28 @@ fn draw_entry(
     }
 }
 
+/// The pane while no prompt is selected. The command comes first, so that a
+/// small pane still shows it.
+fn draw_empty_pane(frame: &mut Frame, area: Rect, state: &ListState) {
+    let text = if state.queue_stopped() {
+        Paragraph::new(vec![
+            Line::from(START_COMMAND),
+            Line::default(),
+            Line::from(
+                "The command above starts the queue. Until then, new prompts wait in the \
+                 terminals of their sessions.",
+            ),
+        ])
+        .wrap(Wrap { trim: false })
+    } else {
+        Paragraph::new("No prompt waits")
+    };
+    frame.render_widget(text.block(Block::bordered()), area);
+}
+
 fn draw_pane(frame: &mut Frame, area: Rect, state: &ListState) -> u16 {
     let Some(listed) = state.selected() else {
-        frame.render_widget(
-            Paragraph::new("No prompt waits").block(Block::bordered()),
-            area,
-        );
+        draw_empty_pane(frame, area, state);
         return 0;
     };
     let entry = &listed.entry;

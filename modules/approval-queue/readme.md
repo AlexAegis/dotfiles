@@ -37,7 +37,8 @@ above the right one.
     it, see [Risk](#risk).
   - Line 3: user, tool, name of the folder, start of the session ID.
   - The border counts the entries above and below the shown ones. Its lower
-    edge shows how long the pings are muted.
+    edge shows `queue stopped` while the socket is gone, see
+    [Stop And Start](#stop-and-start), else how long the pings are muted.
 - Below the entries, while a session reports its state: one line for each
   session, at most 8, with a count of the others in the border. Idle sessions
   come first, then waiting ones, then active ones. In each group, the oldest
@@ -55,7 +56,8 @@ above the right one.
   folder, the reason of a guard hook that asked, the title and the input of the
   tool. A `description` of the input that equals the title is not shown again.
   The last line names the keys that answer. The border counts the lines above
-  and below.
+  and below. With no prompt: `No prompt waits`, or, while the queue is stopped,
+  the command that starts it.
   - The command of a `Bash` call has the colors of a shell script.
   - The content of a `Write` call has the colors of the language that the
     extension of its file names, from the default syntaxes of `syntect`. A
@@ -452,7 +454,11 @@ Limits:
 `Quit: stop the queue` in the menu of the tray icon stops the socket, the
 service process of each waiting prompt and the tray program. No new prompt comes
 to the queue. Each waiting prompt stays in the terminal of its session. An
-open list stays open and shows no prompt.
+open list stays open. While the socket is gone, the lower border of the list
+shows `queue stopped`. With no prompt, the right part shows the first command
+below. The list looks for the socket file and does not connect: each
+connection starts a service process. A socket file that a crash of the user
+manager left behind counts as a running queue.
 
 The stop lasts until the tray program starts again, such as at the next login.
 Its unit starts the socket too. To start the queue before that:

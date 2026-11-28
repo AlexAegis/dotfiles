@@ -8,7 +8,7 @@ use std::{
 use anyhow::{Context, Result, ensure};
 use approval_queue::{
     list_actions, list_state::ListState, list_view, list_window, queue_folder::QueueFolder,
-    terminal_event::take_event,
+    queue_units, terminal_event::take_event,
 };
 use ratatui::{
     DefaultTerminal,
@@ -83,6 +83,7 @@ fn show(terminal: &mut DefaultTerminal, queue: &QueueFolder) -> Result<()> {
         state.refresh(queue.waiting()?, Instant::now());
         state.show_mute(queue.pings_muted_until());
         state.show_sessions(queue.sessions()?);
+        state.show_queue_stopped(queue_units::is_stopped());
         let mut scroll_limit = 0;
         terminal.draw(|frame| scroll_limit = list_view::draw(frame, &state, SystemTime::now()))?;
         state.limit_scroll(scroll_limit);

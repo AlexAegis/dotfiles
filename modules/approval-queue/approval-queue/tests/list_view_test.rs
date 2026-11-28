@@ -1,4 +1,7 @@
-use std::time::{Duration, Instant, UNIX_EPOCH};
+use std::{
+    slice,
+    time::{Duration, Instant, UNIX_EPOCH},
+};
 
 use approval_queue::{
     entry::Entry,
@@ -6,6 +9,7 @@ use approval_queue::{
     list_state::ListState,
     list_view,
     listed_entry::ListedEntry,
+    queue_units::START_COMMAND,
     request::Risk,
     session_state::{Activity, ListedSession, SessionState},
 };
@@ -474,6 +478,56 @@ fn should_show_that_no_prompt_waits() {
     assert_shows(&lines, " approval-queue: 0 waiting ");
     assert_shows(&lines, "│No prompt waits");
     assert_shows(&lines, "││No prompt waits");
+}
+
+#[test]
+fn should_show_how_to_start_the_queue_while_it_is_stopped() {
+    let (mut state, _) = state_with(Vec::new());
+    state.show_queue_stopped(true);
+    for (width, height) in [(110, 24), (80, 8), (40, 16)] {
+        let lines = drawn_at_size(&state, width, height);
+        assert_shows(&lines, "└ queue stopped ");
+        let words = lines
+            .iter()
+            .map(|line| text_of_the_pane(slice::from_ref(line)))
+            .collect::<Vec<_>>()
+            .join(" ")
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" ");
+        assert!(
+            words.contains(START_COMMAND),
+            "{width}x{height}:\n{}",
+            lines.join("\n")
+        );
+    }
+    let lines = screen(&state, 5);
+    assert!(text_of_the_pane(&lines).contains("The command above starts the queue."));
+    assert!(!lines.iter().any(|line| line.contains("││No prompt waits")));
+    state.show_queue_stopped(false);
+    let lines = screen(&state, 5);
+    assert!(!lines.iter().any(|line| line.contains("stopped")));
+    assert_shows(&lines, "││No prompt waits");
+}
+
+#[test]
+fn should_hide_the_mute_while_the_queue_is_stopped() {
+    let (mut state, _) = state_with(vec![push()]);
+    state.show_mute(Some(UNIX_EPOCH + Duration::from_secs(RECEIVED + 5 + 3600)));
+    state.show_queue_stopped(true);
+    let lines = drawn_at_width(&state, 5, 100).0;
+    assert_shows(&lines, "└ queue stopped ─");
+    assert!(!lines.iter().any(|line| line.contains("muted")));
+}
+
+#[test]
+fn should_keep_the_waiting_prompts_in_the_list_while_the_queue_is_stopped() {
+    let (mut state, _) = state_with(vec![push()]);
+    state.show_queue_stopped(true);
+    let lines = screen(&state, 5);
+    assert_shows(&lines, "└ queue stopped ");
+    assert_shows(&lines, " approval-queue: 1 waiting ");
+    assert_shows(&lines, "│PERMISSION");
 }
 
 #[test]

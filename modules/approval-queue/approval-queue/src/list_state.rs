@@ -60,6 +60,7 @@ pub struct ListState {
     notice: Option<String>,
     pings_muted_until: Option<SystemTime>,
     sessions: Vec<ListedSession>,
+    queue_stopped: bool,
 }
 
 impl ListState {
@@ -253,6 +254,17 @@ impl ListState {
     #[must_use]
     pub fn pings_muted_until(&self) -> Option<SystemTime> {
         self.pings_muted_until
+    }
+
+    /// Takes whether the socket of the queue is gone, for the border of the
+    /// list and the empty pane.
+    pub fn show_queue_stopped(&mut self, stopped: bool) {
+        self.queue_stopped = stopped;
+    }
+
+    #[must_use]
+    pub fn queue_stopped(&self) -> bool {
+        self.queue_stopped
     }
 
     /// Takes the count of the lines that the selected entry has below its
